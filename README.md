@@ -5,6 +5,8 @@ A Julia interface for training and applying models in machine learning and stati
 
 &#x1F6A7;
 
+Hyperlinks in this README.md do not work.
+
 | Linux | Coverage |
 | :------------ | :------- |
 | [![Build Status](https://github.com/JuliaAI/MLInterface.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLInterface.jl/actions) | [![Coverage](https://codecov.io/gh/JuliaAI/MLInterface.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLInterface.jl?branch=master) |
@@ -16,6 +18,9 @@ based on experiences of developers of MLJ's [MLJModelInterface.jl]() which it wi
 eventually replace, but hopes to be useful more generally. The design is in a state of flux
 and comments (posted as issues) are welcome.
 
+To get an idea of the kinds of models we are aiming to indclude, see [Common Implementation
+Patterns](@ref) below.
+
 The interface makes wide use of traits to articulate model functionality. There is no
 abstract model type heirarchy. Model data type requirements can be articulated using
 [scientific types](https://github.com/JuliaAI/ScientificTypes.jl) but this is optional.
@@ -24,6 +29,8 @@ abstract model type heirarchy. Model data type requirements can be articulated u
 README.md for now:
 
 ---
+
+# Introduction
 
 Machine learning algorithms, sometimes called *models*, have a complicated taxonomy. In our
 experience, grouping algorithms into a relatively small number of types, such as
@@ -63,7 +70,7 @@ MLInterface.jl, which is lightweight (and has no reference to machines).
 
 !!! important
 
-    This introductory section introduces terminology essential in the sequel.
+	This introductory section introduces terminology essential in the sequel.
 
 We begin by describing an implementation of the ML Model Interface for a naive
 zero-intercept ridge regression algorithm (training is one line of Julia) to introduce the
@@ -82,7 +89,7 @@ Next, we define a struct to store the single hyper-parameter `lambda` of this mo
 
 ```julia
 struct MyRidge <: MLInterface.Model
-    lambda::Float64
+	lambda::Float64
 end
 ```
 
@@ -107,27 +114,27 @@ A ridge regressor requires two types of data for training: **input features** `X
 ```julia
 function MLInterface.fit(model::MyRidge, verbosity, X, y)
 
-    # process input:
-    x = Tables.matrix(X)  # convert table to matrix
-    features = Tables.columnnames(X)
+	# process input:
+	x = Tables.matrix(X)  # convert table to matrix
+	features = Tables.columnnames(X)
 
-    # core solver:
-    coefficients = (x'x + model.lambda*I)\(x'y)
+	# core solver:
+	coefficients = (x'x + model.lambda*I)\(x'y)
 
-    # prepare output - learned parameters:
-    fitresult = (; coefficients)
+	# prepare output - learned parameters:
+	fitresult = (; coefficients)
 
-    # prepare output - model state:
-    state = nothing  # only relevant for models also implementing an `update` method
+	# prepare output - model state:
+	state = nothing  # only relevant for models also implementing an `update` method
 
-    # prepare output - byproducts of training:
-    feature_importances =
-        [features[j] => abs(coefficients[j]) for j in eachindex(features)]
-    sort!(feature_importances, by=last) |> reverse!
-    verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
-    report = (; feature_importances)
+	# prepare output - byproducts of training:
+	feature_importances =
+		[features[j] => abs(coefficients[j]) for j in eachindex(features)]
+	sort!(feature_importances, by=last) |> reverse!
+	verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
+	report = (; feature_importances)
 
-    return fitresult, state, report
+	return fitresult, state, report
 end
 ```
 
@@ -161,7 +168,7 @@ we can implement for `MyRidge`:
 MLInterface.feature_importances(::MyRidge, fitresult, report) = report.feature_importances
 ```
 
-Another example of an accessor function is `training_losses`. 
+Another example of an accessor function is `training_losses`.
 
 Now the data argument `Xnew` of `predict` has the same type as the *first* argument `X`
 encountered in `fit`, while `predict` returns an object with the type of the *second* data
@@ -190,14 +197,23 @@ MLInterface.prediction_type(::Type{<:MyRidge}) = :point
 Such a declaration is required by any model implementing a `predict` method. Other options
 here include `:pdf`, `:interval` and `:sampleable`.
 
+As explained in the introduction, the ML Model Interface does not attempt to define strict
+model types, such as "regressor" or "clusterer". Nevertheless, we can optionally specify keywords suggesting how it might be categorized:
+
+```julia
+MLJInterface.keywords(::Type{<:MyRidge}) = [:regression,]
+```
+
+Do `MLInterface.keywords()` to get a list of available keywords. 
+
 Finally, we are required to declare what methods (excluding traits) we have explicitly
 overloaded for our type:
 
 ```julia
 MLInterface.implemented_methods(::Type{<:MyRidge}) = [
-    :fit, 
-    :predict,
-    :feature_importances,
+	:fit,
+	:predict,
+	:feature_importances,
 ]
 ```
 
@@ -241,9 +257,9 @@ elements.
 
 !!! warning
 
-    This section is only an implementation guide. The definitive specification of the 
+	This section is only an implementation guide. The definitive specification of the
 	ML Model Interface is given in [Reference](@ref).
-	
+
 This guide is intended to be consulted after reading [Anatomy of a Model
 Implementation](@ref), which introduces the main interface objects and terminology.
 
@@ -301,8 +317,8 @@ Any instance of `SomeModel` below is a model in the above sense:
 
 ```julia
 struct SomeModel{T<:Real} <: MLInterface.Model
-        epochs::Int
-        lambda::T
+		epochs::Int
+		lambda::T
 end
 ```
 
@@ -319,14 +335,13 @@ Model functionality is created and dilineated by implementing `fit`, one or more
 *operations*, optional **accessor functions**, and some number of **model traits**. Examples
 of these methods are given in [Anatomy of an Interface](@ref)).
 
-- [The fit Method](@ref): required by all models that "learn" (generalize to new data)
+- [The fit, update, and update_data Methods](@ref): for models that "learn" (generalize to
+  new data)
 
 - [Operations](@ref): `predict`, `transform` and their relatives
 
 - [Accessor Functions](@ref): accessing byproducts of training shared by some models, such
   as feature importances and training losses
- 
+
 - [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I
   predict probability distributions"
-
-
