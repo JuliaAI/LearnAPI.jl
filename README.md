@@ -244,8 +244,8 @@ elements.
     This section is only an implementation guide. The definitive specification of the 
 	ML Model Interface is given in [Reference](@ref).
 	
-This guide is intended to consulted after reading [Anatomy of a Model Implementation](@ref),
-which introduces the main interface objects and terminology. 
+This guide is intended to be consulted after reading [Anatomy of a Model
+Implementation](@ref), which introduces the main interface objects and terminology.
 
 Although an implementation is defined purely by the methods and traits it implements, most
 implementations fall into one of the following informally understood algorithm "types":
@@ -312,9 +312,12 @@ instead a `mutable struct`, then there is no need to explicitly overload `Base.=
 > **MLJ only.** The subtyping also ensures instances will be displayed according to a
 > standard MLJ convention, assuming MLJ or MLJBase are loaded.
 
-Model functionality is created and dilineated by implementing `fit`, operations, accessor
-functions, and traits. Examples of these methods are given in [Anatomy of an
-Interface](@ref)).
+
+## Methods
+
+Model functionality is created and dilineated by implementing `fit`, one or more
+*operations*, optional **accessor functions**, and some number of **model traits**. Examples
+of these methods are given in [Anatomy of an Interface](@ref)).
 
 - [The fit Method](@ref): required by all models that "learn" (generalize to new data)
 
@@ -323,6 +326,7 @@ Interface](@ref)).
 - [Accessor Functions](@ref): accessing byproducts of training shared by some models, such
   as feature importances and training losses
  
-- [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I predict probability distributions"
+- [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I
+  predict probability distributions"
 
 
