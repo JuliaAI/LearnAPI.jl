@@ -31,11 +31,12 @@ experience, grouping algorithms into a relatively small number of types, such as
 is overly limiting. Accordingly, the behaviour of a model implementing the **ML Model
 Interface** documented here is articulated using traits - methods dispatched on the model
 type, such as `is_supervised(model::SomeModel) = true` and
-`prediction_type(model::SomeModel) = :probabilistic`. Although designed to support
-[MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/)'s "machine" interface for user
-interaction, the interface described here is a general purpose, standalone API for machine
-learning algorithms, implemented by extending methods in the lightweight package
-[MLModelInterface.jl](TODO), which has no reference to machines.
+`prediction_type(model::SomeModel) = :probabilistic`.
+
+Although designed to support [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/)'s
+"machine" interface for user interaction, the interface described here is a general purpose,
+standalone API for machine learning algorithms, implemented by extending methods in
+MLInterface.jl, which is lightweight (and has no reference to machines).
 
 The preceding observations notwithstanding, a new implementation of the ML Model Interface
 will often fall into one of the [Common Implementation Patterns](@ref) described first. The
@@ -55,17 +56,19 @@ definitive specification of the interface is provided in the [Reference](@ref) s
 
 > **Summmary.** A **model** is just a container for hyper-parameters. A basic implementation
 > for a ridge regressor requires implementing `fit` and `predict` methods dispatched on the
-> model type; and it needs traits to flag the model as supervised, and its predictions as
-> deterministic (non-probabilistic). Optional traits articulate the model's data type
-> requirements.
+> model type; `predict` is an example of an **operation**; another is `transform`. In this
+> exaple we can also implement an **accessor function** called `feature_importance`
+> (returning the absolute values of the linear coefficients). Finally, we need trait
+> declarations to flag the model as supervised, and that its predictions as deterministic
+> (non-probabilistic). Optional traits articulate the model's data type requirements.
 
 !!! important
 
     This introductory section introduces terminology essential in the sequel.
 
 We begin by describing an implementation of the ML Model Interface for a naive
-zero-intercept ridge regression algorithm, to introduce the main actors in any
-implementation.
+zero-intercept ridge regression algorithm (training is one line of Julia) to introduce the
+main actors in any implementation.
 
 The first line below imports the lightweight package MLInterface.jl whose methods we
 will be extending:
@@ -79,12 +82,12 @@ using LinearAlgebra
 Next, we define a struct to store the single hyper-parameter `lambda` of this model:
 
 ```julia
-struct MyRidge 
+struct MyRidge
     lambda::Float64
 end
 ```
 
-Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**. 
+Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
 > **MLJ Only.** To ensure that `MyRidge` instances are displayed using MLJ's standard, add the
 > optional subtyping `MyRidge <: MLInterface.Model`.
@@ -95,38 +98,42 @@ A keyword argument constructor providing default hyper-parameters is strongly re
 MyRidge(; lambda=0.1) = MyRidge(lambda)
 ```
 
-A ridge regressor requires two types of data for training: **input features** `X` and
-a **target** `y`. Training is implemented with the following `fit` method:
+A ridge regressor requires two types of data for training: **input features** `X` and a
+**target** `y`. Training is implemented by overloading `fit`; here `verbosity` is an integer
+(`0` should train silently, unless warnings are needed):
 
 ```julia
 function MLInterface.fit(model::MyRidge, verbosity, X, y)
 
-	# process input:
+    # process input:
     x = Tables.matrix(X)  # convert table to matrix
-	
-	# core solver:
+    features = Tables.columnnames(X)
+
+    # core solver:
     coefficients = (x'x + model.lambda*I)\(x'y)
 
     # prepare output - learned parameters:
-	features = Tables.columnnames(x)
-	fitresult = (; coefficients, features)
-	
-	# prepare output - model state:
+    fitresult = (; coefficients)
+
+    # prepare output - model state:
     state = nothing  # only relevant for models also implementing an `update` method
-    
-	# prepare output - byproducts of training:
-	feature_importances = [features[j] => abs(coefficients[j] for j in eachindex(features)]
-	sort!(feature_importances, by=last)
-	verbosity > 1 && @info "Features in order of importance: $(keys(feature_importances))"
-    report = (; importances)
+
+    # prepare output - byproducts of training:
+    feature_importances =
+        [features[j] => abs(coefficients[j]) for j in eachindex(features)]
+    sort!(feature_importances, by=last) |> reverse!
+    verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
+    report = (; feature_importances)
 
     return fitresult, state, report
 end
 ```
 
-The `state` variable is only relevant when additionally implementing an [`update`](@ref)
-method, which is for updating learned parameters after a change in hyper-parameters (e.g.,
-an increase in a iteration parameter) or because of additional data (incremental learning).
+The `fitresult` is for the model's learned parameters. The `state` variable is only relevant
+when additionally implementing an [`update`](@ref) method, which is for updating learned
+parameters after a change in hyper-parameters (e.g., an increase in a iteration parameter)
+or because of additional data (incremental learning). The `report` is for other byproducts
+of training in which a user may be interested in.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
 observations); we suppose `y` is a `Real` vector. This is typical of MLJ implementations.
@@ -134,13 +141,21 @@ observations); we suppose `y` is a `Real` vector. This is typical of MLJ impleme
 Now we need a method for predicting the target on new input features:
 
 ```julia
-MLInterface.predict(::MyRidge, fitresult, Xnew) = Tables.matrix(Xnew)*fitresult
+MLInterface.predict(::MyRidge, fitresult, Xnew) = Tables.matrix(Xnew)*fitresult.coefficients
 ```
 
-The above `predict` method is an example of what here called an **operation**.
-operations include `transform` and `inverse_transform` and a model can implement more than
-one. For example, a K-means clustering model might implement a `transform` for dimension
-reduction, and a `predict` to return cluster labels. 
+The above `predict` method is an example of what here called an **operation**.  operations
+include `transform` and `inverse_transform` and a model can implement more than one. For
+example, a K-means clustering model might implement a `transform` for dimension reduction,
+and a `predict` to return cluster labels.
+
+The arguments of an operation are always `(model, fitresult, data...)`. The interface also
+provides more specialized **accessor functions** which inspect `fitresult` and `report` but
+doo not depend on data. There is one that applies in this case, `feature_importance`:
+
+```julia
+MLInterface.feature_importances(::MyRidge, fitresult, report) = report.feature_importances
+```
 
 Now the data argument `Xnew` of `predict` has the same type as the *first* argument `X`
 encountered in `fit`, while `predict` returns an object with the type of the *second* data
@@ -153,15 +168,14 @@ MLInterface.is_supervised(::Type{<:MyRidge}) = true
 ```
 
 This is an example of a **model trait** declaration. A complete list of traits and the
-contracts they imply is given in TODO. 
+contracts they imply is given in TODO.
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
 > recorded in the searchable MLJ Model Registry, assuming the implementation-providing
 > package is registered there.
 
-
-We add a trait declaration to distinguish our ridge regressor from other regressors that
-make *probabilistic* or *interval* predictions:
+We also add a trait declaration to distinguish our ridge regressor from other regressors
+that make *probabilistic* or *interval* predictions:
 
 ```julia
 MLInterface.prediction_type(::Type{<:MyRidge}) = :deterministic
@@ -169,6 +183,16 @@ MLInterface.prediction_type(::Type{<:MyRidge}) = :deterministic
 
 Such a declaration is required by any model implementing a `predict` method.
 
+Finally, we are required to declare what methods (excluding traits) we have explicitly
+overloaded for our type:
+
+```julia
+MLInterface.implemented_methods(::Type{<:MyRidge}) = [
+    :fit, 
+	:predict,
+	:feature_importances,
+]
+```
 
 ## Articulating data type requirements
 
@@ -199,16 +223,16 @@ meaning that it is an abstract vector with `<:AbstractFloat` elements.
 
 # Common Implementation Patterns
 
-!!! warning 
+!!! warning
 
-    This section is not a definitive specification of the ML Model Interface. 
-	See instead [Reference](@ref).
+    This section is not a definitive specification of the ML Model Interface.
+        See instead [Reference](@ref).
 
 
 # Reference
 
 This section is a detailed specification of the ML Model Interface. For a more
-informal discussion see [Common Implementation Patterns](@ref). 
+informal discussion see [Common Implementation Patterns](@ref).
 
 Strongly recommended prepartion is the section [Anatomy of a Model Implementation](@ref).
 
@@ -232,8 +256,8 @@ Any instance of `SomeModel` below is a model in the above sense:
 
 ```julia
 struct SomeModel{T<:Real} <: MLInterface.Model
-	epochs::Int
-	lambda::T
+        epochs::Int
+        lambda::T
 end
 ```
 
@@ -254,7 +278,3 @@ additional behaviour by implementing appropriate traits summarized in TODO.
 
 
 ## Summary of traits
-
-
-
-
