@@ -31,7 +31,7 @@ experience, grouping algorithms into a relatively small number of types, such as
 is overly limiting. Accordingly, the behaviour of a model implementing the **ML Model
 Interface** documented here is articulated using traits - methods dispatched on the model
 type, such as `is_supervised(model::SomeModel) = true` and
-`prediction_type(model::SomeModel) = :probabilistic`.
+`prediction_type(model::SomeModel) = :pdf`.
 
 The preceding observations notwithstanding, a new implementation of the ML Model Interface
 will often fall into one of the [Common Implementation Patterns](@ref) described first. The
@@ -58,7 +58,7 @@ MLInterface.jl, which is lightweight (and has no reference to machines).
 > model type; `predict` is an example of an **operation**; another is `transform`. In this
 > exaple we can also implement an **accessor function** called `feature_importance`
 > (returning the absolute values of the linear coefficients). Finally, we need trait
-> declarations to flag the model as supervised, and that its predictions as deterministic
+> declarations to flag the model as supervised, and that its predictions are deterministic
 > (non-probabilistic). Optional traits articulate the model's data type requirements.
 
 !!! important
@@ -86,7 +86,7 @@ struct MyRidge <: MLInterface.Model
 end
 ```
 
-*The subtyping  `MyRidge <: MLInterface.Model` is optional* but recommended.
+*The subtyping  `MyRidge <: MLInterface.Model` is optional* but recommended; see TODO.
 
 > **MLJ Only.** Include the typing to ensure that `MyRidge` instances are displayed using
 > MLJ's standard when MLJBase or MLJ is loaded.
@@ -181,13 +181,14 @@ contracts they imply is given in TODO.
 > package is registered there.
 
 We also add a trait declaration to distinguish our ridge regressor from other regressors
-that make *probabilistic* or *interval* predictions:
+that make probabilistic or other kinds of predictions.
 
 ```julia
-MLInterface.prediction_type(::Type{<:MyRidge}) = :deterministic
+MLInterface.prediction_type(::Type{<:MyRidge}) = :point
 ```
 
-Such a declaration is required by any model implementing a `predict` method.
+Such a declaration is required by any model implementing a `predict` method. Other options
+here include `:pdf`, `:interval` and `:sampleable`.
 
 Finally, we are required to declare what methods (excluding traits) we have explicitly
 overloaded for our type:
@@ -203,15 +204,15 @@ MLInterface.implemented_methods(::Type{<:MyRidge}) = [
 ## Articulating data type requirements
 
 Optional trait declarations articulate the permitted types for training data. To be precise,
-an implementation declares [scientific type](https://github.com/JuliaAI/ScientificTypes.jl),
-which in this case would look like:
+an implementation the declares [scientific
+type](https://github.com/JuliaAI/ScientificTypes.jl), which in this case would look like:
 
 ```julia
 using ScientificTypesBase
 fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
 ```
 
-This is a contract that `data` is acceptable input to ` in `fit(model, verbosity, data...)`
+This is a contract that `data` is acceptable in the call `fit(model, verbosity, data...)`
 whenever
 
 ```julia
@@ -240,16 +241,45 @@ elements.
 
 !!! warning
 
-    This section is not a definitive specification of the ML Model Interface.
-        See instead [Reference](@ref).
+    This section is only an implementation guide. The definitive specification of the 
+	ML Model Interface is given in [Reference](@ref).
+	
+This guide is intended to consulted after reading [Anatomy of a Model Implementation](@ref),
+which introduces the main interface objects and terminology. 
+
+Although an implementation is defined purely by the methods and traits it implements, most
+implementations fall into one of the following informally understood algorithm "types":
+
+- [Classifiers](@ref): Supervised learners for categorical targets
+
+- [Regressors](@ref): Supervised learners for continuous targets
+
+- [Static Transformers](@ref): Transformations that do not learn but which have
+  hyper-parameters and/or deliver ancilliary information about the transformation
+
+- [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
+
+
+- [Clusterering](@ref): Algorithms that group data into clusters for classification and
+  possibly dimension reduction. May be true learners (generalize to new data) or static.
+
+- [Outlier Detection](@ref): Supervised, unsupervised, or semi-supervised learners for
+  anomaly detection.
+
+- [Learning a Probability Distribution](@ref): Models that fit a distribution or
+  distribution-like object to data
+
+- [Time Series Forecasting](@ref)
+
+- [Time Series Classifiction](@ref)
+
+- [Bayesian Supervised Models](@ref)
 
 
 # Reference
 
-This section is a detailed specification of the ML Model Interface. For a more
-informal discussion see [Common Implementation Patterns](@ref).
-
-Strongly recommended prepartion is the section [Anatomy of a Model Implementation](@ref).
+Here we give the definitive specification of the ML Model Interface. For a more informal
+guide see [Common Implementation Patterns](@ref).
 
 
 ## Models
@@ -282,14 +312,17 @@ instead a `mutable struct`, then there is no need to explicitly overload `Base.=
 > **MLJ only.** The subtyping also ensures instances will be displayed according to a
 > standard MLJ convention, assuming MLJ or MLJBase are loaded.
 
-To be useful, models must be wrapped in some functionality, which is achieved by overloading
-methods defined in MLInterface.jl, as described in the following sections below. The ML
-Model Interface does not define an abstract model type heirarchy; rather one guarantees
-additional behaviour by implementing appropriate traits summarized in TODO.
+Model functionality is created and dilineated by implementing `fit`, operations, accessor
+functions, and traits. Examples of these methods are given in [Anatomy of an
+Interface](@ref)).
+
+- [The fit Method](@ref): required by all models that "learn" (generalize to new data)
+
+- [Operations](@ref): `predict`, `transform` and their relatives
+
+- [Accessor Functions](@ref): accessing byproducts of training shared by some models, such
+  as feature importances and training losses
+ 
+- [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I predict probability distributions"
 
 
-## The `fit` method
-
-
-
-## Summary of traits
