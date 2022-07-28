@@ -154,7 +154,7 @@ K-means clustering model might implement a `transform` for dimension reduction, 
 
 The arguments of an operation are always `(model, fitresult, data...)`. The interface also
 provides **accessor functions** for extracting information from the `fitresult` and/or
-`report` that a large class of model might share.  There is one for feature importances that
+`report` that is shared by several model types.  There is one for feature importances that
 we can implement for `MyRidge`:
 
 ```julia
