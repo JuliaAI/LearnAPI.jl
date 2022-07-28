@@ -144,14 +144,14 @@ Now we need a method for predicting the target on new input features:
 MLInterface.predict(::MyRidge, fitresult, Xnew) = Tables.matrix(Xnew)*fitresult.coefficients
 ```
 
-The above `predict` method is an example of what here called an **operation**.  operations
-include `transform` and `inverse_transform` and a model can implement more than one. For
-example, a K-means clustering model might implement a `transform` for dimension reduction,
-and a `predict` to return cluster labels.
+The above `predict` method is an example of an **operation**. Other operations include
+`transform` and `inverse_transform` and a model can implement more than one. For example, a
+K-means clustering model might implement a `transform` for dimension reduction, and a
+`predict` to return cluster labels.
 
 The arguments of an operation are always `(model, fitresult, data...)`. The interface also
-provides more specialized **accessor functions** which inspect `fitresult` and `report` but
-doo not depend on data. There is one that applies in this case, `feature_importance`:
+provides more specialized **accessor functions** which are called on `fitresult` and
+`report`.  There is one that applies in this case, `feature_importance`:
 
 ```julia
 MLInterface.feature_importances(::MyRidge, fitresult, report) = report.feature_importances
@@ -189,30 +189,39 @@ overloaded for our type:
 ```julia
 MLInterface.implemented_methods(::Type{<:MyRidge}) = [
     :fit, 
-	:predict,
-	:feature_importances,
+    :predict,
+    :feature_importances,
 ]
 ```
 
 ## Articulating data type requirements
 
 Optional trait declarations articulate the permitted types for training data. To be precise,
-an implementation may declare a [scientific
-type](https://github.com/JuliaAI/ScientificTypes.jl) for this data. In the present case we
-can declare:
+an implementation declares [scientific type](https://github.com/JuliaAI/ScientificTypes.jl),
+which in this case would look like:
 
 ```julia
 using ScientificTypesBase
-MLInterface.input_scitype(::Type{<:MyRidge}) = Table(Continuous)
-MLInterface.target_scitpe(::Type{<:MyRegressor}) = AbstractVector{Continuous}
+fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
 ```
 
-The first declaration asserts that `X` in `fit(model, verbosity, X, y)` is acceptable
-provided `scitype(X) <: Table(Continuous)` - meaning that `X` is a Tables.jl compatible
-table whose columns have some `<:AbstractFloat` element type - and the same is true `Xnew`
-in `predict(model, fitresult, Xnew)`.  The second declaration asserts that `y` in
-`fit(model, verbosity, X, y)` is acceptable if `scitype(y) <: AbstractVector{Continuous}` -
-meaning that it is an abstract vector with `<:AbstractFloat` elements.
+This is a contract that `data` is acceptable input to ` in `fit(model, verbosity, data...)`
+whenever
+
+```julia
+scitype(data) <: Tuple{Table(Continuous), AbstractVector{Continuous}}
+```
+
+Or in other words:
+
+- `X` in `fit(model, verbosity, X, y)` is acceptable, provided `scitype(X) <:
+Table(Continuous)` - meaning that `X` is a Tables.jl compatible table whose columns have
+some `<:AbstractFloat` element type (and the same must be true `Xnew`
+in `predict(model, fitresult, Xnew)`).
+
+- `y` in `fit(model, verbosity, X, y)` is acceptable if `scitype(y) <:
+AbstractVector{Continuous}` - meaning that it is an abstract vector with `<:AbstractFloat`
+elements.
 
 > **MLJ only.** In MLJ these types are used to assist in model search (matching models to
 > data) and to issue informative warnings to users attempting to use invalid data.
