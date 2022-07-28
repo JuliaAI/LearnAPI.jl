@@ -93,10 +93,8 @@ struct MyRidge <: MLInterface.Model
 end
 ```
 
-*The subtyping  `MyRidge <: MLInterface.Model` is optional* but recommended; see TODO.
-
-> **MLJ Only.** Include the typing to ensure that `MyRidge` instances are displayed using
-> MLJ's standard when MLJBase or MLJ is loaded.
+The subtyping `MyRidge <: MLInterface.Model` is optional but recommended where it's not
+otherwise disruptive; see [Models](@ref) for details.
 
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
@@ -125,7 +123,7 @@ function MLInterface.fit(model::MyRidge, verbosity, X, y)
 	fitresult = (; coefficients)
 
 	# prepare output - model state:
-	state = nothing  # only relevant for models also implementing an `update` method
+	state = nothing  # not relevant here
 
 	# prepare output - byproducts of training:
 	feature_importances =
@@ -138,14 +136,17 @@ function MLInterface.fit(model::MyRidge, verbosity, X, y)
 end
 ```
 
-The `fitresult` is for the model's learned parameters. The `state` variable is only relevant
-when additionally implementing an [`update`](@ref) method, which is for updating learned
-parameters after a change in hyper-parameters (e.g., an increase in a iteration parameter)
-or because of additional data (incremental learning). The `report` is for other byproducts
-of training in which a user may be interested in.
+Regarding the return value of `fit`:
+
+- The `fitresult` is for the model's learned parameters, in any form.
+
+- The `state` variable is only relevant when additionally implementing an [`update`](@ref)
+  or [`ingest`](@ref) method; see TODO for details.
+  
+- The `report` is for other byproducts of training in which a user may be interested in.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
-observations); we suppose `y` is a `Real` vector. While this is typical of MLJ model
+observations); and we suppose `y` is a `Real` vector. While this is typical of MLJ model
 implementations, the ML Model Interface puts no restrictions on the form of `X` and `y`.
 
 Now we need a method for predicting the target on new input features:
