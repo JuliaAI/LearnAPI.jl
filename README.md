@@ -1,6 +1,6 @@
 # MLInterface.jl
 
-An Julia interface for training and applying models in machine learning and statistics
+A Julia interface for training and applying models in machine learning and statistics
 
 
 &#x1F6A7;
@@ -33,11 +33,6 @@ Interface** documented here is articulated using traits - methods dispatched on 
 type, such as `is_supervised(model::SomeModel) = true` and
 `prediction_type(model::SomeModel) = :probabilistic`.
 
-Although designed to support [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/)'s
-"machine" interface for user interaction, the interface described here is a general purpose,
-standalone API for machine learning algorithms, implemented by extending methods in
-MLInterface.jl, which is lightweight (and has no reference to machines).
-
 The preceding observations notwithstanding, a new implementation of the ML Model Interface
 will often fall into one of the [Common Implementation Patterns](@ref) described first. The
 definitive specification of the interface is provided in the [Reference](@ref) section.
@@ -50,6 +45,10 @@ definitive specification of the interface is provided in the [Reference](@ref) s
 
 - [Reference](@ref)
 
+Although designed to support [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/)'s
+"machine" interface for user interaction, the interface described here is a general purpose,
+standalone API for machine learning algorithms, implemented by extending methods in
+MLInterface.jl, which is lightweight (and has no reference to machines).
 
 
 # Anatomy of an Implementation
@@ -82,15 +81,18 @@ using LinearAlgebra
 Next, we define a struct to store the single hyper-parameter `lambda` of this model:
 
 ```julia
-struct MyRidge
+struct MyRidge <: MLInterface.Model
     lambda::Float64
 end
 ```
 
+*The subtyping  `MyRidge <: MLInterface.Model` is optional* but recommended.
+
+> **MLJ Only.** Include the typing to ensure that `MyRidge` instances are displayed using
+> MLJ's standard when MLJBase or MLJ is loaded.
+
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
-> **MLJ Only.** To ensure that `MyRidge` instances are displayed using MLJ's standard, add the
-> optional subtyping `MyRidge <: MLInterface.Model`.
 
 A keyword argument constructor providing default hyper-parameters is strongly recommended:
 
@@ -136,7 +138,8 @@ or because of additional data (incremental learning). The `report` is for other 
 of training in which a user may be interested in.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
-observations); we suppose `y` is a `Real` vector. This is typical of MLJ implementations.
+observations); we suppose `y` is a `Real` vector. While this is typical of MLJ model
+implementations, the ML Model Interface puts no restrictions on the form of `X` and `y`.
 
 Now we need a method for predicting the target on new input features:
 
@@ -150,12 +153,15 @@ K-means clustering model might implement a `transform` for dimension reduction, 
 `predict` to return cluster labels.
 
 The arguments of an operation are always `(model, fitresult, data...)`. The interface also
-provides more specialized **accessor functions** which are called on `fitresult` and
-`report`.  There is one that applies in this case, `feature_importance`:
+provides **accessor functions** for extracting information from the `fitresult` and/or
+`report` that a large class of model might share.  There is one for feature importances that
+we can implement for `MyRidge`:
 
 ```julia
 MLInterface.feature_importances(::MyRidge, fitresult, report) = report.feature_importances
 ```
+
+Another example of an accessor function is `training_losses`. 
 
 Now the data argument `Xnew` of `predict` has the same type as the *first* argument `X`
 encountered in `fit`, while `predict` returns an object with the type of the *second* data
