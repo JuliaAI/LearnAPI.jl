@@ -1,0 +1,7 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+MLInterface = "92ad9a40-7767-427a-9ee6-6e577f1266cb"
+
+[compat]
+Documenter = "^0.27"
+julia = "1"
