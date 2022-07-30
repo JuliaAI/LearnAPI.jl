@@ -168,7 +168,7 @@ MLInterface.implemented_methods(::Type{<:MyRidge}) = [
 
 Optional trait declarations articulate the permitted types for training data. To be precise,
 an implementation makes [scientific type](https://github.com/JuliaAI/ScientificTypes.jl)
-declarations, which in this case ook like:
+declarations, which in this case look like:
 
 ```julia
 using ScientificTypesBase
@@ -207,7 +207,7 @@ If `predict` had instead returned `Distributions.pdf`-accessible probability dis
 the declaration would be
 
 ```julia
-operation_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}}})
+operation_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}})
 ```
 
 ## Convenience macros
