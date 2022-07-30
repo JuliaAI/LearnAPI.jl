@@ -22,7 +22,17 @@ of compulsory traits and a larger number of optional ones.  There is a single ab
 type `Model`, but model types can implement the interface without subtyping this. There is
 no abstract model type hierarchy.
 
-The preceding observations notwithstanding, it is useful to have a guide to the interface
+The ML Model Interface provides methods for training and applying machine learning models,
+and that is all. It does distinguish between data that comes in a number of "observations"
+(such as features and target variables for a classical supervised learning) and other
+"metadata" that is non-observational, such as target class weights or group lasso feature
+groupings. However, no assumptions are made about how observations are organized or
+accessed, which is relevant to resampling, and so ultimately, model optimization. At time of
+writing, two promising general data container interfaces for machine learning are provided
+by [Tables.jl](https://github.com/JuliaData/Tables.jl) and
+[MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
+
+Our earlier observations notwithstanding, it is useful to have a guide to the interface
 organized around common informally defined patterns; the definitive specification of the
 interface is provided in the [Reference](@ref) section:
 

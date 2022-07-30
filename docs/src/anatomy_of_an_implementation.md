@@ -144,8 +144,8 @@ contracts they imply is given in TODO.
 > package is registered there.
 
 As explained in the introduction, the ML Model Interface does not attempt to define strict
-model "types", such as "regressor" or "clusterer". Nevertheless, we can specify suggestive
-non-binding keywords:
+model "types", such as "regressor" or "clusterer". Nevertheless, we can optionally specify
+suggestive non-binding keywords:
 
 ```julia
 MLJInterface.keywords(::Type{<:MyRidge}) = [:regression,]
@@ -172,7 +172,7 @@ declarations, which in this case look like:
 
 ```julia
 using ScientificTypesBase
-fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
+MLInterface.fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
 ```
 
 This is a contract that `data` is acceptable in the call `fit(model, verbosity, data...)`
@@ -194,20 +194,24 @@ Or, in other words:
   elements.
 
 
-## Output data types
+## Operation data types
 
-An operation, such as `predict` returns an object whose scientific type is articulated in
-this way:
+A promise that an operation, such as `predict`, returns an object of given scientific type is articulated in this way:
 
 ```julia
-operation_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{<:Continuous})
+MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{<:Continuous})
 ```
 
 If `predict` had instead returned `Distributions.pdf`-accessible probability distributions,
 the declaration would be
 
 ```julia
-operation_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}})
+MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}})
 ```
+
+There is also an `input_scitypes` trait for operations. However, this falls back to the
+scitype for the first argument of `fit`, as inferred from `fit_data_scitype` (see above). So
+we need not overload it here.
+
 
 ## Convenience macros
