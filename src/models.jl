@@ -35,7 +35,7 @@ documentation. In particular, this means:
 
 # New ML Model Implementations
 
-Either declare `NewModelType <: MLInterface.Model` or `MLInterface.model(::SomeModelType) =
+Either declare `NewModelType <: MLInterface.Model` or `MLInterface.model(::NewModelType) =
 true`.
 
 See also [`MLInterface.Model`].

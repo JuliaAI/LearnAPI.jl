@@ -11,9 +11,9 @@ A Julia interface for training and applying models in machine learning and stati
 
 Machine learning algorithms, also called *models*, have a complicated taxonomy. Grouping
 models into a relatively small number of types, such as "classifier" and "clusterer", and
-attempting to impose uniform behaviour within each group, is a problematic approach. It
-either leads to limitations on the models that can be included in a general interface, or to
-undesirable complexity needed to cope with exceptional cases.
+attempting to impose uniform behaviour within each group, is problematic. It either leads to
+limitations on the models that can be included in a general interface, or to undesirable
+complexity needed to cope with exceptional cases.
 
 For these and other reasons, the behaviour of a model implementing the **ML Model
 Interface** documented here is articulated using traits - methods dispatched on
@@ -24,17 +24,17 @@ no abstract model type hierarchy.
 
 The ML Model Interface provides methods for training and applying machine learning models,
 and that is all. It does distinguish between data that comes in a number of "observations"
-(such as features and target variables for a classical supervised learning) and other
+(such as features and target variables for a classical supervised learning model) and other
 "metadata" that is non-observational, such as target class weights or group lasso feature
 groupings. However, no assumptions are made about how observations are organized or
-accessed, which is relevant to resampling, and so ultimately, model optimization. At time of
-writing, two promising general data container interfaces for machine learning are provided
-by [Tables.jl](https://github.com/JuliaData/Tables.jl) and
+accessed, which is relevant to resampling, and so ultimately, for model optimization. At
+time of writing, two promising general data container interfaces for machine learning are
+provided by [Tables.jl](https://github.com/JuliaData/Tables.jl) and
 [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
 
 Our earlier observations notwithstanding, it is useful to have a guide to the interface
-organized around common informally defined patterns; the definitive specification of the
-interface is provided in the [Reference](@ref) section:
+organized around common *informally defined* patterns; however, the definitive specification
+of the interface is provided in the [Reference](@ref) section:
 
 - Overview: [Anatomy of an Implementation](@ref)
 

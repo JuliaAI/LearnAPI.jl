@@ -186,8 +186,7 @@ Or, in other words:
 
 - `X` in `fit(model, verbosity, X, y)` is acceptable, provided `scitype(X) <:
   Table(Continuous)` - meaning that `X` is a Tables.jl compatible table whose columns have
-  some `<:AbstractFloat` element type (and the same must be true `Xnew` in `predict(model,
-  fitresult, Xnew)`).
+  some `<:AbstractFloat` element type.
 
 - `y` in `fit(model, verbosity, X, y)` is acceptable if `scitype(y) <:
   AbstractVector{Continuous}` - meaning that it is an abstract vector with `<:AbstractFloat`
