@@ -15,30 +15,29 @@ attempting to impose uniform behaviour within each group, is problematic. It eit
 limitations on the models that can be included in a general interface, or to undesirable
 complexity needed to cope with exceptional cases.
 
-For these and other reasons, the behaviour of a model implementing the **ML Model
-Interface** documented here is articulated using traits - methods dispatched on
-the model type, such as `is_supervised(model::SomeModel) = true`. There are a small number
-of compulsory traits and a larger number of optional ones.  There is a single abstract model
-type `Model`, but model types can implement the interface without subtyping this. There is
-no abstract model type hierarchy.
+For these and other reasons, the **ML Model Interface** documented here is purely functional
+with no abstract model types (apart an optional supertype `Model`). In addition to `fit`,
+`update!` and `ingest!` methods (all optional), one implements one or more operations, such
+as `predict`, `transform` and `inverse_transform`. Method stubs for access functions, such
+as `feature_importances`, are also provided. Finally, a number of optional trait
+declarations, such as `is_supervised(model::SomeModel) = true`, make promises of specific
+behaviour.
 
-The ML Model Interface provides methods for training and applying machine learning models,
-and that is all. It does distinguish between data that comes in a number of "observations"
-(such as features and target variables for a classical supervised learning model) and other
-"metadata" that is non-observational, such as target class weights or group lasso feature
-groupings. However, no assumptions are made about how observations are organized or
-accessed, which is relevant to resampling, and so ultimately, for model optimization. At
-time of writing, two promising general data container interfaces for machine learning are
-provided by [Tables.jl](https://github.com/JuliaData/Tables.jl) and
-[MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
+The ML Model Interface provides methods for training, applying, and saving machine learning
+models, and that is all. It does not provide an interface for data resampling, although it
+informally distinguishes between training data consisting of "observations", and other
+"metadata", such as target class weights or group lasso feature gropings. At present the
+only restriction on data containers concerns the target predictions of supervised models
+(whether deterministic, probabilistic or otherwise): These must be abstract arrays or tables
+compatible with [Tables.jl](https://github.com/JuliaData/Tables.jl).
 
-Our earlier observations notwithstanding, it is useful to have a guide to the interface
-organized around common *informally defined* patterns; however, the definitive specification
-of the interface is provided in the [Reference](@ref) section:
+Our opening observations notwithstanding, it is useful to have a guide to the interface,
+linked below, organized around common *informally defined* patterns. However, the definitive
+specification of the interface is the [Reference](@ref) section.
 
-- Overview: [Anatomy of an Implementation](@ref)
+- [Anatomy of an Implementation](@ref) (Overview)
 
-- User Guide: [Common Implementation Patterns](@ref)
+- [Common Implementation Patterns](@ref) (User Guide)
 
 - [Reference](@ref)
 
@@ -50,9 +49,9 @@ of the interface is provided in the [Reference](@ref) section:
 	consulting the guide or reference sections.
 
 
-**Note.** The ML Model Interface provides a foundation for the
-[MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/)'s "machine" interface for user
-interaction. However it is a general purpose, standalone, lightweight API for machine
-learning algorithms (and has no reference to machines).
-
-
+**Note.** The ML Model Interface provides a foundation for the higher level "machine"
+interface for user interaction in the toolbox
+[MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) created by the same
+developers. However, the ML Model Interface provided here is meant as a general purpose,
+standalone, lightweight API for machine learning algorithms (and has no reference to
+machines).

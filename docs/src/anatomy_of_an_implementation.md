@@ -65,7 +65,7 @@ function MLInterface.fit(model::MyRidge, verbosity, X, y)
 	coefficients = (x'x + model.lambda*I)\(x'y)
 
 	# prepare output - learned parameters:
-	fitresult = (; coefficients)
+	fitted_params = (; coefficients)
 
 	# prepare output - model state:
 	state = nothing  # not relevant here
@@ -77,13 +77,13 @@ function MLInterface.fit(model::MyRidge, verbosity, X, y)
 	verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
 	report = (; feature_importances)
 
-	return fitresult, state, report
+	return fitted_params, state, report
 end
 ```
 
 Regarding the return value of `fit`:
 
-- The `fitresult` is for the model's learned parameters, in any form, for passing to
+- The `fitted_params` is for the model's learned parameters, in any form, for passing to
   `predict` (see below).
 
 - The `state` variable is only relevant when additionally implementing an [`update`](@ref)
@@ -101,7 +101,7 @@ implementations, the ML Model Interface puts no restrictions on the form of `X` 
 Now we need a method for predicting the target on new input features:
 
 ```julia
-MLInterface.predict(::MyRidge, fitresult, Xnew) = Tables.matrix(Xnew)*fitresult.coefficients
+MLInterface.predict(::MyRidge, fitted_params, Xnew) = Tables.matrix(Xnew)*fitted_params.coefficients
 ```
 
 The above `predict` method is an example of an **operation**. Other operations include
@@ -112,13 +112,13 @@ K-means clustering model might implement a `transform` for dimension reduction, 
 
 ## Accessor functions
 
-The arguments of an operation are always `(model, fitresult, data...)`. The interface also
-provides **accessor functions** for extracting information from the `fitresult` and/or
+The arguments of an operation are always `(model, fitted_params, data...)`. The interface also
+provides **accessor functions** for extracting information from the `fitted_params` and/or
 `report` that is shared by several model types.  There is one for feature importances that
 we can implement for `MyRidge`:
 
 ```julia
-MLInterface.feature_importances(::MyRidge, fitresult, report) = report.feature_importances
+MLInterface.feature_importances(::MyRidge, fitted_params, report) = report.feature_importances
 ```
 
 Another example of an accessor function is `training_losses`.
@@ -126,32 +126,40 @@ Another example of an accessor function is `training_losses`.
 
 ## Model traits
 
-Now the data argument `Xnew` of `predict` has the same type as the *first* argument `X`
-encountered in `fit`, while `predict` returns an object with the type of the *second* data
-argument `y` of `fit`. It therefore makes sense, for example, to apply a suitable metric
-(e.g., a sum of squares) to the pair `(ŷ, y)`, where `ŷ = predict(model, fitresult, X)`. We
-will flag this behavior by declaring
+In this supervised learning example, `predict` returns an object with the same type of the
+*second* data argument `y` of `fit` (the target). It therefore makes sense, for example, to
+apply a suitable metric (e.g., a sum of squares) to the pair `(ŷ, y)`, where `ŷ =
+predict(model, fitted_params, X)`. We will flag this behavior by declaring
 
 ```julia
 MLInterface.is_supervised(::Type{<:MyRidge}) = true
 ```
 
 This is an example of a **model trait** declaration. A complete list of traits and the
-contracts they imply is given in TODO.
+contracts they imply is given in [`Model traits`](@ref).
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
 > recorded in the searchable MLJ Model Registry, assuming the implementation-providing
 > package is registered there.
 
+Since our model is supervised, we are required to implement an additional trait that
+distinguishes our model from other regressors that make probabilistic or other kinds of
+predictions of the target:
+
+```julia
+MLInterface.prediction_type(::Type{<:MyRidge}) = :deterministic
+```
+
 As explained in the introduction, the ML Model Interface does not attempt to define strict
-model "types", such as "regressor" or "clusterer". Nevertheless, we can optionally specify
-suggestive non-binding keywords:
+model "types", such as "regressor" or "clusterer". We can optionally specify
+suggestive keywords, as in
 
 ```julia
 MLJInterface.keywords(::Type{<:MyRidge}) = [:regression,]
 ```
 
-Do `MLInterface.keywords()` to get a list of available keywords.
+but note that this declaration promises nothing. Do `MLInterface.keywords()` to get a list
+of available keywords.
 
 Finally, we are required to declare what methods (excluding traits) we have explicitly
 overloaded for our type:
@@ -201,8 +209,8 @@ A promise that an operation, such as `predict`, returns an object of given scien
 MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{<:Continuous})
 ```
 
-If `predict` had instead returned `Distributions.pdf`-accessible probability distributions,
-the declaration would be
+If `predict` had instead returned probability distributions, and these implement the
+`Distributions.pdf` interface, then the declaration would be
 
 ```julia
 MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}})

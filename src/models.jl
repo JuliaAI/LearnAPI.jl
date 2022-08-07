@@ -38,7 +38,7 @@ documentation. In particular, this means:
 Either declare `NewModelType <: MLInterface.Model` or `MLInterface.model(::NewModelType) =
 true`.
 
-See also [`MLInterface.Model`].
+See also [`MLInterface.Model`](@ref).
 
 """
 ismodel(::Any) = false

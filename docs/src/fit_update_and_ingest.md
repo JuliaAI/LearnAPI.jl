@@ -6,14 +6,14 @@
 > retraining from scratch (e.g., iterative models). Implement `ingest!` to implement
 > incremental learning.
 
-| method                     | fallback                                           | compulsory? |
-|:---------------------------|:---------------------------------------------------|-------------|
-[`MLInterface.fit`](@ref)    | does nothing, returns `(nothing, nothing, nothing)`| no          |
-[`MLInterface.update!`](@ref) | calls `fit`                                        | no          |
-[`MLJInterface.ingest!`](@ref)| none                                               | no          |
+| method                     | fallback                                           | compulsory? | requires          |
+|:---------------------------|:---------------------------------------------------|-------------|-------------------|
+[`MLInterface.fit`](@ref)    | does nothing, returns `(nothing, nothing, nothing)`| no          |                   |
+[`MLInterface.update!`](@ref) | calls `fit`                                       | no          | `MLInterface.fit` |
+[`MLJInterface.ingest!`](@ref)| none                                              | no          | `MLInterfac.fit`  |
 
 Implement `fit` unless your model is **static**, meaning its [operations](@ref operations)
-such as `predict` and `transform`, ignore their `fitresult` argument (which will be
+such as `predict` and `transform`, ignore their `fitted_params` argument (which will be
 `nothing`). This is the case for models that have hyper-parameters, but do not generalize to
 new data, such as a basic DBSCAN clustering algorithm. Related:
 [`MLInterface.reporting_operations`](@ref), [Static Models](@ref).
@@ -37,7 +37,7 @@ MLInterface.ingest!
 
 ## Further guidance on what goes where
 
-Recall that the `fitresult` returned as part of `fit` represents everything needed by an
+Recall that the `fitted_params` returned as part of `fit` represents everything needed by an
 [operation](@ref operations), such as [`MLInterface.predict`](@ref). 
 
 The properties of your model (typically struct fields) are *hyperparameters*, i.e., those
