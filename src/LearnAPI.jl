@@ -1,4 +1,4 @@
-module MLInterface
+module LearnAPI
 
 using Statistics
 

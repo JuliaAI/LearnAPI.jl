@@ -8,37 +8,36 @@
 > model as supervised, and another to list the implemented methods. Optional traits
 > articulate the model's data type requirements and the output type of operations.
 
-We begin by describing an implementation of the ML Model Interface for basic ridge
+We begin by describing an implementation of the Learn API for basic ridge
 regression (no intercept) to introduce the main actors in any implementation.
 
 
 ## Defining a model type
 
-The first line below imports the lightweight package MLInterface.jl whose methods we will be
-extending, the second libraries needed for the core algorithm.
+The first line below imports the lightweight package LearnAPI.jl whose methods we will be
+extending, the second, libraries needed for the core algorithm.
 
 ```julia
-import MLInterface
+import LearnAPI
 using LinearAlgebra, Tables
 ```
 
 Next, we define a struct to store the single hyper-parameter `lambda` of this model:
 
 ```julia
-struct MyRidge <: MLInterface.Model
+struct MyRidge <: LearnAPI.Model
 	lambda::Float64
 end
 ```
 
-The subtyping `MyRidge <: MLInterface.Model` is optional but recommended where it is not
+The subtyping `MyRidge <: LearnAPI.Model` is optional but recommended where it is not
 otherwise disruptive. If you omit the subtyping then you must declare
 
 ```julia
-MLInterface.ismodel(::MyRidge) = true
+LearnAPI.ismodel(::MyRidge) = true
 ```
 
-as a promise that instances of `MyRidge` implement the compulsory elements of the ML Model
-Interface.
+as a promise that instances of `MyRidge` implement the Learn API.
 
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
@@ -55,7 +54,7 @@ A ridge regressor requires two types of data for training: **input features** `X
 (`0` should train silently, unless warnings are needed):
 
 ```julia
-function MLInterface.fit(model::MyRidge, verbosity, X, y)
+function LearnAPI.fit(model::MyRidge, verbosity, X, y)
 
 	# process input:
 	x = Tables.matrix(X)  # convert table to matrix
@@ -83,17 +82,17 @@ end
 
 Regarding the return value of `fit`:
 
-- The `fitted_params` is for the model's learned parameters, in any form, for passing to
+- The `fitted_params` is for the model's learned parameters, for passing to
   `predict` (see below).
 
-- The `state` variable is only relevant when additionally implementing an [`update`](@ref)
-  or [`ingest`](@ref) method (see [Fit, update and ingest](@ref)).
+- The `state` variable is only relevant when additionally implementing an [`update!`](@ref)
+  or [`ingest!`](@ref) method (see [Fit, update! and ingest!](@ref)).
 
 - The `report` is for other byproducts of training, excluding the learned parameters.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
 observations); and we suppose `y` is a `Real` vector. (While this is typical of MLJ model
-implementations, the ML Model Interface puts no restrictions on the form of `X` and `y`.)
+implementations, the Learn API puts no restrictions on the form of `X` and `y`.)
 
 
 ## Operations
@@ -101,7 +100,7 @@ implementations, the ML Model Interface puts no restrictions on the form of `X` 
 Now we need a method for predicting the target on new input features:
 
 ```julia
-MLInterface.predict(::MyRidge, fitted_params, Xnew) = Tables.matrix(Xnew)*fitted_params.coefficients
+LearnAPI.predict(::MyRidge, fitted_params, Xnew) = Tables.matrix(Xnew)*fitted_params.coefficients
 ```
 
 The above `predict` method is an example of an **operation**. Other operations include
@@ -118,10 +117,11 @@ provides **accessor functions** for extracting information from the `fitted_para
 we can implement for `MyRidge`:
 
 ```julia
-MLInterface.feature_importances(::MyRidge, fitted_params, report) = report.feature_importances
+LearnAPI.feature_importances(::MyRidge, fitted_params, report) = report.feature_importances
 ```
 
-Another example of an accessor function is `training_losses`.
+Another example of an accessor function is `training_losses` (supervised models) and
+`training_scores` (outlier detection models).
 
 
 ## Model traits
@@ -132,7 +132,7 @@ apply a suitable metric (e.g., a sum of squares) to the pair `(ŷ, y)`, where `
 predict(model, fitted_params, X)`. We will flag this behavior by declaring
 
 ```julia
-MLInterface.is_supervised(::Type{<:MyRidge}) = true
+LearnAPI.is_supervised(::Type{<:MyRidge}) = true
 ```
 
 This is an example of a **model trait** declaration. A complete list of traits and the
@@ -147,25 +147,30 @@ distinguishes our model from other regressors that make probabilistic or other k
 predictions of the target:
 
 ```julia
-MLInterface.prediction_type(::Type{<:MyRidge}) = :deterministic
+LearnAPI.paradigm(::Type{<:MyRidge}) = Dict(:predict => :point)
 ```
 
-As explained in the introduction, the ML Model Interface does not attempt to define strict
-model "types", such as "regressor" or "clusterer". We can optionally specify
-suggestive keywords, as in
+If instead, our `predict` method would return probabilistic predictions, we would instead
+return `Dict(:predict => :pdf)` or `Dict(:predict => :rand)`, depending on whether or not
+`predict` returns objects implementing `Distributions.pdf` from Distributions.jl, or merely
+`Base.rand`. Other options are `:interval` and `:survival_probability`.
+
+As explained in the introduction, the Learn API does not attempt to define strict
+model "types", such as "regressor" or "clusterer". We can optionally specify suggestive
+keywords, as in
 
 ```julia
 MLJInterface.keywords(::Type{<:MyRidge}) = [:regression,]
 ```
 
-but note that this declaration promises nothing. Do `MLInterface.keywords()` to get a list
+but note that this declaration promises nothing. Do `LearnAPI.keywords()` to get a list
 of available keywords.
 
 Finally, we are required to declare what methods (excluding traits) we have explicitly
 overloaded for our type:
 
 ```julia
-MLInterface.implemented_methods(::Type{<:MyRidge}) = [
+LearnAPI.implemented_methods(::Type{<:MyRidge}) = [
 	:fit,
 	:predict,
 	:feature_importances,
@@ -180,7 +185,7 @@ declarations, which in this case look like:
 
 ```julia
 using ScientificTypesBase
-MLInterface.fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
+LearnAPI.fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
 ```
 
 This is a contract that `data` is acceptable in the call `fit(model, verbosity, data...)`

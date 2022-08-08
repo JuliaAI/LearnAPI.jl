@@ -1,11 +1,11 @@
 # Reference
 
-Here we give the definitive specification of the ML Model Interface. For a more informal
+Here we give the definitive specification of the Learn API. For a more informal
 guide see [Common Implementation Patterns](@ref).
 
 ## Models
 
-> **Summary** In the ML Model Interface a **model** is a Julia object whose properties are
+> **Summary** In the Learn API a **model** is a Julia object whose properties are
 > the hyper-parameters of some learning algorithm. Functionality is created by overloading
 > methods defined by the interface and promises of certain behavior articulated by model
 > traits.
@@ -21,7 +21,7 @@ It is supposed that making copies of model objects is a cheap operation. Consequ
 *learned* parameters, such as coefficients in a linear model, or weights in a neural network
 (the `fitted_params` appearing in [Fit, update! and ingest!](@ref)) are not expected to be
 part of a model. Storing learned parameters in a model is not explicitly ruled out, but
-doing so might lead to performance issues in packages adopting the ML Model Interface.
+doing so might lead to performance issues in packages adopting the Learn API.
 
 Two models with the same type should be `==` if and only if all their hyper-parameters are
 `==`. Of course, a hyper-parameter could be another model.
@@ -29,17 +29,17 @@ Two models with the same type should be `==` if and only if all their hyper-para
 Any instance of `SomeType` below is a model in the above sense:
 
 ```julia
-struct SomeType{T<:Real} <: MLInterface.Model
+struct SomeType{T<:Real} <: LearnAPI.Model
     epochs::Int
     lambda::T
 end
 ```
 
-The subtyping `<: MLInterface.Model` is optional. If it is included and the type is instead
+The subtyping `<: LearnAPI.Model` is optional. If it is included and the type is instead
 a `mutable struct`, then there is no need to explicitly overload `Base.==`. If it is
 omitted, then one must make the declaration
 
-`MLInterface.ismodel(::SomeType) = true`
+`LearnAPI.ismodel(::SomeType) = true`
 
 and overload `Base.==` in the mutable case. 
 
@@ -47,8 +47,8 @@ and overload `Base.==` in the mutable case.
 > standard MLJ convention, assuming MLJ or MLJBase are loaded.
 
 ```@docs
-MLInterface.ismodel
-MLInterface.Model
+LearnAPI.ismodel
+LearnAPI.Model
 ```
 
 ## Data containers

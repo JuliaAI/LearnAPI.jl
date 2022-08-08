@@ -1,10 +1,10 @@
 using Documenter
-using MLInterface
+using LearnAPI
 
-const REPO="github.com/JuliaAI/MLInterface.jl"
+const REPO="github.com/JuliaAI/LearnAPI.jl"
 
 makedocs(;
-    modules=[MLInterface],
+    modules=[LearnAPI],
     format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     pages=[
         "Introduction" => "index.md",
@@ -13,9 +13,10 @@ makedocs(;
         "Reference" => "reference.md",
         "Fit, update and ingest" => "fit_update_and_ingest.md",
         "Predict and other operations" => "operations.md",
+        "Model Traits" => "model_traits.md",
     ],
     repo="https://$REPO/blob/{commit}{path}#L{line}",
-    sitename="MLInterface.jl"
+    sitename="LearnAPI.jl"
 )
 
 deploydocs(

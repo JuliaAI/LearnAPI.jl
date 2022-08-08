@@ -2,17 +2,17 @@ abstract type MLType end
 
 
 """
-    MLInterface.Model
+    LearnAPI.Model
 
 An optional abstract type for models in the ML Model Interface.
 
 # New ML Model Implementations
 
-Either declare `NewModelType <: MLInterface.Model` or `MLInterface.model(::SomeModelType) =
+Either declare `NewModelType <: LearnAPI.Model` or `LearnAPI.model(::SomeModelType) =
 true`. The first implies the second and additionally guarantees `==` has correct behaviour
 for `NewModelType` instances.
 
-See also [`MLInterface.ismodel`](@ref).
+See also [`LearnAPI.ismodel`](@ref).
 
 """
 abstract type Model <: MLType end
@@ -30,15 +30,15 @@ documentation. In particular, this means:
   corresponding properties are `==`.
 
 - `m` correctly implements methods from the ML Model Interface. See the documentation for
-  MLInterface for details.
+  LearnAPI for details.
 
 
 # New ML Model Implementations
 
-Either declare `NewModelType <: MLInterface.Model` or `MLInterface.model(::NewModelType) =
+Either declare `NewModelType <: LearnAPI.Model` or `LearnAPI.model(::NewModelType) =
 true`.
 
-See also [`MLInterface.Model`](@ref).
+See also [`LearnAPI.Model`](@ref).
 
 """
 ismodel(::Any) = false

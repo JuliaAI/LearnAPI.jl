@@ -3,7 +3,7 @@
 !!! warning
 
 	This section is only an implementation guide. The definitive specification of the
-	ML Model Interface is given in [Reference](@ref).
+	Learn API is given in [Reference](@ref).
 
 This guide is intended to be consulted after reading [Anatomy of a Model
 Implementation](@ref), which introduces the main interface objects and terminology.
