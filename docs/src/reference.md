@@ -5,10 +5,10 @@ guide see [Common Implementation Patterns](@ref).
 
 ## Models
 
-> **Summary** In the Learn API a **model** is a Julia object whose properties are
-> the hyper-parameters of some learning algorithm. Functionality is created by overloading
-> methods defined by the interface and promises of certain behavior articulated by model
-> traits.
+> **Summary** In the Learn API a **model** is a Julia object whose properties are the
+> hyper-parameters of some learning algorithm. Functionality is created by overloading
+> methods defined by the interface and promises of certain behavior is articulated by
+> model traits.
 
 In this document the word "model" has a very specific meaning that may differ from the
 reader's common understanding of the word - in statistics, for example. In this document a
@@ -44,27 +44,12 @@ omitted, then one must make the declaration
 and overload `Base.==` in the mutable case. 
 
 > **MLJ only.** The subtyping also ensures instances will be displayed according to a
-> standard MLJ convention, assuming MLJ or MLJBase are loaded.
+> standard MLJ convention, assuming MLJ or MLJBase is loaded.
 
 ```@docs
 LearnAPI.ismodel
 LearnAPI.Model
 ```
-
-## Data containers
-
-In this document a **data container** is any object implementing some kind of iteration
-interface, where the length of the iteration, called the **number of observations**, is
-known in advance.  At present "some kind of iteration interface" remains undefined, but a
-working definition would include the `getrows` interface from
-[Tables.jl](https://github.com/JuliaData/Tables.jl) interface and/or the `getobs` interface
-from [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) (the latter interface
-[subsuming](https://github.com/JuliaML/MLUtils.jl/issues/61) the former at some point?). The
-`getobs` interface includes a built-in implementation for any `AbstractArray`, where the
-observation index is understood to be the *last* index. Unfortunately, according to this
-convention, a matrix `X` in this interface, corresponds to `Tables.table(X')` in the
-`getrows` interface (where observations are rows).
-
 
 ## Methods
 
@@ -77,16 +62,17 @@ Model functionality is created by implementing:
 
 - zero or more **accessor functions**
 
-While promises of certain behaviour are articulated using **model traits**. Examples of all
-these methods given in [Anatomy of an Interface](@ref)).
+Meanwhile, promises of certain behaviour are articulated using **model traits**. 
+
+Examples of all these methods given in [Anatomy of an Interface](@ref).
 
 - [Fit, update! and ingest!](@ref): for models that "learn" (generalize to
   new data)
 
 - [Operations](@ref operations): `predict`, `transform` and their relatives
 
-- [Accessor Functions](@ref): accessing byproducts of training shared by some models, such
-  as feature importances and training losses
+- [Accessor Functions](@ref): accessing certain byproducts of training that many models
+  share, such as feature importances and training losses
 
 - [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I
   predict probability distributions"

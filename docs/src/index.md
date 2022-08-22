@@ -7,33 +7,78 @@ LearnAPI.jl</span>
 A Julia interface for training and applying models in machine learning and statistics</span>
 ```
 
-# Introduction
-
 Machine learning algorithms, also called *models*, have a complicated taxonomy. Grouping
 models into a relatively small number of types, such as "classifier" and "clusterer", and
-attempting to impose uniform behaviour within each group, is problematic. It either leads to
-limitations on the models that can be included in a general interface, or to undesirable
-complexity needed to cope with exceptional cases.
+attempting to impose uniform behaviour within each group, is challenging. In our
+experience, it either leads to limitations on the models that can be included in a general
+interface, or additional complexity needed to cope with exceptional cases. Even if a
+complete user interface for machine learning might benefit from such groupings, a
+basement-level API for ML should, in our view, avoid them.
 
-For these and other reasons, the **Learn API** documented here is purely functional
-with no abstract model types (apart an optional supertype `Model`). In addition to `fit`,
-`update!` and `ingest!` methods (all optional), one implements one or more operations, such
-as `predict`, `transform` and `inverse_transform`. Method stubs for access functions, such
-as `feature_importances`, are also provided. Finally, a number of optional trait
-declarations, such as `is_supervised(model::SomeModel) = true`, make promises of specific
-behaviour.
+The **Learn API** documented here is base API for machine learning that is purely
+functional with no abstract model types (apart an optional supertype `Model`). It provides
+the following methods, dispatched on model type:
 
-The Learn API provides methods for training, applying, and saving machine learning
-models, and that is all. It does not provide an interface for data resampling, although it
-informally distinguishes between training data consisting of "observations", and other
-"metadata", such as target class weights or group lasso feature gropings. At present the
-only restriction on data containers concerns the target predictions of supervised models
-(whether deterministic, probabilistic or otherwise): These must be abstract arrays or tables
-compatible with [Tables.jl](https://github.com/JuliaData/Tables.jl).
+- `fit` for regular training
+
+- `update!` for adding model iterations, or responding efficiently to other
+  post-`fit`changes in hyperparameters
+
+- `ingest!` for incremental learning
+
+- **operations**, such as `predict`, `transform` and `inverse_transform` for applying the model
+  to data
+
+- common **access functions**, such as `feature_importances` and `training_losses`, for
+  extracting from training outcomes information common to particular classes of models.
+
+- **model traits**, such as `is_supervised(model)`, for promising specific behaviour.
+
+Since this is a functional interface, `fit` returns model "state", in addition to learned
+parameters, for passing to the optional `update!` and `ingest!` methods. These three
+methods all return a `report` component, for exposing byproducts of training different
+from learned parameters. Similarly, all operations also return a `report` component,
+although this would typically be `nothing`, unless the model does not implement `fit`
+(does not generalize to new data).
+
+
+## Scope and undefined notions
+
+The Learn API provides methods for training, applying, and saving machine learning models,
+and that is all. To keep it *It does not specify an interface for data access or data
+resampling*. That said, the interface references a few basic undefined notions, which some
+higher-level interface might decide to formalize:
+
+- Each machine learning model's behaviour is governed by a number of user-specified
+  **hyper-parameters**.
+
+- An object which generates ordered sequences of individual **observations** is called
+  **data**.
+
+- Information needed for training that is not a model hyper-parameter and not data is called
+  **metadata** (e.g., target class weights and group lasso feature groupings).
+
+- Some models, including but not limited to supervised models, involve **target** data, in
+  training or otherwise, and implement an operation, typically `predict`, that outputs
+  data that is target-like. To say that data is **target-like** is to say that it can be
+  paired with target data having the same number of observations to obtain useful
+  information about the model and the data that has been presented to it, typically a
+  measure of the model's expected performance on unseen data. Target-like data can take
+  various informally defined forms, such as `Deterministic`, `Distribution`, `Sampleable`,
+  `SurvivalFunction` and `Interval` detailed further under [Operations](@ref operations).
+
+Regarding the last point, consider outlier detection, where target observations are either
+"outlier" or "inlier". If the detector predicts probabilities for outlierness (the
+target-like data) these can be paired with "outlier"/"inlier" labels assigned by humans,
+using, say, area under the ROC curve, to measure performance. Many such detectors are
+trainined without supervision.
+
+
+## Contents
 
 Our opening observations notwithstanding, it is useful to have a guide to the interface,
-linked below, organized around common *informally defined* patterns. However, the definitive
-specification of the interface is the [Reference](@ref) section.
+linked below, organized around common *informally defined* patterns or "tasks". However,
+the definitive specification of the interface is the [Reference](@ref) section.
 
 - [Anatomy of an Implementation](@ref) (Overview)
 

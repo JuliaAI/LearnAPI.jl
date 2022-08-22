@@ -10,9 +10,9 @@
 |:---------------------------|:---------------------------------------------------|-------------|-------------------|
 [`LearnAPI.fit`](@ref)    | does nothing, returns `(nothing, nothing, nothing)`| no          |                   |
 [`LearnAPI.update!`](@ref) | calls `fit`                                       | no          | `LearnAPI.fit` |
-[`MLJInterface.ingest!`](@ref)| none                                              | no          | `MLInterfac.fit`  |
+[`LearnAPI.ingest!`](@ref)| none                                              | no          | `LearnAPI.fit`  |
 
-Implement `fit` unless your model is **static**, meaning its [operations](@ref operations)
+Implement `fit` unless your model is **static**, meaning its [operations](@ref operations),
 such as `predict` and `transform`, ignore their `fitted_params` argument (which will be
 `nothing`). This is the case for models that have hyper-parameters, but do not generalize to
 new data, such as a basic DBSCAN clustering algorithm. Related:

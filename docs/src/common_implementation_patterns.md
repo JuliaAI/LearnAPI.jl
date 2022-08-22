@@ -9,8 +9,8 @@ This guide is intended to be consulted after reading [Anatomy of a Model
 Implementation](@ref), which introduces the main interface objects and terminology.
 
 Although an implementation is defined purely by the methods and traits it implements, most
-implementations fall into one (or more) of the following informally understood algorithm
-"types":
+implementations fall into one (or more) of the following informally understood patterns or
+"tasks":
 
 - [Classifiers](@ref): Supervised learners for categorical targets
 
