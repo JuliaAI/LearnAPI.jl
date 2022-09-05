@@ -4,7 +4,7 @@ using LearnAPI
 const REPO="github.com/JuliaAI/LearnAPI.jl"
 
 makedocs(;
-    modules=[LearnAPI],
+    modules=[LearnAPI,],
     format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     pages=[
         "Introduction" => "index.md",

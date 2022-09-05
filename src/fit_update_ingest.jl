@@ -7,14 +7,23 @@ const DOC_OPERATIONS =
 
 function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     word = overloaded ? "overloaded" : "implemented"
-    "If $word, include `:$name` in the vector returned by the "*
+    "If $word, include `:$name` in the tuple returned by the "*
     "[`LearnAPI.implemented_methods`](@ref) trait. "
 end
 
-const DOC_MUTATING_MODELS = "**Important.** It is not permitted to mutate `model`. "*
-    "In particular, if `model` has a random number generator as a hyperparameter "*
-    "(property) then it must be copied before use. "
+const DOC_WHAT_IS_DATA =
+    """
+    Note that in LearnAPI.jl the word "data" is only defined informally, as an object
+    generating "observations", which are not defined at all.
+    """
 
+const DOC_MUTATING_MODELS =
+    """
+    !!! note
+
+        The method is not permitted to mutate `model`. In particular, if `model` has a
+        random number generator as a hyperparameter (property) then it must be copied
+        before use.  """
 
 # # FIT
 
@@ -27,10 +36,9 @@ should be silent if `verbosity == 0`. Lower values should suppress warnings. Her
 - `model` is a property-accessible object whose properties are the hyper-parameters of some
    machine learning algorithm; see also [`LearnAPI.ismodel`](@ref).
 
-- `data` is a tuple of data objects (as defined in the ML Interface documentation) with a
-  common number of observations, for example, `data = (X, y, w)` where `X` is a table of
-  features, `y` is a target vector with the same number of rows, and `w` a vector of
-  per-observation weights.
+- `data` is a tuple of data objects with a common number of observations, for example,
+  `data = (X, y, w)` where `X` is a table of features, `y` is a target vector with the
+  same number of rows, and `w` a vector of per-observation weights.
 
 - `metadata` is for extra information pertaining to the data that is never iterated, for
   example, weights for target classes. Another example would be feature groupings in the
@@ -55,8 +63,10 @@ Returns a tuple (`fitted_params`, `state`, `report`) where:
 
 # New model implementations
 
-This method is an optional method in the ML Model Interface. A fallback performs no
+Overloading this method for new models is optional.  A fallback performs no
 computation, returning `(nothing, nothing, nothing)`.
+
+$DOC_WHAT_IS_DATA
 
 $DOC_MUTATING_MODELS
 
@@ -80,11 +90,11 @@ properties (hyperparameters) may have changed. Specifically, the assumption is t
 and `metadata` have the same values seen in the most recent call to `fit/update!/ingest!`.
 
 The most common use case is for continuing the training of an iterative model: `state` is
-simply a copy of the model used in the last training call (`fit`, `update!' or `ingest!`) and
-this will include the current number of iterations as a property. If `model` and `state`
-differ only in the number of iterations (e.g., epochs in a neural networ), which has
-increased, then the learned parameters (weights) are updated, rather computed ab
-initio. Otherwise, `update!` simply calls `fit` to retrain from scratch.
+simply a copy of the model used in the last training call (`fit`, `update!` or `ingest!`)
+and this will include the current number of iterations as a property. If `model` and
+`state` differ only in the number of iterations (e.g., epochs in a neural network), which
+has increased, then the learned parameters (weights) are updated, rather computed ab
+initio. Otherwise, `update!` simply calls `fit`, to force retraining from scratch.
 
 It is permitted to return mutated versions of `state` and `fitted_params`.
 
@@ -99,13 +109,14 @@ Same as [`LearnAPI.fit`](@ref), namely a tuple (`fitted_params`, `state`, `repor
 
 # New model implementations
 
-This method is an optional method in the ML Model Interface. A fallback calls
-`LearnAPIperforms.fit`:
+Overloading this method is optional. A fallback calls `LearnAPIperforms.fit`:
 
 ```julia
 LearnAPI.update!(model, verbosity, fitted_params, state, data...; metadata...) =
     fit(model, verbosity, data; metadata...)
 ```
+
+$DOC_WHAT_IS_DATA
 
 $DOC_MUTATING_MODELS
 
@@ -123,10 +134,11 @@ update!(model, verbosity, fitted_params, state, data...; metadata...) =
 """
     LearnAPI.ingest!(model, verbosity, fitted_params, state, data...; metadata...)
 
-For a model that supports incremental learning, update the learned parameters using `data`,
-which has typically not been seen before.  The arguments `state` and `fitted_params` are the
-output of a preceding call to [`LearnAPI.fit`](ref), [`LearnAPI.ingest!`](@ref), or
-[`LearnAPI.update!`](@ref), of which mutated or new versions are returned.
+For a model that supports incremental learning, update the learned parameters using
+`data`, which has typically not been seen before.  The arguments `state` and
+`fitted_params` are the output of a preceding call to [`LearnAPI.fit`](ref),
+[`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), of which mutated or new
+versions are returned.
 
 For updating learned parameters using the *same* data but new hyperparameters, see instead
 [`LearnAPI.update!`](@ref).
@@ -142,7 +154,7 @@ Same as [`LearnAPI.fit`](@ref), namely a tuple (`fitted_params`, `state`, `repor
 
 # New model implementations
 
-This method is an optional method in the ML Model Interface. It has no fallback.
+Implementing this method is an optional. It has no fallback.
 
 $DOC_MUTATING_MODELS
 

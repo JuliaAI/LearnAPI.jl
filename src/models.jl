@@ -4,9 +4,10 @@ abstract type MLType end
 """
     LearnAPI.Model
 
-An optional abstract type for models in the ML Model Interface.
+An optional abstract type for models implementing LearnAPI.jl.
 
-# New ML Model Implementations
+
+# New model implementations
 
 Either declare `NewModelType <: LearnAPI.Model` or `LearnAPI.model(::SomeModelType) =
 true`. The first implies the second and additionally guarantees `==` has correct behaviour
@@ -20,7 +21,7 @@ abstract type Model <: MLType end
 """
     ismodel(m)
 
-Returns `true` exactly when `m` is a *model*, as defined in the ML Model Interface
+Returns `true` exactly when `m` is a *model*, as defined in the LearnAPI.jl
 documentation. In particular, this means:
 
 - `m` is an object whose properties, as returned by `getproperty(m, field)` for `field in
@@ -29,11 +30,11 @@ documentation. In particular, this means:
 - If `n` is another model, then `m == n` if and only if `typeof(n) == typeof(m)` and
   corresponding properties are `==`.
 
-- `m` correctly implements methods from the ML Model Interface. See the documentation for
-  LearnAPI for details.
+- `m` correctly implements zero or more methods from LearnAPI.jl. See the LearnAPI.jl
+  documentation for details.
 
 
-# New ML Model Implementations
+# New model implementations
 
 Either declare `NewModelType <: LearnAPI.Model` or `LearnAPI.model(::NewModelType) =
 true`.

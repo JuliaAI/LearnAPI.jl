@@ -1,14 +1,15 @@
 # Anatomy of an Implementation
 
-> **Summary.** A **model** is just a container for hyper-parameters. A basic implementation
-> for a ridge regressor requires implementing `fit` and `predict` methods dispatched on the
-> model type; `predict` is an example of an **operation**; another is `transform`. In this
-> example we also implement an **accessor function** called `feature_importance` (returning
-> the absolute values of the linear coefficients). We need trait declarations to flag the
-> model as supervised, and another to list the implemented methods. Optional traits
-> articulate the model's data type requirements and the output type of operations.
+> **Summary.** A **model** is just a container for hyper-parameters. A basic
+> implementation of the ridge regressor requires implementing `fit` and `predict` methods
+> dispatched on the model type; `predict` is an example of an **operation** (another is
+> `transform`). In this example we also implement an **accessor function** called
+> `feature_importance` (returning the absolute values of the linear coefficients). The
+> ridge regressor has a target variable and one trait declaration flags the output of
+> `predict` as being a [proxy](@ref scope) for the target. Other traits articulate the
+> model's training data type requirements and the output type of `predict`.
 
-We begin by describing an implementation of the Learn API for basic ridge
+We begin by describing an implementation of LearnAPI.jl for basic ridge
 regression (no intercept) to introduce the main actors in any implementation.
 
 
@@ -26,7 +27,7 @@ Next, we define a struct to store the single hyper-parameter `lambda` of this mo
 
 ```julia
 struct MyRidge <: LearnAPI.Model
-	lambda::Float64
+        lambda::Float64
 end
 ```
 
@@ -37,7 +38,7 @@ otherwise disruptive. If you omit the subtyping then you must declare
 LearnAPI.ismodel(::MyRidge) = true
 ```
 
-as a promise that instances of `MyRidge` implement the Learn API.
+as a promise that instances of `MyRidge` implement LearnAPI.jl.
 
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
@@ -50,49 +51,49 @@ MyRidge(; lambda=0.1) = MyRidge(lambda)
 ## A method to fit the model
 
 A ridge regressor requires two types of data for training: **input features** `X` and a
-**target** `y`. Training is implemented by overloading `fit`. Here `verbosity` is an integer
+[**target**](@ref scope) `y`. Training is implemented by overloading `fit`. Here `verbosity` is an integer
 (`0` should train silently, unless warnings are needed):
 
 ```julia
 function LearnAPI.fit(model::MyRidge, verbosity, X, y)
 
-	# process input:
-	x = Tables.matrix(X)  # convert table to matrix
-	features = Tables.columnnames(X)
+        # process input:
+        x = Tables.matrix(X)  # convert table to matrix
+        features = Tables.columnnames(X)
 
-	# core solver:
-	coefficients = (x'x + model.lambda*I)\(x'y)
+        # core solver:
+        coefficients = (x'x + model.lambda*I)\(x'y)
 
-	# prepare output - learned parameters:
-	fitted_params = (; coefficients)
+        # prepare output - learned parameters:
+        fitted_params = (; coefficients)
 
-	# prepare output - model state:
-	state = nothing  # not relevant here
+        # prepare output - model state:
+        state = nothing  # not relevant here
 
-	# prepare output - byproducts of training:
-	feature_importances =
-		[features[j] => abs(coefficients[j]) for j in eachindex(features)]
-	sort!(feature_importances, by=last) |> reverse!
-	verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
-	report = (; feature_importances)
+        # prepare output - byproducts of training:
+        feature_importances =
+                [features[j] => abs(coefficients[j]) for j in eachindex(features)]
+        sort!(feature_importances, by=last) |> reverse!
+        verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
+        report = (; feature_importances)
 
-	return fitted_params, state, report
+        return fitted_params, state, report
 end
 ```
 
 Regarding the return value of `fit`:
 
-- The `fitted_params` is for the model's learned parameters, for passing to
+- The `fitted_params` variable is for the model's learned parameters, for passing to
   `predict` (see below).
 
-- The `state` variable is only relevant when additionally implementing an [`update!`](@ref)
-  or [`ingest!`](@ref) method (see [Fit, update! and ingest!](@ref)).
+- The `state` variable is only relevant when additionally implementing a [`LearnAPI.update!`](@ref)
+  or [`LearnAPI.ingest!`](@ref) method (see [Fit, update! and ingest!](@ref)).
 
 - The `report` is for other byproducts of training, excluding the learned parameters.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
 observations); and we suppose `y` is a `Real` vector. (While this is typical of MLJ model
-implementations, the Learn API puts no restrictions on the form of `X` and `y`.)
+implementations, LearnAPI.jl puts no restrictions on the form of `X` and `y`.)
 
 
 ## Operations
@@ -100,67 +101,72 @@ implementations, the Learn API puts no restrictions on the form of `X` and `y`.)
 Now we need a method for predicting the target on new input features:
 
 ```julia
-LearnAPI.predict(::MyRidge, fitted_params, Xnew) = Tables.matrix(Xnew)*fitted_params.coefficients
+function LearnAPI.predict(::MyRidge, fitted_params, Xnew)
+    Xmatrix = Tables.matrix(Xnew)
+    report = nothing
+    return Xmatrix*fitted_params.coefficients, report
+end
 ```
 
-The above `predict` method is an example of an **operation**. Other operations include
-`transform` and `inverse_transform` and a model can implement more than one. For example, a
-K-means clustering model might implement a `transform` for dimension reduction, and a
+In some models `predict` computes something of interest in addition to the target
+prediction, and this `report` item is returned as the second component of the return
+value. When there's nothing to report, we must return `nothing`, as here.
+
+Our `predict` method is an example of an **operation**. Other operations include
+`transform` and `inverse_transform` and a model can implement more than one. For example,
+a K-means clustering model might implement a `transform` for dimension reduction, and a
 `predict` to return cluster labels.
 
 
 ## Accessor functions
 
 The arguments of an operation are always `(model, fitted_params, data...)`. The interface also
-provides **accessor functions** for extracting information from the `fitted_params` and/or
-`report` that is shared by several model types.  There is one for feature importances that
+provides **accessor functions** for extracting information, from the `fitted_params` and/or
+`report`, that is shared by several model types.  There is one for feature importances that
 we can implement for `MyRidge`:
 
 ```julia
-LearnAPI.feature_importances(::MyRidge, fitted_params, report) = report.feature_importances
+LearnAPI.feature_importances(::MyRidge, fitted_params, report) =
+report.feature_importances
 ```
 
-Another example of an accessor function is `training_losses` (supervised models) and
-`training_scores` (outlier detection models).
+Another example of an accessor function is `training_losses`.
 
 
 ## Model traits
 
-In this supervised learning example, `predict` returns an object with the same type of the
-*second* data argument `y` of `fit` (the target). It therefore makes sense, for example, to
-apply a suitable metric (e.g., a sum of squares) to the pair `(ŷ, y)`, where `ŷ =
-predict(model, fitted_params, X)`. We will flag this behavior by declaring
+Our model has a target variable, in the sense outlined in [Scope and undefined
+notions](@ref scope), and `predict` returns an object with exactly the same form as the
+target. We indicate this behaviour by declaring
 
 ```julia
-LearnAPI.is_supervised(::Type{<:MyRidge}) = true
+LearnAPI.target_proxy_kind(::Type{<:MyRidge}) = (; predict=LearnAPI.Target())
 ```
 
-This is an example of a **model trait** declaration. A complete list of traits and the
-contracts they imply is given in [`Model traits`](@ref).
+More generally, `predict` only returns a *proxy* for the target, such as probability
+distributions, and we would make a different declaration here. See [Target proxies](@ref)
+for details.
+
+`LearnAPI.target_proxy_kind` is an example of a **model trait**. A complete list of traits
+and the contracts they imply is given in [Model traits](@ref).
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
 > recorded in the searchable MLJ Model Registry, assuming the implementation-providing
 > package is registered there.
 
-Since our model is supervised, we are required to implement an additional trait that
-distinguishes our model from other regressors that make probabilistic or other kinds of
-predictions of the target:
+We also need to indicate that the target appears in training (this is a *supervised*
+model) and the position of `target` within the `data` argument of `fit`:
 
 ```julia
-LearnAPI.paradigm(::Type{<:MyRidge}) = Dict(:predict => :point)
+LearnAPI.position_of_target(::Type{<:MyRidge}) = 2
 ```
 
-If instead, our `predict` method would return probabilistic predictions, we would instead
-return `Dict(:predict => :pdf)` or `Dict(:predict => :rand)`, depending on whether or not
-`predict` returns objects implementing `Distributions.pdf` from Distributions.jl, or merely
-`Base.rand`. Other options are `:interval` and `:survival_probability`.
-
-As explained in the introduction, the Learn API does not attempt to define strict
-model "types", such as "regressor" or "clusterer". We can optionally specify suggestive
+As explained in the introduction, LearnAPI.jl does not attempt to define strict model
+"types", such as "regressor" or "clusterer". However, we can optionally specify suggestive
 keywords, as in
 
 ```julia
-MLJInterface.keywords(::Type{<:MyRidge}) = [:regression,]
+MLJInterface.keywords(::Type{<:MyRidge}) = (:regression,)
 ```
 
 but note that this declaration promises nothing. Do `LearnAPI.keywords()` to get a list
@@ -170,11 +176,11 @@ Finally, we are required to declare what methods (excluding traits) we have expl
 overloaded for our type:
 
 ```julia
-LearnAPI.implemented_methods(::Type{<:MyRidge}) = [
-	:fit,
-	:predict,
-	:feature_importances,
-]
+LearnAPI.implemented_methods(::Type{<:MyRidge}) = (
+        :fit,
+        :predict,
+        :feature_importances,
+)
 ```
 
 ## Training data types
@@ -206,19 +212,20 @@ Or, in other words:
   elements.
 
 
-## Operation data types
+## Types for data returned by operations
 
-A promise that an operation, such as `predict`, returns an object of given scientific type is articulated in this way:
+A promise that an operation, such as `predict`, returns an object of given scientific type
+is articulated in this way:
 
 ```julia
-MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{<:Continuous})
+MLJInterface.return_scitypes(::Type{<:MyRidge}) = (:predict => AbstractVector{<:Continuous},)
 ```
 
 If `predict` had instead returned probability distributions, and these implement the
 `Distributions.pdf` interface, then the declaration would be
 
 ```julia
-MLJInterface.return_scitypes(::Type{<:MyRidge}) = Dict(:predict => AbstractVector{Density{<:Continuous}})
+MLJInterface.return_scitypes(::Type{<:MyRidge}) = (:predict => AbstractVector{Density{<:Continuous}},)
 ```
 
 There is also an `input_scitypes` trait for operations. However, this falls back to the
@@ -227,3 +234,59 @@ we need not overload it here.
 
 
 ## Convenience macros
+
+
+## [Illustrative fit/predict workflow](@id workflow)
+
+Here's some toy data for supervised learning:
+
+```julia
+using Tables
+
+n = 10          # number of training observations
+train = 1:6
+test = 7:10
+
+a, b, c = rand(n), rand(n), rand(n)
+X = (; a, b, c) |> Tables.rowtable
+y = 2a - b + 3c + 0.05*rand(n)
+```
+Instantiate a model with relevant hyperparameters:
+
+```julia
+model = MyRidge(lambda=0.5)
+```
+
+Train the model:
+
+```julia
+import LearnAPI: fit, predict, feature_importances
+
+fitted_params, state, fit_report = fit(model, 1, X[train], y[train])
+```
+
+Inspect the learned paramters and report:
+
+```julia
+@info "training outcomes" fitted_params report
+```
+
+Inspect feature importances:
+
+```julia
+feature_importances(model, fitted_params, report)
+```
+
+Make a prediction using new data:
+
+```julia
+yhat, predict_report = predict(model, fitted_params, X[test])
+```
+
+Compare predictions with ground truth
+
+```julia
+deviations = yhat - y[test]
+loss = deviations .^2 |> sum
+@info "Sum of squares loss" loss
+```
