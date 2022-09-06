@@ -92,8 +92,9 @@ Regarding the return value of `fit`:
 - The `report` is for other byproducts of training, excluding the learned parameters.
 
 Notice that we have chosen here to suppose that `X` is presented as a table (rows are the
-observations); and we suppose `y` is a `Real` vector. (While this is typical of MLJ model
-implementations, LearnAPI.jl puts no restrictions on the form of `X` and `y`.)
+observations); and we suppose `y` is a `Real` vector. This is not a restriction on types
+placed by LearnAPI.jl. However, we can articulate our model's particular type requirements
+with the [`LearnAPI.fit_data_scitype`](@ref) trait; see [Training data types](@ref) below.
 
 
 ## Operations

@@ -58,8 +58,9 @@ inverses.
 ## Target proxies
 
 In the case that a model has the concept of a **target** variable, as described under
-[Scope and undefined notions](@ref scope), the output of an operation may have the form of
-a proxy for the target, such as a vector of truth-probabilities for binary targets.
+[Scope and undefined notions](@ref scope), the output of `predict` or `predict_joint` may
+have the form of a proxy for the target, such as a vector of truth-probabilities for
+binary targets.
 
 We assume the reader is already familiar with the notion of a target variable in
 supervised learning, but target variables are not limited to supervised models. For
@@ -72,9 +73,9 @@ Similarly, the integer labels assigned to some observations by a clustering algo
 be regarded as a target variable. The labels obtained can be paired with human labels
 using, say, the Rand index. 
 
-The kind of proxy one has for the target in some operation output is informally
-classified by a subtype of `LearnAPI.TargetProxy`. These types are intended for dispatch
-outside of LearnAPI.jl and have no fields.
+The kind of proxy one has is informally classified by a subtype of
+`LearnAPI.TargetProxy`. These types are intended for dispatch outside of LearnAPI.jl and
+have no fields.
 
 |          type                   | form of observations | possible requirement in some external API |
 |:-------------------------------:|:---------------------|:------------------------------------------|
@@ -84,7 +85,7 @@ outside of LearnAPI.jl and have no fields.
 | `LearnAPI.LogDistribution`      | explicit log probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.logpdf` and `Base.rand` |
 |  † `LearnAPI.Probability`       | raw numerical probability or probability vector | |
 |  † `LearnAPI.LogProbability`    | log probability or log probability vector | |
-|  † `LearnAPI.Parametric`        | a list of parameters describing some distribution |
+|  † `LearnAPI.Parametric`        | a list of parameters (e.g., mean and variance) describing some distribution |
 | `LearnAPI.Ambiguous`            | same form as the (multi-class) target, but with new, unmatched labels of possibly unequal number (as in, e.g., clustering)| 
 | `LearnAPI.AmbiguousSampleable`  | sampleable version of `Ambiguous`; see `Sampleable` above  |
 | `LearnAPI.AmbiguousDistribution`| pdf/pmf version of `Ambiguous`; see `Distribution`  above  |
@@ -92,7 +93,9 @@ outside of LearnAPI.jl and have no fields.
 | `LearnAPI.SurvivalFunction`     | survival functions | Observations are single-argument functions mapping `Real` to `Real`.
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time | Observations have type `Distributions.ContinuousUnivariateDistribution`.
 
-† Not recommended because of ambiguities in interpretation
+> **† MLJ only.** To avoid [ambiguities in
+> representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation),
+> these options are disallowed, in favour of the preceding alternatives.
 
 !!! warning
 
