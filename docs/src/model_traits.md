@@ -4,7 +4,7 @@
 |:-------------------------------------------------|:----------------------|:--------------|:--------|
 | [`LearnAPI.ismodel`](@ref)`(model)`              | `false`               | is `true` for any model, as defined in [`Models`](@ref) | `true` |
 | [`LearnAPI.implemented_methods`](@ref)`(model)`  | `()`                  | lists of all overloaded/implemented methods (traits excluded) | `(:fit, :predict)` |
-| [`LearnAPI.target_proxy_kind`](@ref)`(model)`    | `()`                  | details form of target proxy output | `(:predict => LearnAPI.Distribution,)` |
+| [`LearnAPI.target_proxy_kind`](@ref)`(model)`    | `()`                  | details form of target proxy output | `(predict= LearnAPI.Distribution,)` |
 | [`LearnAPI.position_of_target`](@ref)`(model)`   | `0`                   | † the positional index of the **target** in `data` in `fit(..., data...; metadata)` calls | 2 |
 | [`LearnAPI.position_of_weights`](@ref)`(model)`  | `0`                   | † the positional index of **observation weights** in `data` in `fit(..., data...; metadata)` | 3 |
 | [`LearnAPI.keywords`](@ref)`(model)`             | `()`                  | lists one or more suggestive model descriptors from `LearnAPI.keywords()` | (:regressor, ) |

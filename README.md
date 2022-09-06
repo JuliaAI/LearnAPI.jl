@@ -1,11 +1,10 @@
 # LearnAPI.jl
 
-A Julia interface for training and applying models in machine learning and statistics
+A Julia interface for training and applying machine learning models.
 
 
 &#x1F6A7;
 
-Hyperlinks in this README.md do not work.
 
 | Linux | Coverage |
 | :------------ | :------- |
@@ -13,15 +12,7 @@ Hyperlinks in this README.md do not work.
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliaai.github.io/LearnAPI.jl/stable/)
 
-
 **Status.** Proposal, unregistered. 
 
-This repository is to provide a general purpose machine learning interface. It is designed
-based on experiences of developers of MLJ's [MLJModelInterface.jl]() which it will
-eventually replace, but hopes to be useful more generally. The design is not yet fixed and
-comments (posted as issues) are welcome.
-
-To get an idea of the kinds of models we are aiming to indclude, see [Common Implementation
-Patterns]().
 
 

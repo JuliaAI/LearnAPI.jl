@@ -79,16 +79,16 @@ have no fields.
 
 |          type                   | form of observations | possible requirement in some external API |
 |:-------------------------------:|:---------------------|:------------------------------------------|
-| `LearnAPI.Target `              | same as target observations | Observations have same type as target observations. |
+| `LearnAPI.TrueTarget`              | same as target observations | Observations have same type as target observations. |
 | `LearnAPI.Sampleable`           | objects that can be sampled to obtain objects of the same form as target observations | Each observation implements `Base.rand`. |
 | `LearnAPI.Distribution`         | explicit probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.pdf` and `Base.rand` |
 | `LearnAPI.LogDistribution`      | explicit log probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.logpdf` and `Base.rand` |
 |  † `LearnAPI.Probability`       | raw numerical probability or probability vector | |
 |  † `LearnAPI.LogProbability`    | log probability or log probability vector | |
 |  † `LearnAPI.Parametric`        | a list of parameters (e.g., mean and variance) describing some distribution |
-| `LearnAPI.Ambiguous`            | same form as the (multi-class) target, but with new, unmatched labels of possibly unequal number (as in, e.g., clustering)| 
-| `LearnAPI.AmbiguousSampleable`  | sampleable version of `Ambiguous`; see `Sampleable` above  |
-| `LearnAPI.AmbiguousDistribution`| pdf/pmf version of `Ambiguous`; see `Distribution`  above  |
+| `LearnAPI.LabelAmbiguous`            | same form as the (multi-class) target, but with new, unmatched labels of possibly unequal number (as in, e.g., clustering)| 
+| `LearnAPI.LabelAmbiguousSampleable`  | sampleable version of `LabelAmbiguous`; see `Sampleable` above  |
+| `LearnAPI.LabelAmbiguousDistribution`| pdf/pmf version of `LabelAmbiguous`; see `Distribution`  above  |
 | `LearnAPI.ConfidenceInterval`   | confidence intervals |  Each observation `isa Tuple{Real,Real}`.
 | `LearnAPI.SurvivalFunction`     | survival functions | Observations are single-argument functions mapping `Real` to `Real`.
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time | Observations have type `Distributions.ContinuousUnivariateDistribution`.

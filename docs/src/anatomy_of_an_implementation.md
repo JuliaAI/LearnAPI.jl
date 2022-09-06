@@ -134,14 +134,14 @@ report.feature_importances
 Another example of an accessor function is `training_losses`.
 
 
-## Model traits
+## [Model traits](@id traits) 
 
 Our model has a target variable, in the sense outlined in [Scope and undefined
 notions](@ref scope), and `predict` returns an object with exactly the same form as the
 target. We indicate this behaviour by declaring
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{<:MyRidge}) = (; predict=LearnAPI.Target())
+LearnAPI.target_proxy_kind(::Type{<:MyRidge}) = (; predict=LearnAPI.TrueTarget())
 ```
 
 More generally, `predict` only returns a *proxy* for the target, such as probability
@@ -149,7 +149,7 @@ distributions, and we would make a different declaration here. See [Target proxi
 for details.
 
 `LearnAPI.target_proxy_kind` is an example of a **model trait**. A complete list of traits
-and the contracts they imply is given in [Model traits](@ref).
+and the contracts they imply is given in [Model Traits](@ref).
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
 > recorded in the searchable MLJ Model Registry, assuming the implementation-providing
