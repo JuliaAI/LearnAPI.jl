@@ -99,9 +99,9 @@ jobs:
           julia --project=docs -e '
             if ENV["BUILD_DOCS"] == "true"
                 using Documenter: doctest
-                using MLInterface
+                using LearnAPI
                 @info "attempting to run the doctests"
-                doctest(MLInterface)
+                doctest(LearnAPI)
             else
                 @info "skipping the doctests"
             end'
