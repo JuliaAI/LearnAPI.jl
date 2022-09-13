@@ -2,6 +2,8 @@
 
 A Julia interface for training and applying machine learning models.
 
+**Status:** Proposal.
+
 
 &#x1F6A7;
 
@@ -12,6 +14,3 @@ A Julia interface for training and applying machine learning models.
 
 Please refer to the documentation for a detailed preview of what this package proposes to
 offer.
-
-
- 
