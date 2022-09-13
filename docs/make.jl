@@ -22,6 +22,6 @@ makedocs(;
 deploydocs(
     ; repo=REPO,
     devbranch="dev",
-    push_preview=true,
+    push_preview=false,
 )
 
