@@ -2,7 +2,7 @@
 
 A Julia interface for training and applying machine learning models.
 
-**Status:** Proposal.
+**Status:** Proposal. 
 
 
 &#x1F6A7;
