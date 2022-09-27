@@ -19,7 +19,7 @@ The first line below imports the lightweight package LearnAPI.jl whose methods w
 extending, the second, libraries needed for the core algorithm.
 
 ```julia
-import LearnAPI
+using LearnAPI
 using LinearAlgebra, Tables
 ```
 
@@ -143,6 +143,11 @@ target. We indicate this behaviour by declaring
 ```julia
 LearnAPI.target_proxy_kind(::Type{<:MyRidge}) = (; predict=LearnAPI.TrueTarget())
 ```
+Or, you can use the shorthand
+
+```julia
+@trait MyRidge target_proxy_kind = (; predict=LearnAPI.TrueTarget())
+```
 
 More generally, `predict` only returns a *proxy* for the target, such as probability
 distributions, and we would make a different declaration here. See [Target proxies](@ref)
@@ -159,7 +164,7 @@ We also need to indicate that the target appears in training (this is a *supervi
 model) and the position of `target` within the `data` argument of `fit`:
 
 ```julia
-LearnAPI.position_of_target(::Type{<:MyRidge}) = 2
+@trait MyRidge position_of_target = 2
 ```
 
 As explained in the introduction, LearnAPI.jl does not attempt to define strict model
@@ -167,7 +172,7 @@ As explained in the introduction, LearnAPI.jl does not attempt to define strict 
 keywords, as in
 
 ```julia
-MLJInterface.keywords(::Type{<:MyRidge}) = (:regression,)
+@trait MyRidge keywords = (:regression,)
 ```
 
 but note that this declaration promises nothing. Do `LearnAPI.keywords()` to get a list
@@ -177,7 +182,7 @@ Finally, we are required to declare what methods (excluding traits) we have expl
 overloaded for our type:
 
 ```julia
-LearnAPI.implemented_methods(::Type{<:MyRidge}) = (
+@trait MyRidge implemented_methods = (
         :fit,
         :predict,
         :feature_importances,
@@ -192,7 +197,7 @@ declarations, which in this case look like:
 
 ```julia
 using ScientificTypesBase
-LearnAPI.fit_data_scitype(::Type{<:MyRidge}) = Tuple{Table(Continuous), AbstractVector{Continuous}}
+@trait MyRidge fit_data_scitype = Tuple{Table(Continuous), AbstractVector{Continuous}}
 ```
 
 This is a contract that `data` is acceptable in the call `fit(model, verbosity, data...)`
@@ -219,22 +224,19 @@ A promise that an operation, such as `predict`, returns an object of given scien
 is articulated in this way:
 
 ```julia
-MLJInterface.return_scitypes(::Type{<:MyRidge}) = (:predict => AbstractVector{<:Continuous},)
+@trait return_scitypes = (:predict => AbstractVector{<:Continuous},)
 ```
 
 If `predict` had instead returned probability distributions, and these implement the
 `Distributions.pdf` interface, then the declaration would be
 
 ```julia
-MLJInterface.return_scitypes(::Type{<:MyRidge}) = (:predict => AbstractVector{Density{<:Continuous}},)
+@trait return_scitypes = (:predict => AbstractVector{Density{<:Continuous}},)
 ```
 
 There is also an `input_scitypes` trait for operations. However, this falls back to the
 scitype for the first argument of `fit`, as inferred from `fit_data_scitype` (see above). So
 we need not overload it here.
-
-
-## Convenience macros
 
 
 ## [Illustrative fit/predict workflow](@id workflow)

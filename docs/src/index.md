@@ -13,7 +13,7 @@ implementation, see [Anatomy of an Implementation](@ref).
 
 **Quick tour for users of models implementing LearnAPI.jl.** Although primarily intended
 as a basement-level machine learning interface for developers, users can interact directly
-with LearnAPI.jl models, as illustrated [here](@ref workflow). 
+with LearnAPI.jl models, as illustrated [here](@ref workflow).
 
 ## Approach
 
@@ -25,9 +25,16 @@ ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads t
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
 machine learning might benefit from such groupings, a basement-level API for ML should, in
-our view, avoid them.
+our view, avoid them. Consequently, model behavour is here articulated using a number of
+traits.
 
-## Summary
+For certain models involving a "target" variable (understood in a rather general way - see
+below) there is a clear-cut classification based on the proxy for the target as actually
+output by the model. Probability distributions, confidence intervals and survival
+functions are examples of [Target proxies](@ref). This API provides types and a trait for
+classifying models based on the type of target proxy.
+
+## Methods
 
 LearnAPI.jl is a base interface for machine learning algorithms in which behaviour is
 articulated using traits. It has no abstract model types, apart from an optional supertype
@@ -90,7 +97,7 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
   sense for unsupervised models, and also for models that do not generalize to new
   observations.  For examples, and an informal classification of target proxy types, refer
   to [Target proxies](@ref).
-  
+
 
 ## Contents
 
