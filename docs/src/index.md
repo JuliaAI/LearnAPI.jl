@@ -25,14 +25,14 @@ ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads t
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
 machine learning might benefit from such groupings, a basement-level API for ML should, in
-our view, avoid them. Consequently, model behavour is here articulated using a number of
+our view, avoid them. In LearnAPI model behavour is articulated using a number of
 traits.
 
-For certain models involving a "target" variable (understood in a rather general way - see
-below) there is a clear-cut classification based on the proxy for the target as actually
-output by the model. Probability distributions, confidence intervals and survival
-functions are examples of [Target proxies](@ref). This API provides types and a trait for
-classifying models based on the type of target proxy.
+That said, for certain models involving a "target" variable (understood in a rather
+general way - see below) there is a clear-cut classification based on the proxy for the
+target as actually output by the model. Probability distributions, confidence intervals
+and survival functions are examples of [Target proxies](@ref). LearnAPI provides
+a trait for distinguishing such models based on the kind of target proxy.
 
 ## Methods
 
