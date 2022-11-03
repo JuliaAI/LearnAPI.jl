@@ -30,8 +30,9 @@ const DOC_MUTATING_MODELS =
 """
     LearnAPI.fit(model, verbosity, data...; metadata...)
 
-Fit `model` to the provided `data` and `metadata`. With the exception of warnings, training
-should be silent if `verbosity == 0`. Lower values should suppress warnings. Here:
+Fit `model` to the provided `data` and `metadata`. With the exception of warnings,
+training should be silent if `verbosity == 0`. Lower values should suppress warnings; any
+integer ought to be admissible. Here:
 
 - `model` is a property-accessible object whose properties are the hyper-parameters of some
    machine learning algorithm; see also [`LearnAPI.ismodel`](@ref).

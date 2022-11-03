@@ -77,29 +77,31 @@ The kind of proxy one has is informally classified by a subtype of
 `LearnAPI.TargetProxy`. These types are intended for dispatch outside of LearnAPI.jl and
 have no fields.
 
-|          type                   | form of observations | possible requirement in some external API |
-|:-------------------------------:|:---------------------|:------------------------------------------|
-| `LearnAPI.TrueTarget`              | same as target observations | Observations have same type as target observations. |
-| `LearnAPI.Sampleable`           | objects that can be sampled to obtain objects of the same form as target observations | Each observation implements `Base.rand`. |
-| `LearnAPI.Distribution`         | explicit probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.pdf` and `Base.rand` |
-| `LearnAPI.LogDistribution`      | explicit log probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.logpdf` and `Base.rand` |
-|  † `LearnAPI.Probability`       | raw numerical probability or probability vector | |
-|  † `LearnAPI.LogProbability`    | log probability or log probability vector | |
+|          type                   | form of an observation 
+|:-------------------------------:|:---------------------|
+| `LearnAPI.TrueTarget`           | same as target observations (possible requirement: observations have same type as target observations) |
+| `LearnAPI.Sampleable`           | object that can be sampled to obtain object of the same form as target observation (possible requirement: observation implements `Base.rand`) |
+| `LearnAPI.Distribution`         | explicit probability density/mass function whose sample space is all possible target observations (possible requirement: observation implements `Distributions.pdf` and `Base.rand`) |
+| `LearnAPI.LogDistribution`      | explicit log probability density/mass function whose sample space is possible target observations (possible requirement: observation implements `Distributions.logpdf` and `Base.rand`) |
+|  † `LearnAPI.Probability`       | raw numerical probability or probability vector |
+|  † `LearnAPI.LogProbability`    | log probability or log probability vector | 
 |  † `LearnAPI.Parametric`        | a list of parameters (e.g., mean and variance) describing some distribution |
-| `LearnAPI.LabelAmbiguous`            | same form as the (multi-class) target, but with new, unmatched labels of possibly unequal number (as in, e.g., clustering)| 
+| `LearnAPI.LabelAmbiguous`            | same form as the (multi-class) target, but selected from new unmatched labels of possibly unequal number (as in, e.g., clustering)| 
 | `LearnAPI.LabelAmbiguousSampleable`  | sampleable version of `LabelAmbiguous`; see `Sampleable` above  |
 | `LearnAPI.LabelAmbiguousDistribution`| pdf/pmf version of `LabelAmbiguous`; see `Distribution`  above  |
-| `LearnAPI.ConfidenceInterval`   | confidence intervals |  Each observation `isa Tuple{Real,Real}`.
-| `LearnAPI.SurvivalFunction`     | survival functions | Observations are single-argument functions mapping `Real` to `Real`.
-| `LearnAPI.SurvivalDistribution` | probability distribution for survival time | Observations have type `Distributions.ContinuousUnivariateDistribution`.
+| `LearnAPI.ConfidenceInterval`   | confidence interval (possible requirement:  observation `isa Tuple{Real,Real}`) |
+| `LearnAPI.Set`                  | finite but possibly varying number of target observations (possible requirement: observation isa `Set{target_observation_type}`) |
+| `LearnAPI.ProbabilisticSet`      | as for `Set` but labelled with probabilities (not necessarily summing to one) |
+| `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
+| `LearnAPI.SurvivalDistribution` | probability distribution for survival time (possible requirement: observation have type `Distributions.ContinuousUnivariateDistribution`) |
 
 > **† MLJ only.** To avoid [ambiguities in
 > representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation),
-> these options are disallowed, in favour of the preceding alternatives.
+> these options are disallowed, in favour of preceding alternatives.
 
 !!! warning
 
-	The last column of the table is not part of LearnAPI.jl.
+	The "possible requirement"s listed are not part of LearnAPI.jl.
 
 An operation with target proxy as output must declare the `TargetProxy` subtype using the
 [`LearnAPI.target_proxy_kind`](@ref), as in

@@ -43,6 +43,10 @@ omitted, then one must make the declaration
 
 and overload `Base.==` if the type is mutable.
 
+A keyword constructor providing default values for all non-model hyper-parameters is
+required. If a model has other models as hyper-parameters, its
+[`LearnAPI.is_wrapper`](@ref) trait must be set to `true`.
+
 > **MLJ only.** The subtyping also ensures instances will be displayed according to a
 > standard MLJ convention, assuming MLJ or MLJBase is loaded.
 

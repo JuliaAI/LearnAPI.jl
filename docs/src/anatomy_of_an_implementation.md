@@ -42,7 +42,8 @@ as a promise that instances of `MyRidge` implement LearnAPI.jl.
 
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
-A keyword argument constructor providing default hyper-parameters is strongly recommended:
+A keyword argument constructor providing defaults for all hyper-parameters should be
+provided:
 
 ```julia
 MyRidge(; lambda=0.1) = MyRidge(lambda)
@@ -161,7 +162,8 @@ and the contracts they imply is given in [Model Traits](@ref).
 > package is registered there.
 
 We also need to indicate that the target appears in training (this is a *supervised*
-model) and the position of `target` within the `data` argument of `fit`:
+model). We do this by declaring *where* in the list of training data arguments (in this
+case `(X, y)`) the target variable (in this case `y`) appears:
 
 ```julia
 @trait MyRidge position_of_target = 2
@@ -169,14 +171,14 @@ model) and the position of `target` within the `data` argument of `fit`:
 
 As explained in the introduction, LearnAPI.jl does not attempt to define strict model
 "types", such as "regressor" or "clusterer". However, we can optionally specify suggestive
-keywords, as in
+descriptors, as in
 
 ```julia
-@trait MyRidge keywords = (:regression,)
+@trait MyRidge descriptors = (:regression,)
 ```
 
-but note that this declaration promises nothing. Do `LearnAPI.keywords()` to get a list
-of available keywords.
+but note that this declaration promises nothing. Do `LearnAPI.descriptors()` to get a list
+of available descriptors.
 
 Finally, we are required to declare what methods (excluding traits) we have explicitly
 overloaded for our type:
