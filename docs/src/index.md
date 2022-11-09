@@ -79,14 +79,20 @@ and that is all. *It does not specify an interface for data access or data
 resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions (in
 **boldface**) which some higher-level interface might decide to formalize:
 
-- An object which generates ordered sequences of individual **observations** is
-  called **data**.
+- An object which generates ordered sequences of individual **observations** is called
+  **data**. For example a `DataFrame` instance, from
+  [DataFrames.jl](https://dataframes.juliadata.org/stable/), is considered data, the
+  observatons being the rows. A matrix can be considered data, but whether the
+  observations are rows or columns is ambiguous and not fixed by LearnAPI.
 
 - Each machine learning model's behaviour is governed by a number of user-specified
-  **hyperparameters**.
+  **hyperparameters**. The regularization parameter in ridge regression is an
+  example. Hyperparameters are data independent. For example, the number of target classes
+  is not a hyperparameter.
 
-- Information needed for training that is not a model hyperparameter and not data is called
-  **metadata** (e.g., target class weights and group lasso feature groupings).
+- Information needed for training that is not a model hyperparameter and not data is
+  called **metadata**. Examples, include target *class* weights and group lasso feature
+  groupings.
 
 - Some models involve the notion of a **target** variable and generate output with the
   same form as the target, or, more generally, some kind of target proxy, such as
