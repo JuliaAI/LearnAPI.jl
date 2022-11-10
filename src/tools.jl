@@ -17,5 +17,5 @@ macro trait(model_ex, exs...)
             :($LearnAPI.$trait_ex(::Type{<:$model_ex}) = $value_ex),
         )
     end
-    return program
+    return esc(program)
 end

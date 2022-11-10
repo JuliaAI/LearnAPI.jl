@@ -13,8 +13,8 @@ A basic Julia interface for training and applying machine learning models </span
 - For developers wanting to **IMPLEMENT** the learn API for new ML models: See [Anatomy of
   an Implementation](@ref).
 
-- For those who want to **USE** models implementing LearnAPI.jl: Users
-can interact directly with LearnAPI.jl models, as illustrated [here](@ref workflow).
+- For those who want to **USE** models implementing LearnAPI.jl: Basic fit/predict
+  workflow is illustrated [here](@ref workflow).
 
 ## Approach
 
@@ -118,7 +118,7 @@ the definitive specification of the interface is the [Reference](@ref) section.
 
 - [Common Implementation Patterns](@ref) (User Guide)
 
-- [Reference](@ref)
+- [Reference](@ref) (Official Specification)
 
 - [Testing an Implementation](@ref)
 
