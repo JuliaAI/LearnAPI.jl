@@ -1,4 +1,4 @@
-# [Predict and other operations](@id operations)
+# [Predict and Other Operations](@id operations)
 
 > **Summary** Methods like `predict` and `transform`, that generally depend on learned
 > parameters, are called **operations**. All implemented operations must be included in

@@ -75,5 +75,5 @@ For examples, see [Anatomy of an Interface](@ref).
 - [Accessor Functions](@ref): accessing certain byproducts of training that many models
   share, such as feature importances and training losses
 
-- [Model Traits](@ref): contracts for specific behaviour, such as "I am supervised" or "I
-  predict probability distributions"
+- [Model Traits](@ref): contracts for specific behaviour, such as "The second data
+  argument of `fit` is a target variable" or "I predict probability distributions".
