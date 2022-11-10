@@ -8,12 +8,13 @@ A basic Julia interface for training and applying machine learning models </span
 <br><br>
 ```
 
-**Quick tour for developers of ML software.** For a rapid overview, by way of a sample
-implementation, see [Anatomy of an Implementation](@ref).
+## Quick tours
 
-**Quick tour for users of models implementing LearnAPI.jl.** Although primarily intended
-as a basement-level machine learning interface for developers, users can interact directly
-with LearnAPI.jl models, as illustrated [here](@ref workflow).
+- For developers wanting to **IMPLEMENT** the learn API for new ML models: See [Anatomy of
+  an Implementation](@ref).
+
+- For those who want to **USE** models implementing LearnAPI.jl: Users
+can interact directly with LearnAPI.jl models, as illustrated [here](@ref workflow).
 
 ## Approach
 
@@ -25,8 +26,10 @@ ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads t
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
 machine learning might benefit from such groupings, a basement-level API for ML should, in
-our view, avoid them. In LearnAPI model behavour is articulated using a number of
-traits.
+our view, avoid them. In
+
+LearnAPI model behaviour is articulated using a number of traits. There is no abstract
+type model hierarchy.
 
 That said, for certain models involving a "target" variable (understood in a rather
 general way - see below) there is a clear-cut classification based on the proxy for the
@@ -51,8 +54,8 @@ articulated using traits. It has no abstract model types, apart from an optional
 - **operations**, such as `predict`, `transform` and `inverse_transform` for applying the
   model to data not used for training
 
-- common **access functions**, such as `feature_importances` and `training_losses`, for
-  extracting, from training outcomes information, common to particular classes of models
+- common **accessor functions**, such as `feature_importances` and `training_losses`, for
+  extracting, from training outcomes, information common to different types of models
 
 - **model traits**, such as `target_proxy_kind(model)`, for promising specific behaviour
 
