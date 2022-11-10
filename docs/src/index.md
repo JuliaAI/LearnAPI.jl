@@ -26,9 +26,9 @@ ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads t
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
 machine learning might benefit from such groupings, a basement-level API for ML should, in
-our view, avoid them. In
+our view, avoid them.
 
-LearnAPI model behaviour is articulated using a number of traits. There is no abstract
+In LearnAPI model behaviour is articulated using a number of traits. There is no abstract
 type model hierarchy.
 
 That said, for certain models involving a "target" variable (understood in a rather
