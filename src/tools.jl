@@ -66,7 +66,7 @@ function snakecase(str::AbstractString; delim='_')
                 !(is_uppercase(str[i + 1]) && is_uppercase(str[i - 1]))
                 push!(snake, delim)
             end
-            push!(snake, uppercacase(char))
+            push!(snake, lowercase(char))
         else
             push!(snake, char)
         end
