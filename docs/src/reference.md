@@ -25,7 +25,7 @@ performance issues in packages adopting LearnAPI.jl.
 
 The only formal requirements of models are properties 1 and 2 given below in the
 following explanation of the an **optional** supertype `LearnAPI.Model` for model
-types.
+types:
 
 ```@docs
 LearnAPI.Model

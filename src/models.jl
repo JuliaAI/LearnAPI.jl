@@ -1,9 +1,11 @@
 const DOC_MODEL =
-    """
-    1. `m` is an object whose properties, as returned by `getproperty(m, field)` for `field in propertynames(m)`, represent the hyper-parameters of a machine learning algorithm, reflected in the name of the type of `m`.
+"""
 
-    2. If `n` is another model, then `m == n` if and only if `typeof(n) == typeof(m)` and corresponding properties are `==`.
-    """
+1. The properties of `m`, as returned by `getproperty(m, field)` for `field in propertynames(m)`, represent the hyper-parameters of a machine learning algorithm (reflected in the name of the type of `m`).
+
+2. If `n` is another model, then `m == n` if and only if `typeof(n) == typeof(m)` and corresponding properties are `==`.
+
+"""
 
 abstract type MLType end
 
@@ -15,7 +17,7 @@ An optional abstract type for models implementing LearnAPI.jl.
 If `typeof(m) <: LearnAPI.Model`, then `m` is guaranteed to be a model in the LearnAPI.jl
 sense. Specifically, this means:
 
-    $DOC_MODEL
+$DOC_MODEL
 
 # New model implementations
 
