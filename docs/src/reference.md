@@ -14,8 +14,8 @@ In this document the word "model" has a very specific meaning that may differ fr
 reader's common understanding of the word - in statistics, for example. In this document a
 **model** is any julia object, `some_model` say, storing the hyper-parameters of some
 learning algorithm that are accessible as named properties of the model, as in
-`some_model.epochs`. Calling `Base.propertynames(some_model)` must return the names of those
-hyper-parameters.
+`some_model.epochs`. Calling `Base.propertynames(some_model)` must return the names of
+those hyper-parameters.
 
 It is supposed that making copies of model objects is a cheap operation. Consequently,
 *learned* parameters, such as weights in a neural network (the `fitted_params` described
@@ -23,46 +23,43 @@ in [Fit, update! and ingest!](@ref)) are not expected to be part of a model. Sto
 learned parameters in a model is not explicitly ruled out, but doing so might lead to
 performance issues in packages adopting LearnAPI.jl.
 
-Two models with the same type should be `==` if and only if all their hyper-parameters are
-`==`. Of course, a hyper-parameter could be another model.
+The only formal requirements of models are properties 1 and 2 given below in the
+following explanation of the an **optional** supertype `LearnAPI.Model` for model
+types.
 
-Any instance of `SomeType` below is a model in the above sense:
+```@docs
+LearnAPI.Model
+```
+
+### Example
+
+Any instance of `GradientRidgeRegressor` defined below is a valid LearnAPI.jl model:
 
 ```julia
-struct SomeType{T<:Real} <: LearnAPI.Model
+struct GradientRidgeRegressor{T<:Real} <: LearnAPI.Model
+    learning_rate::T
     epochs::Int
-    lambda::T
+    l2_regularization::T
 end
 ```
 
-The subtyping `<: LearnAPI.Model` is optional. If it is included and the type is instead
-a `mutable struct`, then there is no need to explicitly overload `Base.==`. If it is
-omitted, then one must make the declaration
+The same is true if we omit the subtyping `<: LearnAPI.Model`, but not if we also make
+this a `mutable struct`. In that case we will need to overload `Base.==` for
+`GradientRidgeRegressor`.
 
-`LearnAPI.ismodel(::SomeType) = true`
-
-and overload `Base.==` if the type is mutable.
-
-A keyword constructor providing default values for all non-model hyper-parameters is
+A keyword constructor providing default values for *all* non-model hyper-parameters is
 required. If a model has other models as hyper-parameters, its
 [`LearnAPI.is_wrapper`](@ref) trait must be set to `true`.
 
-> **MLJ only.** The subtyping also ensures instances will be displayed according to a
-> standard MLJ convention, assuming MLJ or MLJBase is loaded.
-
-```@docs
-LearnAPI.ismodel
-LearnAPI.Model
-```
 
 ## Methods
 
 None of the methods described in the linked sections below are compulsory, but any
 implemented or overloaded method that is not a model trait must be added to the return
-value of [`LearnAPI.implemented_methods`](@ref), as in
+value of [`LearnAPI.methods`](@ref), as in
 
 ```julia
-LearnAPI.implemented_methods(::Type{<SomeModelType}) = (:fit, update!, predict)
+LearnAPI.methods(::Type{<SomeModelType}) = (:fit, update!, predict)
 ```
 
 For examples, see [Anatomy of an Interface](@ref).

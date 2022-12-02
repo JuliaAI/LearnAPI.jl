@@ -40,13 +40,13 @@ implementation itself promises, by making an optional [`LearnAPI.output_scitypes
 declaration.
 
 If `predict` is computing a target proxy, as defined in the MLJLearn documentation, then a
-[`LearnAPI.target_proxy_kind`](@ref) declaration is required, as in
+[`LearnAPI.target_proxy`](@ref) declaration is required, as in
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
+LearnAPI.target_proxy(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
 ```
 
-Do `LearnAPI.target_proxy_kind()` to list the available kinds.
+Do `LearnAPI.target_proxy()` to list the available kinds.
 
 By default, it is expected that `data` has length one. Otherwise,
 [`LearnAPI.input_scitypes`](@ref) must be overloaded.
@@ -96,11 +96,14 @@ end
 """
     LearnAPI.predict_joint(model, fitted_params, data...)
 
-For a supervised learning model, return `(d, report)`, where `d` is a *single* probability
-distribution for the sample space ``Y^n``, where ``Y`` is the space in which the target
-variable associated with `model` takes its values. Here `n` is the number of observations
-in `data`.  Here `fitted_params` are the model's learned parameters, as returned by a
-preceding call to [`LearnAPI.fit`](@ref). $DOC_NEW_DATA.
+For a supervised learning model, return `(d, report)`, where `d` is some representation of
+the *single* probability distribution for the sample space ``Y^n``. Here ``Y`` is the
+space in which the target variable associated with `model` takes its values, and `n` is
+the number of observations in `data`. The specific form of the representation is given by
+`LearnAPI.target_proxy(model)`.
+
+Here `fitted_params` are the model's learned parameters, as returned by a preceding call
+to [`LearnAPI.fit`](@ref). $DOC_NEW_DATA.
 
 While the interpretation of this distribution depends on the model, marginalizing
 component-wise will generally deliver *correlated* univariate distributions, and these will
@@ -110,10 +113,10 @@ generally not agree with those returned by `LearnAPI.predict`, if also implement
 
 Only implement this method if `model` has an associated concept of target variable, as
 defined in the LearnAPI.jl documentation. A trait declaration
-[`LearnAPI.target_proxy_kind`](@ref), such as
+[`LearnAPI.target_proxy`](@ref), such as
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{SomeModel}) = (predict_joint=JointSampleable(),)
+LearnAPI.target_proxy(::Type{SomeModel}) = (; predict_joint=Sampleable())
 ```
 
 is required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
@@ -183,3 +186,24 @@ function inverse_transform end
 
 function save end
 function restore end
+
+
+# # TARGET PROXIES
+
+abstract type TargetProxy end
+
+struct TrueTarget <: TargetProxy end
+struct Sampleable <: TargetProxy end
+struct Distribution <: TargetProxy end
+struct LogDistribution <: TargetProxy end
+struct Probability <: TargetProxy end
+struct LogProbability <: TargetProxy end
+struct Parametric <: TargetProxy end
+struct LabelAmbiguous <: TargetProxy end
+struct LabelAmbiguousSampleable <: TargetProxy end
+struct LabelAmbiguousDistribution <: TargetProxy end
+struct ConfidenceInterval <: TargetProxy end
+struct Set <: TargetProxy end
+struct ProbabilisticSet <: TargetProxy end
+struct SurvivalFunction <: TargetProxy end
+struct SurvivalDistribution <: TargetProxy end

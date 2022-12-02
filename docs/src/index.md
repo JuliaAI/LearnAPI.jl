@@ -10,18 +10,18 @@ A basic Julia interface for training and applying machine learning models </span
 
 ## Quick tours
 
-- For developers wanting to **IMPLEMENT** the learn API for new ML models: See [Anatomy of
+- For developers wanting to **implement** LearnAPI: [Anatomy of
   an Implementation](@ref).
 
-- For those who want to **USE** models implementing LearnAPI.jl: Basic fit/predict
-  workflow is illustrated [here](@ref workflow).
+- For those who wanting to **USE** models implementing LearnAPI.jl: [Basic fit/predict
+  workflow](@ref workflow).
 
 ## Approach
 
-Machine learning algorithms, also called *models*, have a complicated taxonomy. Grouping
-models, or modelling tasks, into a relatively small number of types, such as "classifier"
-and "clusterer", and attempting to impose uniform behaviour within each group, is
-challenging. In our experience developing the [MLJ
+Machine learning algorithms, also called *models*, have a complicated
+taxonomy. Grouping models, or modelling tasks, into a relatively small number of types,
+such as "classifier" and "clusterer", and attempting to impose uniform behaviour within
+each group, is challenging. In our experience developing the [MLJ
 ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads to
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
@@ -31,11 +31,12 @@ our view, avoid them.
 In LearnAPI model behaviour is articulated using a number of traits. There is no abstract
 type model hierarchy.
 
-That said, for certain models involving a "target" variable (understood in a rather
-general way - see below) there is a clear-cut classification based on the proxy for the
-target as actually output by the model. Probability distributions, confidence intervals
-and survival functions are examples of [Target proxies](@ref). LearnAPI provides
-a trait for distinguishing such models based on the kind of target proxy.
+Our preceding remarks notwithstanding, there is, for certain applications involving a
+"target" variable (understood in a rather general way - see below) a clear-cut distinction
+between models, based on the proxy for the target as actually output by the
+model. Probability distributions, confidence intervals and survival functions are examples
+of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
+on the target proxy.
 
 ## Methods
 
@@ -57,10 +58,10 @@ articulated using traits. It has no abstract model types, apart from an optional
 - common **accessor functions**, such as `feature_importances` and `training_losses`, for
   extracting, from training outcomes, information common to different types of models
 
-- **model traits**, such as `target_proxy_kind(model)`, for promising specific behaviour
+- **model traits**, such as `target_proxy(model)`, for promising specific behaviour
 
 There is flexibility about how much of the interface is implemented by a given model
-object `model`. A special trait `implemented_methods(model)` declares what has been
+object `model`. A special trait `methods(model)` declares what has been
 explicitly implemented or overloaded to work with `model`.
 
 Since this is a functional-style interface, `fit` returns model `state`, in addition to
