@@ -95,8 +95,10 @@ Regarding the return value of `fit`:
 Our `fit` method assumes that `X` is a table (satifies the [Tables.jl
 spec](https://github.com/JuliaData/Tables.jl)) whose rows are the observations; and it
 will need need `y` to be an `AbstractFloat` vector. A model implementation is free to
-dictate the representation of data that `fit` accepts but must articulate its requirements
-using appropriate traits; see [Training data types](@ref) below.
+dictate the representation of data that `fit` accepts but articulates its requirements
+using appropriate traits; see [Training data types](@ref) below. We recommend against data
+type checks internal to `fit`; this would ordinarily be the responsibility of a higher
+level API, using those trasits. 
 
 
 ## Operations

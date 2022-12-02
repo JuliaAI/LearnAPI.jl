@@ -13,7 +13,7 @@ A basic Julia interface for training and applying machine learning models </span
 - For developers wanting to **IMPLEMEMT** LearnAPI: [Anatomy of
   an Implementation](@ref).
 
-- For those who wanting to **USE** models implementing LearnAPI.jl: [Basic fit/predict
+- For those who wanting to **USE** models implementing LearnAPI: [Basic fit/predict
   workflow](@ref workflow).
 
 ## Approach
@@ -43,9 +43,10 @@ on the target proxy.
 
 ## Methods
 
-LearnAPI.jl is a base interface for machine learning algorithms in which behaviour is
-articulated using traits. It has no abstract model types, apart from an optional supertype
-`Model`. It provides the following methods, dispatched on model type:
+In LearnAPI.jl a *model* is just a container for the hyper-parameters of some machine
+learning algorithm, and that's all. It does not include learned parameters.
+
+The following methods, dispatched on model type, are provided:
 
 - `fit` for regular training, overloaded if the model generalizes to new data, as in
   classical supervised learning
@@ -94,7 +95,7 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
 
 - Each machine learning model's behaviour is governed by a number of user-specified
   **hyperparameters**. The regularization parameter in ridge regression is an
-  example. Hyperparameters are data independent. For example, the number of target classes
+  example. Hyperparameters are data-independent. For example, the number of target classes
   is not a hyperparameter.
 
 - Information needed for training that is not a model hyperparameter and not data is
