@@ -10,7 +10,7 @@ A basic Julia interface for training and applying machine learning models </span
 
 ## Quick tours
 
-- For developers wanting to **implement** LearnAPI: [Anatomy of
+- For developers wanting to **IMPLEMEMT** LearnAPI: [Anatomy of
   an Implementation](@ref).
 
 - For those who wanting to **USE** models implementing LearnAPI.jl: [Basic fit/predict
@@ -28,8 +28,11 @@ complexity needed to cope with exceptional cases. Even if a complete user interf
 machine learning might benefit from such groupings, a basement-level API for ML should, in
 our view, avoid them.
 
-In LearnAPI model behaviour is articulated using a number of traits. There is no abstract
-type model hierarchy.
+In a addition to basic methods, like `fit` and `predict`, LearnAPI provides a large number
+of optional model
+[traits](https://ahsmart.com/pub/holy-traits-design-patterns-and-best-practice-book/),
+each promising a specific kind of behaviour, such as "The predictions of this model are
+probability distributions".  There is no abstract type model hierarchy.
 
 Our preceding remarks notwithstanding, there is, for certain applications involving a
 "target" variable (understood in a rather general way - see below) a clear-cut distinction
