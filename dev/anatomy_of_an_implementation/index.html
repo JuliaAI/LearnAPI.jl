@@ -46,59 +46,9 @@ a, b, c = rand(n), rand(n), rand(n)
 X = (; a, b, c) |&gt; Tables.rowtable
 y = 2a - b + 3c + 0.05*rand(n)</code></pre><p>Instantiate a model with relevant hyperparameters:</p><pre><code class="language-julia hljs">model = MyRidge(lambda=0.5)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Main.MyRidge(0.5)</code></pre><p>Train the model:</p><pre><code class="language-julia hljs">import LearnAPI: fit, predict, feature_importances
 
-fitted_params, state, fit_report = fit(model, 1, X[train], y[train])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">((coefficients = [1.0971271065491959, 0.6628916467417865, 1.5589834433343253],), nothing, (feature_importances = Union{}[],))</code></pre><p>Inspect the learned paramters and report:</p><pre><code class="language-julia hljs">@info &quot;training outcomes&quot; fitted_params report</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌ Error: Exception while generating log record in module Main at anatomy_of_an_implementation.md:301
-│   exception =
-│    UndefVarError: report not defined
-│    Stacktrace:
-│      [1] logging_error(logger::Any, level::Any, _module::Any, group::Any, id::Any, filepath::Any, line::Any, err::Any, real::Bool)
-│        @ Base.CoreLogging ./logging.jl:462
-│      [2] top-level scope
-│        @ logging.jl:352
-│      [3] eval
-│        @ ./boot.jl:368 [inlined]
-│      [4] #17
-│        @ ~/.julia/packages/Documenter/yf96B/src/Expanders.jl:629 [inlined]
-│      [5] cd(f::Documenter.Expanders.var&quot;#17#19&quot;{Module, Expr}, dir::String)
-│        @ Base.Filesystem ./file.jl:112
-│      [6] (::Documenter.Expanders.var&quot;#16#18&quot;{Documenter.Documents.Page, Module, Expr})()
-│        @ Documenter.Expanders ~/.julia/packages/Documenter/yf96B/src/Expanders.jl:628
-│      [7] (::IOCapture.var&quot;#3#5&quot;{DataType, Documenter.Expanders.var&quot;#16#18&quot;{Documenter.Documents.Page, Module, Expr}, Task, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}, IOContext{Base.PipeEndpoint}})()
-│        @ IOCapture ~/.julia/packages/IOCapture/sXY71/src/IOCapture.jl:118
-│      [8] with_logstate(f::Function, logstate::Any)
-│        @ Base.CoreLogging ./logging.jl:511
-│      [9] with_logger
-│        @ ./logging.jl:623 [inlined]
-│     [10] capture(f::Documenter.Expanders.var&quot;#16#18&quot;{Documenter.Documents.Page, Module, Expr}; rethrow::Type, color::Bool)
-│        @ IOCapture ~/.julia/packages/IOCapture/sXY71/src/IOCapture.jl:116
-│     [11] runner(#unused#::Type{Documenter.Expanders.ExampleBlocks}, x::Markdown.Code, page::Documenter.Documents.Page, doc::Documenter.Documents.Document)
-│        @ Documenter.Expanders ~/.julia/packages/Documenter/yf96B/src/Expanders.jl:627
-│     [12] dispatch(::Type{Documenter.Expanders.ExpanderPipeline}, ::Markdown.Code, ::Vararg{Any})
-│        @ Documenter.Utilities.Selectors ~/.julia/packages/Documenter/yf96B/src/Utilities/Selectors.jl:170
-│     [13] expand(doc::Documenter.Documents.Document)
-│        @ Documenter.Expanders ~/.julia/packages/Documenter/yf96B/src/Expanders.jl:42
-│     [14] runner(#unused#::Type{Documenter.Builder.ExpandTemplates}, doc::Documenter.Documents.Document)
-│        @ Documenter.Builder ~/.julia/packages/Documenter/yf96B/src/Builder.jl:226
-│     [15] dispatch(#unused#::Type{Documenter.Builder.DocumentPipeline}, x::Documenter.Documents.Document)
-│        @ Documenter.Utilities.Selectors ~/.julia/packages/Documenter/yf96B/src/Utilities/Selectors.jl:170
-│     [16] #2
-│        @ ~/.julia/packages/Documenter/yf96B/src/Documenter.jl:273 [inlined]
-│     [17] cd(f::Documenter.var&quot;#2#3&quot;{Documenter.Documents.Document}, dir::String)
-│        @ Base.Filesystem ./file.jl:112
-│     [18] makedocs(; debug::Bool, format::Documenter.Writers.HTMLWriter.HTML, kwargs::Base.Pairs{Symbol, Any, NTuple{4, Symbol}, NamedTuple{(:modules, :pages, :repo, :sitename), Tuple{Vector{Module}, Vector{Pair{String, String}}, String, String}}})
-│        @ Documenter ~/.julia/packages/Documenter/yf96B/src/Documenter.jl:272
-│     [19] top-level scope
-│        @ ~/work/LearnAPI.jl/LearnAPI.jl/docs/make.jl:6
-│     [20] include(fname::String)
-│        @ Base.MainInclude ./client.jl:476
-│     [21] top-level scope
-│        @ none:8
-│     [22] eval
-│        @ ./boot.jl:368 [inlined]
-│     [23] exec_options(opts::Base.JLOptions)
-│        @ Base ./client.jl:276
-│     [24] _start()
-│        @ Base ./client.jl:522
-└ @ Main anatomy_of_an_implementation.md:301</code></pre><p>Inspect feature importances:</p><pre><code class="language-julia hljs">feature_importances(model, fitted_params, fit_report)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Union{}[]</code></pre><p>Make a prediction using new data:</p><pre><code class="language-julia hljs">yhat, predict_report = predict(model, fitted_params, X[test])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([1.5709993804281857, 1.2136842923535265, 2.4330292581569006, 2.1534275029982064], nothing)</code></pre><p>Compare predictions with ground truth</p><pre><code class="language-julia hljs">deviations = yhat - y[test]
+fitted_params, state, fit_report = fit(model, 1, X[train], y[train])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">((coefficients = [0.9484658202260167, 0.27133167264073177, 1.8339554862725753],), nothing, (feature_importances = Union{}[],))</code></pre><p>Inspect the learned paramters and report:</p><pre><code class="language-julia hljs">@info &quot;training outcomes&quot; fitted_params fit_report</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌ Info: training outcomes
+│   fitted_params = (coefficients = [0.9484658202260167, 0.27133167264073177, 1.8339554862725753],)
+└   fit_report = (feature_importances = Union{}[],)</code></pre><p>Inspect feature importances:</p><pre><code class="language-julia hljs">feature_importances(model, fitted_params, fit_report)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Union{}[]</code></pre><p>Make a prediction using new data:</p><pre><code class="language-julia hljs">yhat, predict_report = predict(model, fitted_params, X[test])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([1.9530617379074555, 2.52109485683852, 1.2000497720119905, 1.1526533968011994], nothing)</code></pre><p>Compare predictions with ground truth</p><pre><code class="language-julia hljs">deviations = yhat - y[test]
 loss = deviations .^2 |&gt; sum
 @info &quot;Sum of squares loss&quot; loss</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌ Info: Sum of squares loss
-└   loss = 3.477514671185923</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_implementation_patterns/">Common Implementation Patterns »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Friday 2 December 2022 20:19">Friday 2 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+└   loss = 2.4805755516149226</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_implementation_patterns/">Common Implementation Patterns »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Friday 2 December 2022 21:31">Friday 2 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
