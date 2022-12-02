@@ -298,7 +298,7 @@ fitted_params, state, fit_report = fit(model, 1, X[train], y[train])
 Inspect the learned paramters and report:
 
 ```@example anatomy
-@info "training outcomes" fitted_params report
+@info "training outcomes" fitted_params fit_report
 ```
 
 Inspect feature importances:
