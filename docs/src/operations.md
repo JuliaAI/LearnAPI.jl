@@ -37,7 +37,7 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
   [`LearnAPI.predict_joint`](@ref).
 
 - Each operation explicitly implemented or overloaded must be included in the return value
-  of [`LearnAPI.methods`](@ref).
+  of [`LearnAPI.functions`](@ref).
 
 ## Predict or transform?
 

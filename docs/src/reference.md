@@ -56,10 +56,10 @@ required. If a model has other models as hyper-parameters, its
 
 None of the methods described in the linked sections below are compulsory, but any
 implemented or overloaded method that is not a model trait must be added to the return
-value of [`LearnAPI.methods`](@ref), as in
+value of [`LearnAPI.functions`](@ref), as in
 
 ```julia
-LearnAPI.methods(::Type{<SomeModelType}) = (:fit, update!, predict)
+LearnAPI.functions(::Type{<SomeModelType}) = (:fit, update!, predict)
 ```
 
 For examples, see [Anatomy of an Interface](@ref).

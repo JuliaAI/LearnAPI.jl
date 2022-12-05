@@ -15,7 +15,7 @@ Return the model-specific feature importances of `model`, given `fittted_params`
 => 0.1]`).
 
 The `model` supports feature importances if `:feature_importance in
-LearnAPI.methods(model)`.
+LearnAPI.functions(model)`.
 
 If for some reason a model is sometimes unable to report feature importances, then
 `feature_importances` will return all importances as 0.0, as in `[:gender =>0.0, :height

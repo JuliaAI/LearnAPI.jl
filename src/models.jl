@@ -21,11 +21,11 @@ $DOC_MODEL
 
 # New model implementations
 
-Overloading [`LearnAPI.methods`](@ref) for a given type implies a promise that instances
+Overloading [`LearnAPI.functions`](@ref) for a given type implies a promise that instances
 of that type are LearnAPI.jl models in the above sense. If one subtypes `LearnAPI.Model`,
 then this promise automatically holds true.
 
-See also [`LearnAPI.methods`](@ref).
+See also [`LearnAPI.functions`](@ref).
 
 """
 abstract type Model <: MLType end

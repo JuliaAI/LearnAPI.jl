@@ -8,7 +8,7 @@ const DOC_OPERATIONS =
 function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     word = overloaded ? "overloaded" : "implemented"
     "If $word, include `:$name` in the tuple returned by the "*
-    "[`LearnAPI.methods`](@ref) trait. "
+    "[`LearnAPI.functions`](@ref) trait. "
 end
 
 const DOC_WHAT_IS_DATA =

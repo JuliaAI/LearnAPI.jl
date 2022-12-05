@@ -1,18 +1,44 @@
 # There are two types of traits - ordinary traits that an implemenation overloads to make
 # promises of model behaviour, and derived traits, which are never overloaded.
 
+const DERIVED_TRAITS = (:name, :ismodel)
+const ORDINARY_TRAITS = (
+    :functions,
+    :target_proxy,
+    :position_of_target,
+    :position_of_weights,
+    :descriptors,
+    :is_pure_julia,
+    :pkg_name,
+    :pkg_license,
+    :doc_url,
+    :load_path,
+    :is_wrapper,
+    :fit_keywords,
+    :human_name,
+    :iteration_parameter,
+    :fit_data_scitype,
+    :fit_data_type,
+    :fit_observation_scitypes,
+    :fit_observation_types,
+    :input_scitypes,
+    :input_types,
+    :output_scitypes,
+    :output_types,
+)
 
 # # DERIVED TRAITS
 
 name(M::Type) = string(typename(M))
+ismodel(M::Type) = !isempty(functions(M))
 
 
 # # ORDINARY TRAITS
 
-methods() = METHODS = (OPERATIONS..., ACCESSOR_FUNCTIONS...)
+functions() = METHODS = (OPERATIONS..., ACCESSOR_FUNCTIONS...)
 
 """
-   LearnAPI.methods(m)
+   LearnAPI.functions(m)
 
 Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI.jl
 methods implemented for objects having the same type as `m`.
@@ -26,7 +52,7 @@ $DOC_MODEL
 
 # New model implementations
 
-Elements of the returned tuple must come from this list: $(join(string.(methods()), ", ")).
+Elements of the returned tuple must come from this list: $(join(string.(functions()), ", ")).
 
 A new type whose instances are intended to be LearnAPI models can guarantee that by
 subtyping [`LearnAPI.Model`](@ref).
@@ -34,10 +60,7 @@ subtyping [`LearnAPI.Model`](@ref).
 See also [`LearnAPI.Model`](@ref).
 
 """
-methods(::Type) = ()
-
-ismodel(::Any) = false
-ismodel(::Model) = true
+functions(::Type) = ()
 
 target_proxy(::Type) = NamedTuple()
 
@@ -92,7 +115,7 @@ iteration_parameter(::Type) = nothing
 
 fit_data_scitype(::Type) = Union{}
 
-fit_data_types(::Type) = Union{}
+fit_data_type(::Type) = Union{}
 
 fit_observation_scitypes(::Type) = Union{}
 

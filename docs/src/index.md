@@ -36,7 +36,7 @@ probability distributions".  There is no abstract type model hierarchy.
 
 Our preceding remarks notwithstanding, there is, for certain applications involving a
 "target" variable (understood in a rather general way - see below) a clear-cut distinction
-between models, based on the proxy for the target as actually output by the
+between models, based on the proxy for the target that is actually output by the
 model. Probability distributions, confidence intervals and survival functions are examples
 of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
 on the target proxy.
@@ -65,8 +65,8 @@ The following methods, dispatched on model type, are provided:
 - **model traits**, such as `target_proxy(model)`, for promising specific behaviour
 
 There is flexibility about how much of the interface is implemented by a given model
-object `model`. A special trait `methods(model)` declares what has been
-explicitly implemented or overloaded to work with `model`.
+object `model`. A special trait `functions(model)` declares what has been explicitly
+implemented or overloaded to work with `model`, excluding traits.
 
 Since this is a functional-style interface, `fit` returns model `state`, in addition to
 learned parameters, for passing to the optional `update!` and `ingest!` methods. These
