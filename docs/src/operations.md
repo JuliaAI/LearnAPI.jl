@@ -19,9 +19,6 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
 | method                             | compulsory? | fallback | requires    |
 |:-----------------------------------|:-----------:|:--------:|:-----------:|
 [`LearnAPI.predict`](@ref)           | no          | none     |             |
-[`LearnAPI.predict_mode`](@ref)      | no          | none     | `predict`   |
-[`LearnAPI.predict_mean`](@ref)      | no          | none     | `predict`   |
-[`LearnAPI.predict_median`](@ref)    | no          | none     | `predict`   |
 [`LearnAPI.predict_joint`](@ref)     | no          | none     |             |
 [`LearnAPI.transform`](@ref)         | no          | none     |             |
 [`LearnAPI.inverse_transform`](@ref) | no          | none     | `transform` |
@@ -128,8 +125,6 @@ See more at [`LearnAPI.predict_joint`](@ref) below.
 
 ```@docs
 LearnAPI.predict
-LearnAPI.predict_mean
-LearnAPI.predict_median
 LearnAPI.predict_joint
 LearnAPI.transform
 LearnAPI.inverse_transform

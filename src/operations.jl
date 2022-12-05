@@ -1,10 +1,6 @@
-const PREDICT_OPERATIONS = (:predict,
-                            :predict_mode,
-                            :predict_mean,
-                            :predict_median,
-                            :predict_joint)
+const PREDICT_OPERATIONS = (
 
-const OPERATIONS = (PREDICT_OPERATIONS..., :transform, :inverse_transform)
+const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
 
 const DOC_NEW_DATA =
     "Here `report` contains ancilliary byproducts of the computation, or "*
@@ -57,41 +53,41 @@ See also [`LearnAPI.fit`](@ref), [`LearnAPI.predict_mean`](@ref),
 """
 function predict end
 
-function DOC_PREDICT(reducer)
-    operation = Symbol(string("predict_", reducer))
-    extra = DOC_IMPLEMENTED_METHODS(operation, overloaded=true)
-    """
-        LearnAPI.predict_$reducer(model, fitted_params, data...)
+# function DOC_PREDICT(reducer)
+#     operation = Symbol(string("predict_", reducer))
+#     extra = DOC_IMPLEMENTED_METHODS(operation, overloaded=true)
+#     """
+#         LearnAPI.predict_$reducer(model, fitted_params, data...)
 
-    Same as [`LearnAPI.predict`](@ref) except replaces probababilistic predictions with
-    $reducer values.
+#     Same as [`LearnAPI.predict`](@ref) except replaces probababilistic predictions with
+#     $reducer values.
 
-    # New model implementations
+#     # New model implementations
 
-    A fallback broadcasts `$reducer` over the first return value `ŷ` of
-    `LearnAPI.predict`. An algorithm that computes probabilistic predictions may already
-    need to predict mean values, and so overloading this method might enable a performance
-    boost.
+#     A fallback broadcasts `$reducer` over the first return value `ŷ` of
+#     `LearnAPI.predict`. An algorithm that computes probabilistic predictions may already
+#     need to predict mean values, and so overloading this method might enable a performance
+#     boost.
 
-    $extra
+#     $extra
 
-    See also [`LearnAPI.predict`](@ref), [`LearnAPI.fit`](@ref).
+#     See also [`LearnAPI.predict`](@ref), [`LearnAPI.fit`](@ref).
 
-    """
-end
+#     """
+# end
 
-for reducer in [:mean, :median]
-    operation = Symbol(string("predict_", reducer))
-    docstring = DOC_PREDICT(reducer)
-    quote
-        "$($docstring)"
-        function $operation(args...)
-            distributions, report = predict(args...)
-            yhat = $reducer.(distributions)
-            return (yhat, report)
-        end
-    end |> eval
-end
+# for reducer in [:mean, :median]
+#     operation = Symbol(string("predict_", reducer))
+#     docstring = DOC_PREDICT(reducer)
+#     quote
+#         "$($docstring)"
+#         function $operation(args...)
+#             distributions, report = predict(args...)
+#             yhat = $reducer.(distributions)
+#             return (yhat, report)
+#         end
+#     end |> eval
+# end
 
 """
     LearnAPI.predict_joint(model, fitted_params, data...)
