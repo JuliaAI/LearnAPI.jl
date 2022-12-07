@@ -41,6 +41,11 @@ model. Probability distributions, confidence intervals and survival functions ar
 of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
 on the target proxy.
 
+LearnAPI does not provide an interface for data access or data resampling, and could be
+used in conjunction with one or more such interfaces (e.g.,
+[Tables.jl](https://github.com/JuliaML/MLUtils.jl),
+[MLJUtils.jl](https://github.com/JuliaML/MLUtils.jl)).
+
 ## Methods
 
 In LearnAPI.jl a *model* is just a container for the hyper-parameters of some machine
@@ -56,17 +61,17 @@ The following methods, dispatched on model type, are provided:
 
 - `ingest!` for incremental learning
 
-- **operations**, such as `predict`, `transform` and `inverse_transform` for applying the
-  model to data not used for training
+- **operations**, `predict`, `predict_joint`, `transform` and `inverse_transform` for
+  applying the model to data not used for training
 
 - common **accessor functions**, such as `feature_importances` and `training_losses`, for
-  extracting, from training outcomes, information common to different types of models
+  extracting, from training outcomes, information common to some models
 
-- **model traits**, such as `target_proxy(model)`, for promising specific behaviour
+- **model traits**, such as `target_proxies(model)`, for promising specific behaviour
 
 There is flexibility about how much of the interface is implemented by a given model
 object `model`. A special trait `functions(model)` declares what has been explicitly
-implemented or overloaded to work with `model`, excluding traits.
+implemented to work with `model`, excluding traits.
 
 Since this is a functional-style interface, `fit` returns model `state`, in addition to
 learned parameters, for passing to the optional `update!` and `ingest!` methods. These
@@ -77,12 +82,13 @@ component (important for models that do not generalize to new data).
 Models can be supervised or not supervised, can generalize to new data observations, or
 not generalize. To ensure proper handling by client packages of probabilistic and other
 non-literal forms of target predictions (pdfs, confidence intervals, survival functions,
-etc) the kind of prediction can be flagged appropriately; see more at "target" below.
+etc) the output of `predict` and `predict_joint` can be flagged appropriately; see more at
+"target" below.
 
 
 ## [Scope and undefined notions](@id scope)
 
-The Learn API provides methods for training, applying, and saving machine learning models,
+LearnAPI.jl provides methods for training, applying, and saving machine learning models,
 and that is all. *It does not specify an interface for data access or data
 resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions (in
 **boldface**) which some higher-level interface might decide to formalize:
@@ -115,15 +121,15 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
 
 ## Contents
 
-Our opening observations notwithstanding, it is useful to have a guide to the interface,
-linked below, organized around common *informally defined* patterns or "tasks". However,
-the definitive specification of the interface is the [Reference](@ref) section.
+It is useful to have a guide to the interface, linked below, organized around common
+*informally defined* patterns or "tasks". However, the definitive specification of the
+interface is the [Reference](@ref) section.
 
 - [Anatomy of an Implementation](@ref) (Overview)
 
-- [Common Implementation Patterns](@ref) (User Guide)
-
 - [Reference](@ref) (Official Specification)
+
+- [Common Implementation Patterns](@ref) (User Guide)
 
 - [Testing an Implementation](@ref)
 

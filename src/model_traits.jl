@@ -4,7 +4,7 @@
 const DERIVED_TRAITS = (:name, :ismodel)
 const ORDINARY_TRAITS = (
     :functions,
-    :target_proxy,
+    :target_proxies,
     :position_of_target,
     :position_of_weights,
     :descriptors,
@@ -62,7 +62,22 @@ See also [`LearnAPI.Model`](@ref).
 """
 functions(::Type) = ()
 
-target_proxy(::Type) = NamedTuple()
+target_proxies() = subtypes(TargetProxy)
+
+"""
+    target_proxies(model)
+
+Return a named tuple of target proxies, keyed on operation name, applying to `model`. For
+example, a value of
+
+    (predict=LearnAPI.Distribution(),)
+
+means that `LearnAPI.predict` returns probability distributions, rather than actual values
+of the target. View all target proxy types with `target_proxies()`. For more information
+on target variables and target proxies, refer to the LearnAPI documentation.
+
+"""
+target_proxies(::Type) = NamedTuple()
 
 position_of_target(::Type) = 0
 

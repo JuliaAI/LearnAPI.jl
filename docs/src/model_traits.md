@@ -1,12 +1,17 @@
 # Model Traits
 
-In this table, `Table` and `Continuous` are names owned by the package
-[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
+Ordinary traits are available for overloading by an new model implementation. Derived
+traits are not.
+
+## Ordinary traits
+
+In the examples column of the table below, `Table` and `Continuous` are names owned by the
+package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
 
 | trait                                            | fallback value        | return value  | example |
 |:-------------------------------------------------|:----------------------|:--------------|:--------|
 | [`LearnAPI.functions`](@ref)`(model)`  | `()`                  | implemented LearnAPI functions (traits excluded) | `(:fit, :predict)` |
-| [`LearnAPI.target_proxy`](@ref)`(model)`    | `NamedTuple()`                  | details form of target proxy output | `(; predict=LearnAPI.Distribution()` |
+| [`LearnAPI.target_proxies`](@ref)`(model)`    | `NamedTuple()`                  | details form of target proxy output | `(; predict=LearnAPI.Distribution()` |
 | [`LearnAPI.position_of_target`](@ref)`(model)`   | `0`                   | † the positional index of the **target** in `data` in `fit(..., data...; metadata)` calls | 2 |
 | [`LearnAPI.position_of_weights`](@ref)`(model)`  | `0`                   | † the positional index of **observation weights** in `data` in `fit(..., data...; metadata)` | 3 |
 | [`LearnAPI.descriptors`](@ref)`(model)`          | `()`                  | lists one or more suggestive model descriptors from `LearnAPI.descriptors()` | (:classifier, :probabilistic) |
@@ -35,3 +40,10 @@ is understood to exclude the variable, but note that `fit` can have multiple sig
 varying lengths, as in `fit(model, verbosity, X, y)` and `fit(model, verbosity, X, y,
 w)`. A non-zero value is a promise that `fit` includes a signature of sufficient length to
 include the variable.
+
+## Dervied Traits
+
+| trait                                  | return value              | example |
+|:---------------------------------------|:--------------------------|:--------|
+| [`LearnAPI.name`](@ref)`(model)`       | model type name as string | "PCA"   |
+| [`LearnAPI.ismodel`](@ref)`(model)`    | `true` if `functions(model)` is not empty | `true` |

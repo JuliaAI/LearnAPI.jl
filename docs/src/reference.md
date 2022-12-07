@@ -1,7 +1,7 @@
 # Reference
 
-Here we give the definitive specification of interface provided by LearnAPI.jl. For a more
-informal guide see [Common Implementation Patterns](@ref).
+Here we give the definitive specification of the interface provided by LearnAPI.jl. For a
+more informal guide see [Common Implementation Patterns](@ref).
 
 ## Models
 

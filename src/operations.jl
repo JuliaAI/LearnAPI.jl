@@ -1,9 +1,7 @@
-const PREDICT_OPERATIONS = (
-
 const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
 
 const DOC_NEW_DATA =
-    "Here `report` contains ancilliary byproducts of the computation, or "*
+    "The `report` contains ancilliary byproducts of the computation, or "*
     "is `nothing`; `data` is a tuple of data objects, "*
     "generally a single object representing new observations "*
     "not seen in training. "
@@ -16,7 +14,7 @@ const DOC_NEW_DATA =
 
 Return `(ŷ, report)` where `ŷ` are the predictions, or prediction-like output (such as
 probabilities), for a machine learning model `model`, with learned parameters
-`fitted_params`, as returned by a preceding call to [`LearnAPI.fit`](@ref)`(model, ...)`.
+`fitted_params` (first object returned by [`LearnAPI.fit`](@ref)`(model, ...)`).
 $DOC_NEW_DATA
 
 
@@ -36,13 +34,13 @@ implementation itself promises, by making an optional [`LearnAPI.output_scitypes
 declaration.
 
 If `predict` is computing a target proxy, as defined in the MLJLearn documentation, then a
-[`LearnAPI.target_proxy`](@ref) declaration is required, as in
+[`LearnAPI.target_proxies`](@ref) declaration is required, as in
 
 ```julia
-LearnAPI.target_proxy(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
+LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
 ```
 
-Do `LearnAPI.target_proxy()` to list the available kinds.
+Do `LearnAPI.target_proxies()` to list the available kinds.
 
 By default, it is expected that `data` has length one. Otherwise,
 [`LearnAPI.input_scitypes`](@ref) must be overloaded.
@@ -96,10 +94,10 @@ For a supervised learning model, return `(d, report)`, where `d` is some represe
 the *single* probability distribution for the sample space ``Y^n``. Here ``Y`` is the
 space in which the target variable associated with `model` takes its values, and `n` is
 the number of observations in `data`. The specific form of the representation is given by
-`LearnAPI.target_proxy(model)`.
+[`LearnAPI.target_proxies(model)`](@ref).
 
-Here `fitted_params` are the model's learned parameters, as returned by a preceding call
-to [`LearnAPI.fit`](@ref). $DOC_NEW_DATA.
+Here `fitted_params` are the model's learned parameters (the first object returned by
+[`LearnAPI.fit`](@ref)). $DOC_NEW_DATA.
 
 While the interpretation of this distribution depends on the model, marginalizing
 component-wise will generally deliver *correlated* univariate distributions, and these will
@@ -109,10 +107,10 @@ generally not agree with those returned by `LearnAPI.predict`, if also implement
 
 Only implement this method if `model` has an associated concept of target variable, as
 defined in the LearnAPI.jl documentation. A trait declaration
-[`LearnAPI.target_proxy`](@ref), such as
+[`LearnAPI.target_proxies`](@ref), such as
 
 ```julia
-LearnAPI.target_proxy(::Type{SomeModel}) = (; predict_joint=Sampleable())
+LearnAPI.target_proxies(::Type{SomeModel}) = (; predict_joint=Sampleable())
 ```
 
 is required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
@@ -129,9 +127,9 @@ function predict_joint end
     LearnAPI.transform(model, fitted_params, data...)
 
 Return `(output, report)`, where `output` is some kind of transformation of `data`,
-provided by `model`, based on the learned parameters `fitted_params`, as returned by a
-preceding call to [`LearnAPI.fit`](@ref)`(model, ...)` (which could be `nothing` for
-models that do not generalize to new data, such as "static transformers"). $DOC_NEW_DATA
+provided by `model`, based on the learned parameters `fitted_params` (the first object
+returned by [`LearnAPI.fit`](@ref)`(model, ...)`). The `fitted_params` could be `nothing`,
+in the case of models that do not generalize to new data. $DOC_NEW_DATA
 
 
 # New model implementations
@@ -167,7 +165,7 @@ the map
 data -> first(transform(model, fitted_params, data))
 ```
 
-For example, if `transform` corresponds to a projection, `inverse_transform` is the
+For example, if `transform` corresponds to a projection, `inverse_transform` might be the
 corresponding embedding.
 
 

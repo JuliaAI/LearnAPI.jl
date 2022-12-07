@@ -2,8 +2,8 @@
 
 > **Summary** Methods like `predict` and `transform`, that generally depend on learned
 > parameters, are called **operations**. All implemented operations must be included in
-> the output of the `methods` model trait. When an operation returns a [target
-> proxy](@ref scope), it must make a `target_proxy` declaration.
+> the output of the `functions` model trait. When an operation returns a [target
+> proxy](@ref scope), it must make a `target_proxies` declaration.
 
 An *operation* is any method with signature `some_operation(model, fitted_params,
 data...)`. Here `fitted_params` is the learned parameters object, as returned by
@@ -23,9 +23,6 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
 [`LearnAPI.transform`](@ref)         | no          | none     |             |
 [`LearnAPI.inverse_transform`](@ref) | no          | none     | `transform` |
 
-> **† MLJ only.** MLJBase provides fallbacks for `predict_mode`, `predict_mean` and
-> `predict_median` by broadcasting methods from `Statistics` and `StatsBase` over the
-> results of `predict`.
 
 ## General requirements
 
@@ -33,7 +30,7 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
   distribution for multiple target predictions, as described further at
   [`LearnAPI.predict_joint`](@ref).
 
-- Each operation explicitly implemented or overloaded must be included in the return value
+- Each operation explicitly overloaded must be included in the return value
   of [`LearnAPI.functions`](@ref).
 
 ## Predict or transform?
@@ -91,27 +88,33 @@ have no fields.
 | `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time (possible requirement: observation have type `Distributions.ContinuousUnivariateDistribution`) |
 
-> **† MLJ only.** To avoid [ambiguities in
-> representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation),
-> these options are disallowed, in favour of preceding alternatives.
+† Provided for completeness but discouraged to avoid [ambiguities in
+representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation).
+
 
 !!! warning
 
 	The "possible requirement"s listed are not part of LearnAPI.jl.
 
 An operation with target proxy as output must declare a `TargetProxy` instance using the
-[`LearnAPI.target_proxy`](@ref), as in
+[`LearnAPI.target_proxies`](@ref), as in
 
 ```julia
-LearnAPI.target_proxy(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution(),)
+LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution(),)
 ```
 
-If `predict_joint` is implemented, then a `target_proxy` declaration is also
+which has the short form
+
+```julia
+LearnAPI.@trait target_proxies = (predict=LearnAPI.Distribution(),)
+```
+
+If `predict_joint` is implemented, then a `target_proxies` declaration is also
 required, but the interpretation is slightly different. This is because the output of
 `predict_joint` is not a number of observations but a single object. The trait value
 should be an instance of one of the following types:
 
-|          type                   | form of output of `predict_joint(model, _, data)`
+|          type                   | form of output of `predict_joint(model, fitted_params, data)`
 |:-------------------------------:|:--------------------------------------------------|
 | `LearnAPI.Sampleable`      | object that can be sampled to obtain a *vector* whose elements have the form of target observations; the vector length matches the number of observations in `data`. |
 | `LearnAPI.Distribution`    | explicit probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |

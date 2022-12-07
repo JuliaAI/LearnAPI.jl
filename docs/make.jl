@@ -9,11 +9,11 @@ makedocs(;
     pages=[
         "Introduction" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
-        "Common Implementation Patterns" => "common_implementation_patterns.md",
         "Reference" => "reference.md",
         "Fit, update and ingest" => "fit_update_and_ingest.md",
         "Predict and other operations" => "operations.md",
         "Model Traits" => "model_traits.md",
+        "Common Implementation Patterns" => "common_implementation_patterns.md",
     ],
     repo="https://$REPO/blob/{commit}{path}#L{line}",
     sitename="LearnAPI.jl"

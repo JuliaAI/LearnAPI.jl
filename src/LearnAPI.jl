@@ -1,6 +1,7 @@
 module LearnAPI
 
 using Statistics
+using InteractiveUtils
 
 include("tools.jl")
 include("models.jl")

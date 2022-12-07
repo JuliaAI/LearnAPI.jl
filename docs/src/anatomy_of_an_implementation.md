@@ -5,9 +5,10 @@
 > dispatched on the model type; `predict` is an example of an **operation** (another is
 > `transform`). In this example we also implement an **accessor function**, called
 > `feature_importance`, returning the absolute values of the linear coefficients. The
-> ridge regressor has a target variable and one trait declaration flags the output of
-> `predict` as being a [proxy](@ref scope) for the target. Other traits articulate the
-> model's training data type requirements and the input/output type of `predict`.
+> ridge regressor has a target variable and `predict` makes literal predictions of the
+> target (rather than, say, probablistic predictions); this behaviour is flagged by the
+> `target_proxies` model trait.  Other traits articulate the model's training data type
+> requirements and the input/output type of `predict`.
 
 We begin by describing an implementation of LearnAPI.jl for basic ridge
 regression (no intercept) to introduce the main actors in any implementation.
@@ -58,7 +59,8 @@ function LearnAPI.fit(model::MyRidge, verbosity, X, y)
 
         # process input:
         x = Tables.matrix(X)  # convert table to matrix
-        features = Tables.columnnames(X)
+        s = Tables.schema(X)
+        features = s.names
 
         # core solver:
         coefficients = (x'x + model.lambda*I)\(x'y)
@@ -140,20 +142,20 @@ nothing # hide
 Another example of an accessor function is [`training_losses`](@ref).
 
 
-## [Model traits](@id traits) 
+## [Model traits](@id traits)
 
 Our model has a target variable, in the sense outlined in [Scope and undefined
 notions](@ref scope), and `predict` returns an object with exactly the same form as the
 target. We indicate this behaviour by declaring
 
 ```@example anatomy
-LearnAPI.target_proxy(::Type{<:MyRidge}) = (; predict=LearnAPI.TrueTarget())
+LearnAPI.target_proxies(::Type{<:MyRidge}) = (; predict=LearnAPI.TrueTarget())
 nothing # hide
 ```
 Or, you can use the shorthand
 
 ```@example anatomy
-@trait MyRidge target_proxy = (; predict=LearnAPI.TrueTarget())
+@trait MyRidge target_proxies = (; predict=LearnAPI.TrueTarget())
 nothing # hide
 ```
 
@@ -161,7 +163,7 @@ More generally, `predict` only returns a *proxy* for the target, such as probabi
 distributions, and we would make a different declaration here. See [Target proxies](@ref)
 for details.
 
-`LearnAPI.target_proxy` is an example of a **model trait**. A complete list of traits
+`LearnAPI.target_proxies` is an example of a **model trait**. A complete list of traits
 and the contracts they imply is given in [Model Traits](@ref).
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
