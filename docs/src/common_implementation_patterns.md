@@ -38,7 +38,7 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Time Series Forecasting](@ref)
 
-- [Time Series Classifiction](@ref)
+- [Time Series Classification](@ref)
 
 - [Supervised Bayesian Models](@ref)
 

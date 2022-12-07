@@ -1,13 +1,7 @@
-const PREDICT_OPERATIONS = (:predict,
-                            :predict_mode,
-                            :predict_mean,
-                            :predict_median,
-                            :predict_joint)
-
-const OPERATIONS = (PREDICT_OPERATIONS..., :transform, :inverse_transform)
+const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
 
 const DOC_NEW_DATA =
-    "Here `report` contains ancilliary byproducts of the computation, or "*
+    "The `report` contains ancilliary byproducts of the computation, or "*
     "is `nothing`; `data` is a tuple of data objects, "*
     "generally a single object representing new observations "*
     "not seen in training. "
@@ -20,7 +14,7 @@ const DOC_NEW_DATA =
 
 Return `(ŷ, report)` where `ŷ` are the predictions, or prediction-like output (such as
 probabilities), for a machine learning model `model`, with learned parameters
-`fitted_params`, as returned by a preceding call to [`LearnAPI.fit`](@ref)`(model, ...)`.
+`fitted_params` (first object returned by [`LearnAPI.fit`](@ref)`(model, ...)`).
 $DOC_NEW_DATA
 
 
@@ -40,13 +34,13 @@ implementation itself promises, by making an optional [`LearnAPI.output_scitypes
 declaration.
 
 If `predict` is computing a target proxy, as defined in the MLJLearn documentation, then a
-[`LearnAPI.target_proxy_kind`](@ref) declaration is required, as in
+[`LearnAPI.target_proxies`](@ref) declaration is required, as in
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
+LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
 ```
 
-Do `LearnAPI.target_proxy_kind()` to list the available kinds.
+Do `LearnAPI.target_proxies()` to list the available kinds.
 
 By default, it is expected that `data` has length one. Otherwise,
 [`LearnAPI.input_scitypes`](@ref) must be overloaded.
@@ -57,50 +51,53 @@ See also [`LearnAPI.fit`](@ref), [`LearnAPI.predict_mean`](@ref),
 """
 function predict end
 
-function DOC_PREDICT(reducer)
-    operation = Symbol(string("predict_", reducer))
-    extra = DOC_IMPLEMENTED_METHODS(operation, overloaded=true)
-    """
-        LearnAPI.predict_$reducer(model, fitted_params, data...)
+# function DOC_PREDICT(reducer)
+#     operation = Symbol(string("predict_", reducer))
+#     extra = DOC_IMPLEMENTED_METHODS(operation, overloaded=true)
+#     """
+#         LearnAPI.predict_$reducer(model, fitted_params, data...)
 
-    Same as [`LearnAPI.predict`](@ref) except replaces probababilistic predictions with
-    $reducer values.
+#     Same as [`LearnAPI.predict`](@ref) except replaces probababilistic predictions with
+#     $reducer values.
 
-    # New model implementations
+#     # New model implementations
 
-    A fallback broadcasts `$reducer` over the first return value `ŷ` of
-    `LearnAPI.predict`. An algorithm that computes probabilistic predictions may already
-    need to predict mean values, and so overloading this method might enable a performance
-    boost.
+#     A fallback broadcasts `$reducer` over the first return value `ŷ` of
+#     `LearnAPI.predict`. An algorithm that computes probabilistic predictions may already
+#     need to predict mean values, and so overloading this method might enable a performance
+#     boost.
 
-    $extra
+#     $extra
 
-    See also [`LearnAPI.predict`](@ref), [`LearnAPI.fit`](@ref).
+#     See also [`LearnAPI.predict`](@ref), [`LearnAPI.fit`](@ref).
 
-    """
-end
+#     """
+# end
 
-for reducer in [:mean, :median]
-    operation = Symbol(string("predict_", reducer))
-    docstring = DOC_PREDICT(reducer)
-    quote
-        "$($docstring)"
-        function $operation(args...)
-            distributions, report = predict(args...)
-            yhat = $reducer.(distributions)
-            return (yhat, report)
-        end
-    end |> eval
-end
+# for reducer in [:mean, :median]
+#     operation = Symbol(string("predict_", reducer))
+#     docstring = DOC_PREDICT(reducer)
+#     quote
+#         "$($docstring)"
+#         function $operation(args...)
+#             distributions, report = predict(args...)
+#             yhat = $reducer.(distributions)
+#             return (yhat, report)
+#         end
+#     end |> eval
+# end
 
 """
     LearnAPI.predict_joint(model, fitted_params, data...)
 
-For a supervised learning model, return `(d, report)`, where `d` is a *single* probability
-distribution for the sample space ``Y^n``, where ``Y`` is the space in which the target
-variable associated with `model` takes its values. Here `n` is the number of observations
-in `data`.  Here `fitted_params` are the model's learned parameters, as returned by a
-preceding call to [`LearnAPI.fit`](@ref). $DOC_NEW_DATA.
+For a supervised learning model, return `(d, report)`, where `d` is some representation of
+the *single* probability distribution for the sample space ``Y^n``. Here ``Y`` is the
+space in which the target variable associated with `model` takes its values, and `n` is
+the number of observations in `data`. The specific form of the representation is given by
+[`LearnAPI.target_proxies(model)`](@ref).
+
+Here `fitted_params` are the model's learned parameters (the first object returned by
+[`LearnAPI.fit`](@ref)). $DOC_NEW_DATA.
 
 While the interpretation of this distribution depends on the model, marginalizing
 component-wise will generally deliver *correlated* univariate distributions, and these will
@@ -110,10 +107,10 @@ generally not agree with those returned by `LearnAPI.predict`, if also implement
 
 Only implement this method if `model` has an associated concept of target variable, as
 defined in the LearnAPI.jl documentation. A trait declaration
-[`LearnAPI.target_proxy_kind`](@ref), such as
+[`LearnAPI.target_proxies`](@ref), such as
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{SomeModel}) = (predict_joint=JointSampleable(),)
+LearnAPI.target_proxies(::Type{SomeModel}) = (; predict_joint=Sampleable())
 ```
 
 is required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
@@ -130,9 +127,9 @@ function predict_joint end
     LearnAPI.transform(model, fitted_params, data...)
 
 Return `(output, report)`, where `output` is some kind of transformation of `data`,
-provided by `model`, based on the learned parameters `fitted_params`, as returned by a
-preceding call to [`LearnAPI.fit`](@ref)`(model, ...)` (which could be `nothing` for
-models that do not generalize to new data, such as "static transformers"). $DOC_NEW_DATA
+provided by `model`, based on the learned parameters `fitted_params` (the first object
+returned by [`LearnAPI.fit`](@ref)`(model, ...)`). The `fitted_params` could be `nothing`,
+in the case of models that do not generalize to new data. $DOC_NEW_DATA
 
 
 # New model implementations
@@ -168,7 +165,7 @@ the map
 data -> first(transform(model, fitted_params, data))
 ```
 
-For example, if `transform` corresponds to a projection, `inverse_transform` is the
+For example, if `transform` corresponds to a projection, `inverse_transform` might be the
 corresponding embedding.
 
 
@@ -183,3 +180,24 @@ function inverse_transform end
 
 function save end
 function restore end
+
+
+# # TARGET PROXIES
+
+abstract type TargetProxy end
+
+struct TrueTarget <: TargetProxy end
+struct Sampleable <: TargetProxy end
+struct Distribution <: TargetProxy end
+struct LogDistribution <: TargetProxy end
+struct Probability <: TargetProxy end
+struct LogProbability <: TargetProxy end
+struct Parametric <: TargetProxy end
+struct LabelAmbiguous <: TargetProxy end
+struct LabelAmbiguousSampleable <: TargetProxy end
+struct LabelAmbiguousDistribution <: TargetProxy end
+struct ConfidenceInterval <: TargetProxy end
+struct Set <: TargetProxy end
+struct ProbabilisticSet <: TargetProxy end
+struct SurvivalFunction <: TargetProxy end
+struct SurvivalDistribution <: TargetProxy end

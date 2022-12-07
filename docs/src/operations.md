@@ -1,9 +1,9 @@
-# [Predict and other operations](@id operations)
+# [Predict and Other Operations](@id operations)
 
 > **Summary** Methods like `predict` and `transform`, that generally depend on learned
 > parameters, are called **operations**. All implemented operations must be included in
-> the output of the `implemented_methods` model trait. When an operation returns a [target
-> proxy](@ref scope), it must make a `target_proxy_kind` declaration.
+> the output of the `functions` model trait. When an operation returns a [target
+> proxy](@ref scope), it must make a `target_proxies` declaration.
 
 An *operation* is any method with signature `some_operation(model, fitted_params,
 data...)`. Here `fitted_params` is the learned parameters object, as returned by
@@ -19,16 +19,10 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
 | method                             | compulsory? | fallback | requires    |
 |:-----------------------------------|:-----------:|:--------:|:-----------:|
 [`LearnAPI.predict`](@ref)           | no          | none     |             |
-[`LearnAPI.predict_mode`](@ref)      | no          | none     | `predict`   |
-[`LearnAPI.predict_mean`](@ref)      | no          | none     | `predict`   |
-[`LearnAPI.predict_median`](@ref)    | no          | none     | `predict`   |
 [`LearnAPI.predict_joint`](@ref)     | no          | none     |             |
 [`LearnAPI.transform`](@ref)         | no          | none     |             |
 [`LearnAPI.inverse_transform`](@ref) | no          | none     | `transform` |
 
-> **† MLJ only.** MLJBase provides fallbacks for `predict_mode`, `predict_mean` and
-> `predict_median` by broadcasting methods from `Statistics` and `StatsBase` over the
-> results of `predict`.
 
 ## General requirements
 
@@ -36,8 +30,8 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
   distribution for multiple target predictions, as described further at
   [`LearnAPI.predict_joint`](@ref).
 
-- Each operation explicitly implemented or overloaded must be included in the return value
-  of [`LearnAPI.implemented_methods`](@ref).
+- Each operation explicitly overloaded must be included in the return value
+  of [`LearnAPI.functions`](@ref).
 
 ## Predict or transform?
 
@@ -58,9 +52,8 @@ inverses.
 ## Target proxies
 
 In the case that a model has the concept of a **target** variable, as described under
-[Scope and undefined notions](@ref scope), the output of `predict` or `predict_joint` may
-have the form of a proxy for the target, such as a vector of truth-probabilities for
-binary targets.
+[Scope and undefined notions](@ref scope), the output of `predict` may have the form of a
+proxy for the target, such as a vector of truth-probabilities for binary targets.
 
 We assume the reader is already familiar with the notion of a target variable in
 supervised learning, but target variables are not limited to supervised models. For
@@ -73,54 +66,68 @@ Similarly, the integer labels assigned to some observations by a clustering algo
 be regarded as a target variable. The labels obtained can be paired with human labels
 using, say, the Rand index. 
 
-The kind of proxy one has is informally classified by a subtype of
+The kind of proxy one has is informally classified by a subtype of the abstract type
 `LearnAPI.TargetProxy`. These types are intended for dispatch outside of LearnAPI.jl and
 have no fields.
 
-|          type                   | form of observations | possible requirement in some external API |
-|:-------------------------------:|:---------------------|:------------------------------------------|
-| `LearnAPI.TrueTarget`              | same as target observations | Observations have same type as target observations. |
-| `LearnAPI.Sampleable`           | objects that can be sampled to obtain objects of the same form as target observations | Each observation implements `Base.rand`. |
-| `LearnAPI.Distribution`         | explicit probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.pdf` and `Base.rand` |
-| `LearnAPI.LogDistribution`      | explicit log probability density/mass functions with sample space all possible target observations | Observations implement `Distributions.logpdf` and `Base.rand` |
-|  † `LearnAPI.Probability`       | raw numerical probability or probability vector | |
-|  † `LearnAPI.LogProbability`    | log probability or log probability vector | |
+|          type                   | form of an observation 
+|:-------------------------------:|:---------------------|
+| `LearnAPI.TrueTarget`           | same as target observations (possible requirement: observations have same type as target observations) |
+| `LearnAPI.Sampleable`           | object that can be sampled to obtain object of the same form as target observation (possible requirement: observation implements `Base.rand`) |
+| `LearnAPI.Distribution`         | explicit probability density/mass function whose sample space is all possible target observations (possible requirement: observation implements `Distributions.pdf` and `Base.rand`) |
+| `LearnAPI.LogDistribution`      | explicit log-probability density/mass function whose sample space is possible target observations (possible requirement: observation implements `Distributions.logpdf` and `Base.rand`) |
+|  † `LearnAPI.Probability`       | raw numerical probability or probability vector |
+|  † `LearnAPI.LogProbability`    | log-probability or log-probability vector | 
 |  † `LearnAPI.Parametric`        | a list of parameters (e.g., mean and variance) describing some distribution |
-| `LearnAPI.LabelAmbiguous`            | same form as the (multi-class) target, but with new, unmatched labels of possibly unequal number (as in, e.g., clustering)| 
+| `LearnAPI.LabelAmbiguous`            | same form as the (multi-class) target, but selected from new unmatched labels of possibly unequal number (as in, e.g., clustering)| 
 | `LearnAPI.LabelAmbiguousSampleable`  | sampleable version of `LabelAmbiguous`; see `Sampleable` above  |
 | `LearnAPI.LabelAmbiguousDistribution`| pdf/pmf version of `LabelAmbiguous`; see `Distribution`  above  |
-| `LearnAPI.ConfidenceInterval`   | confidence intervals |  Each observation `isa Tuple{Real,Real}`.
-| `LearnAPI.SurvivalFunction`     | survival functions | Observations are single-argument functions mapping `Real` to `Real`.
-| `LearnAPI.SurvivalDistribution` | probability distribution for survival time | Observations have type `Distributions.ContinuousUnivariateDistribution`.
+| `LearnAPI.ConfidenceInterval`   | confidence interval (possible requirement:  observation `isa Tuple{Real,Real}`) |
+| `LearnAPI.Set`                  | finite but possibly varying number of target observations (possible requirement: observation isa `Set{target_observation_type}`) |
+| `LearnAPI.ProbabilisticSet`      | as for `Set` but labelled with probabilities (not necessarily summing to one) |
+| `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
+| `LearnAPI.SurvivalDistribution` | probability distribution for survival time (possible requirement: observation have type `Distributions.ContinuousUnivariateDistribution`) |
 
-> **† MLJ only.** To avoid [ambiguities in
-> representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation),
-> these options are disallowed, in favour of the preceding alternatives.
+† Provided for completeness but discouraged to avoid [ambiguities in
+representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation).
+
 
 !!! warning
 
-	The last column of the table is not part of LearnAPI.jl.
+	The "possible requirement"s listed are not part of LearnAPI.jl.
 
-An operation with target proxy as output must declare the `TargetProxy` subtype using the
-[`LearnAPI.target_proxy_kind`](@ref), as in
+An operation with target proxy as output must declare a `TargetProxy` instance using the
+[`LearnAPI.target_proxies`](@ref), as in
 
 ```julia
-LearnAPI.target_proxy_kind(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
+LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution(),)
 ```
 
-### Special case of predict_joint
+which has the short form
 
-If `predict_joint` is implemented, then a `target_proxy_kind` declaration is required, but
-the interpretation is slightly different. This is because the output of `predict_joint` is
-not a number of observations but a single object. See more at [`LearnAPI.predict_joint`](@ref) below.
+```julia
+LearnAPI.@trait target_proxies = (predict=LearnAPI.Distribution(),)
+```
+
+If `predict_joint` is implemented, then a `target_proxies` declaration is also
+required, but the interpretation is slightly different. This is because the output of
+`predict_joint` is not a number of observations but a single object. The trait value
+should be an instance of one of the following types:
+
+|          type                   | form of output of `predict_joint(model, fitted_params, data)`
+|:-------------------------------:|:--------------------------------------------------|
+| `LearnAPI.Sampleable`      | object that can be sampled to obtain a *vector* whose elements have the form of target observations; the vector length matches the number of observations in `data`. |
+| `LearnAPI.Distribution`    | explicit probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
+| `LearnAPI.LogDistribution` | explicit log-probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
+
+
+See more at [`LearnAPI.predict_joint`](@ref) below.
 
 
 ## Operation-specific details
 
 ```@docs
 LearnAPI.predict
-LearnAPI.predict_mean
-LearnAPI.predict_median
 LearnAPI.predict_joint
 LearnAPI.transform
 LearnAPI.inverse_transform

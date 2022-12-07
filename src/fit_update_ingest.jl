@@ -8,7 +8,7 @@ const DOC_OPERATIONS =
 function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     word = overloaded ? "overloaded" : "implemented"
     "If $word, include `:$name` in the tuple returned by the "*
-    "[`LearnAPI.implemented_methods`](@ref) trait. "
+    "[`LearnAPI.functions`](@ref) trait. "
 end
 
 const DOC_WHAT_IS_DATA =
@@ -30,8 +30,9 @@ const DOC_MUTATING_MODELS =
 """
     LearnAPI.fit(model, verbosity, data...; metadata...)
 
-Fit `model` to the provided `data` and `metadata`. With the exception of warnings, training
-should be silent if `verbosity == 0`. Lower values should suppress warnings. Here:
+Fit `model` to the provided `data` and `metadata`. With the exception of warnings,
+training should be silent if `verbosity == 0`. Lower values should suppress warnings; any
+integer ought to be admissible. Here:
 
 - `model` is a property-accessible object whose properties are the hyper-parameters of some
    machine learning algorithm; see also [`LearnAPI.ismodel`](@ref).

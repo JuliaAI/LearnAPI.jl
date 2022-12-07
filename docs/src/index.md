@@ -8,30 +8,50 @@ A basic Julia interface for training and applying machine learning models </span
 <br><br>
 ```
 
-**Quick tour for developers of ML software.** For a rapid overview, by way of a sample
-implementation, see [Anatomy of an Implementation](@ref).
+## Quick tours
 
-**Quick tour for users of models implementing LearnAPI.jl.** Although primarily intended
-as a basement-level machine learning interface for developers, users can interact directly
-with LearnAPI.jl models, as illustrated [here](@ref workflow). 
+- For developers wanting to **IMPLEMEMT** LearnAPI: [Anatomy of
+  an Implementation](@ref).
+
+- For those who wanting to **USE** models implementing LearnAPI: [Basic fit/predict
+  workflow](@ref workflow).
 
 ## Approach
 
-Machine learning algorithms, also called *models*, have a complicated taxonomy. Grouping
-models, or modelling tasks, into a relatively small number of types, such as "classifier"
-and "clusterer", and attempting to impose uniform behaviour within each group, is
-challenging. In our experience developing the [MLJ
+Machine learning algorithms, also called *models*, have a complicated
+taxonomy. Grouping models, or modelling tasks, into a relatively small number of types,
+such as "classifier" and "clusterer", and attempting to impose uniform behaviour within
+each group, is challenging. In our experience developing the [MLJ
 ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads to
 limitations on the models that can be included in a general interface, or additional
 complexity needed to cope with exceptional cases. Even if a complete user interface for
 machine learning might benefit from such groupings, a basement-level API for ML should, in
 our view, avoid them.
 
-## Summary
+In a addition to basic methods, like `fit` and `predict`, LearnAPI provides a large number
+of optional model
+[traits](https://ahsmart.com/pub/holy-traits-design-patterns-and-best-practice-book/),
+each promising a specific kind of behaviour, such as "The predictions of this model are
+probability distributions".  There is no abstract type model hierarchy.
 
-LearnAPI.jl is a base interface for machine learning algorithms in which behaviour is
-articulated using traits. It has no abstract model types, apart from an optional supertype
-`Model`. It provides the following methods, dispatched on model type:
+Our preceding remarks notwithstanding, there is, for certain applications involving a
+"target" variable (understood in a rather general way - see below) a clear-cut distinction
+between models, based on the proxy for the target that is actually output by the
+model. Probability distributions, confidence intervals and survival functions are examples
+of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
+on the target proxy.
+
+LearnAPI does not provide an interface for data access or data resampling, and could be
+used in conjunction with one or more such interfaces (e.g.,
+[Tables.jl](https://github.com/JuliaML/MLUtils.jl),
+[MLJUtils.jl](https://github.com/JuliaML/MLUtils.jl)).
+
+## Methods
+
+In LearnAPI.jl a *model* is just a container for the hyper-parameters of some machine
+learning algorithm, and that's all. It does not include learned parameters.
+
+The following methods, dispatched on model type, are provided:
 
 - `fit` for regular training, overloaded if the model generalizes to new data, as in
   classical supervised learning
@@ -41,17 +61,17 @@ articulated using traits. It has no abstract model types, apart from an optional
 
 - `ingest!` for incremental learning
 
-- **operations**, such as `predict`, `transform` and `inverse_transform` for applying the
-  model to data not used for training
+- **operations**, `predict`, `predict_joint`, `transform` and `inverse_transform` for
+  applying the model to data not used for training
 
-- common **access functions**, such as `feature_importances` and `training_losses`, for
-  extracting, from training outcomes information, common to particular classes of models
+- common **accessor functions**, such as `feature_importances` and `training_losses`, for
+  extracting, from training outcomes, information common to some models
 
-- **model traits**, such as `target_proxy_kind(model)`, for promising specific behaviour
+- **model traits**, such as `target_proxies(model)`, for promising specific behaviour
 
 There is flexibility about how much of the interface is implemented by a given model
-object `model`. A special trait `implemented_methods(model)` declares what has been
-explicitly implemented or overloaded to work with `model`.
+object `model`. A special trait `functions(model)` declares what has been explicitly
+implemented to work with `model`, excluding traits.
 
 Since this is a functional-style interface, `fit` returns model `state`, in addition to
 learned parameters, for passing to the optional `update!` and `ingest!` methods. These
@@ -62,24 +82,31 @@ component (important for models that do not generalize to new data).
 Models can be supervised or not supervised, can generalize to new data observations, or
 not generalize. To ensure proper handling by client packages of probabilistic and other
 non-literal forms of target predictions (pdfs, confidence intervals, survival functions,
-etc) the kind of prediction can be flagged appropriately; see more at "target" below.
+etc) the output of `predict` and `predict_joint` can be flagged appropriately; see more at
+"target" below.
 
 
 ## [Scope and undefined notions](@id scope)
 
-The Learn API provides methods for training, applying, and saving machine learning models,
+LearnAPI.jl provides methods for training, applying, and saving machine learning models,
 and that is all. *It does not specify an interface for data access or data
 resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions (in
 **boldface**) which some higher-level interface might decide to formalize:
 
-- An object which generates ordered sequences of individual **observations** is
-  called **data**.
+- An object which generates ordered sequences of individual **observations** is called
+  **data**. For example a `DataFrame` instance, from
+  [DataFrames.jl](https://dataframes.juliadata.org/stable/), is considered data, the
+  observatons being the rows. A matrix can be considered data, but whether the
+  observations are rows or columns is ambiguous and not fixed by LearnAPI.
 
 - Each machine learning model's behaviour is governed by a number of user-specified
-  **hyperparameters**.
+  **hyperparameters**. The regularization parameter in ridge regression is an
+  example. Hyperparameters are data-independent. For example, the number of target classes
+  is not a hyperparameter.
 
-- Information needed for training that is not a model hyperparameter and not data is called
-  **metadata** (e.g., target class weights and group lasso feature groupings).
+- Information needed for training that is not a model hyperparameter and not data is
+  called **metadata**. Examples, include target *class* weights and group lasso feature
+  groupings.
 
 - Some models involve the notion of a **target** variable and generate output with the
   same form as the target, or, more generally, some kind of target proxy, such as
@@ -90,19 +117,19 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
   sense for unsupervised models, and also for models that do not generalize to new
   observations.  For examples, and an informal classification of target proxy types, refer
   to [Target proxies](@ref).
-  
+
 
 ## Contents
 
-Our opening observations notwithstanding, it is useful to have a guide to the interface,
-linked below, organized around common *informally defined* patterns or "tasks". However,
-the definitive specification of the interface is the [Reference](@ref) section.
+It is useful to have a guide to the interface, linked below, organized around common
+*informally defined* patterns or "tasks". However, the definitive specification of the
+interface is the [Reference](@ref) section.
 
 - [Anatomy of an Implementation](@ref) (Overview)
 
-- [Common Implementation Patterns](@ref) (User Guide)
+- [Reference](@ref) (Official Specification)
 
-- [Reference](@ref)
+- [Common Implementation Patterns](@ref) (User Guide)
 
 - [Testing an Implementation](@ref)
 
