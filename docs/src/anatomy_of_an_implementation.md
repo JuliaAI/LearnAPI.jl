@@ -7,7 +7,7 @@
 > `feature_importance`, returning the absolute values of the linear coefficients. The
 > ridge regressor has a target variable and `predict` makes literal predictions of the
 > target (rather than, say, probablistic predictions); this behaviour is flagged by the
-> `target_proxies` model trait.  Other traits articulate the model's training data type
+> `predict_proxy` model trait.  Other traits articulate the model's training data type
 > requirements and the input/output type of `predict`.
 
 We begin by describing an implementation of LearnAPI.jl for basic ridge
@@ -149,13 +149,13 @@ notions](@ref scope), and `predict` returns an object with exactly the same form
 target. We indicate this behaviour by declaring
 
 ```@example anatomy
-LearnAPI.target_proxies(::Type{<:MyRidge}) = (; predict=LearnAPI.TrueTarget())
+LearnAPI.predict_proxy(::Type{<:MyRidge}) = LearnAPI.TrueTarget()
 nothing # hide
 ```
 Or, you can use the shorthand
 
 ```@example anatomy
-@trait MyRidge target_proxies = (; predict=LearnAPI.TrueTarget())
+@trait MyRidge predict_proxy=LearnAPI.TrueTarget()
 nothing # hide
 ```
 
@@ -163,7 +163,7 @@ More generally, `predict` only returns a *proxy* for the target, such as probabi
 distributions, and we would make a different declaration here. See [Target proxies](@ref)
 for details.
 
-`LearnAPI.target_proxies` is an example of a **model trait**. A complete list of traits
+`LearnAPI.predict_proxy` is an example of a **model trait**. A complete list of traits
 and the contracts they imply is given in [Model Traits](@ref).
 
 > **MLJ only.** The values of all traits constitute a model's **metadata**, which is
@@ -175,7 +175,7 @@ model). We do this by declaring *where* in the list of training data arguments (
 case `(X, y)`) the target variable (in this case `y`) appears:
 
 ```@example anatomy
-@trait MyRidge position_of_target = 2
+@trait MyRidge position_of_target=2
 nothing # hide
 ```
 
@@ -184,7 +184,7 @@ As explained in the introduction, LearnAPI.jl does not attempt to define strict 
 descriptors, as in
 
 ```@example anatomy
-@trait MyRidge descriptors = (:regression,)
+@trait MyRidge descriptors=(:regression,)
 nothing # hide
 ```
 
@@ -195,7 +195,7 @@ Finally, we are required to declare what methods (excluding traits) we have expl
 overloaded for our type:
 
 ```@example anatomy
-@trait MyRidge methods = (
+@trait MyRidge methods=(
         :fit,
         :predict,
         :feature_importances,
@@ -223,9 +223,8 @@ nothing # hide
 This is a contract that `data` is acceptable in the call `fit(model, verbosity, data...)`
 whenever
 
-```@example anatomy
+```julia
 scitype(data) <: Tuple{Table(Continuous), AbstractVector{Continuous}}
-nothing # hide
 ```
 
 Or, in other words:
@@ -245,7 +244,7 @@ An optional promise that an operation, such as `predict`, returns an object of g
 scientific type is articulated in this way:
 
 ```@example anatomy
-@trait output_scitypes = (; predict=AbstractVector{<:Continuous})
+@trait output_scitypes=(; predict=AbstractVector{<:Continuous})
 nothing # hide
 ```
 
@@ -263,7 +262,7 @@ Finally, we'll make a promise about what `data` is acceptable in a call like
 `predict(model, fitted_params, data...)`. Note that `data` is always a `Tuple`, even if it
 has only one component (the typical case).
 
-```example anatomy
+```@example anatomy
 @trait MyRidge input_scitype = (; predict=Tuple{AbstractVector{<:Continuous}})
 ```
 

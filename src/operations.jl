@@ -94,7 +94,7 @@ For a supervised learning model, return `(d, report)`, where `d` is some represe
 the *single* probability distribution for the sample space ``Y^n``. Here ``Y`` is the
 space in which the target variable associated with `model` takes its values, and `n` is
 the number of observations in `data`. The specific form of the representation is given by
-[`LearnAPI.target_proxies(model)`](@ref).
+[`LearnAPI.predict_joint_proxy(model)`](@ref).
 
 Here `fitted_params` are the model's learned parameters (the first object returned by
 [`LearnAPI.fit`](@ref)). $DOC_NEW_DATA.
@@ -107,13 +107,13 @@ generally not agree with those returned by `LearnAPI.predict`, if also implement
 
 Only implement this method if `model` has an associated concept of target variable, as
 defined in the LearnAPI.jl documentation. A trait declaration
-[`LearnAPI.target_proxies`](@ref), such as
+[`LearnAPI.predict_joint_proxy`](@ref), such as
 
 ```julia
 LearnAPI.target_proxies(::Type{SomeModel}) = (; predict_joint=Sampleable())
 ```
 
-is required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
+is also required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
 `LearnAPI.Distribution`, and `LearnAPI.LogDistribution`.
 
 $(DOC_IMPLEMENTED_METHODS(:predict_joint)).

@@ -26,22 +26,29 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
 
 ## General requirements
 
+- Operations always return a tuple `(output, report)` where `output` is the usual output
+  (e.g., the target predictions if the operation is `predict`) and `report`
+  includes byproducts of the computation, typically `nothing` unless the model does not
+  generalize to new data (does not implement `fit`). 
+
 - Only implement `predict_joint` for outputing a *single* multivariate probability
   distribution for multiple target predictions, as described further at
-  [`LearnAPI.predict_joint`](@ref).
+  [`LearnAPI.predict_joint`](@ref). 
 
-- Each operation explicitly overloaded must be included in the return value
-  of [`LearnAPI.functions`](@ref).
+- The name of each operation explicitly overloaded must be included in the return value
+  of the [`LearnAPI.functions`](@ref) trait.
 
 ## Predict or transform?
 
-- If the model has a target, as defined under [Scope and undefined notions](@ref scope), then
-  only `predict` or `predict_joint` can be used to generate a corresponding target proxy.
+- If the model has a target, as defined under [Scope and undefined notions](@ref scope),
+  then only `predict` or `predict_joint` can be used to compute a corresponding target
+  proxy.
 
 - If an operation is to have an inverse operation, then it cannot be `predict` - use
   `transform` and `inverse_transform`.
 
-- If only a single operation is implemented, and there is no target variable, use `transform`. 
+- If only a single operation is implemented, and there is no target variable, use
+  `transform`.
 
 Here an "inverse" of `transform` is very broadly understood as any operation that can be
 applied to the output of `transform` to obtain an object of the same form as the input of
@@ -96,23 +103,24 @@ representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/p
 
 	The "possible requirement"s listed are not part of LearnAPI.jl.
 
-An operation with target proxy as output must declare a `TargetProxy` instance using the
-[`LearnAPI.target_proxies`](@ref), as in
+When `predict` outputs a target proxy, there must be [`LearnAPI.predict_proxy`](@ref)
+declaration, as in
 
 ```julia
-LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution(),)
+LearnAPI.predict_proxy(::Type{<:SomeModel}) = LearnAPI.Distribution()
 ```
 
 which has the short form
 
 ```julia
-LearnAPI.@trait target_proxies = (predict=LearnAPI.Distribution(),)
+LearnAPI.@trait predict_proxy = (predict=LearnAPI.Distribution(),)
 ```
 
-If `predict_joint` is implemented, then a `target_proxies` declaration is also
-required, but the interpretation is slightly different. This is because the output of
-`predict_joint` is not a number of observations but a single object. The trait value
-should be an instance of one of the following types:
+If `predict_joint` is implemented, then an analogous
+[`LearnAPI.predict_joint_proxy`](@ref) declaration is required, but the interpretation is
+slightly different. This is because the output of `predict_joint` is not a number of
+observations but a single object. The trait value should be an instance of one of the
+following types:
 
 |          type                   | form of output of `predict_joint(model, fitted_params, data)`
 |:-------------------------------:|:--------------------------------------------------|
@@ -124,7 +132,7 @@ should be an instance of one of the following types:
 See more at [`LearnAPI.predict_joint`](@ref) below.
 
 
-## Operation-specific details
+## Reference
 
 ```@docs
 LearnAPI.predict

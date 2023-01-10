@@ -1,5 +1,7 @@
 # # DOC STRING HELPERS
 
+const TRAINING_FUNCTIONS = (:fit, :update!, :ingest!)
+
 const DOC_OPERATIONS =
     "An *operation* is a method, like [`LearnAPI.predict`](@ref) or "*
     "[`LearnAPI.transform`](@ref), that has signature "*

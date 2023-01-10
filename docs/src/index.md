@@ -13,7 +13,7 @@ A basic Julia interface for training and applying machine learning models </span
 - For developers wanting to **IMPLEMEMT** LearnAPI: [Anatomy of
   an Implementation](@ref).
 
-- For those who wanting to **USE** models implementing LearnAPI: [Basic fit/predict
+- To see how to **USE** models implementing LearnAPI: [Basic fit/predict
   workflow](@ref workflow).
 
 ## Approach
@@ -41,10 +41,9 @@ model. Probability distributions, confidence intervals and survival functions ar
 of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
 on the target proxy.
 
-LearnAPI does not provide an interface for data access or data resampling, and could be
-used in conjunction with one or more such interfaces (e.g.,
-[Tables.jl](https://github.com/JuliaML/MLUtils.jl),
-[MLJUtils.jl](https://github.com/JuliaML/MLUtils.jl)).
+LearnAPI is a basement-level interface and not a general ML toolbox. Almost no assumptions
+are made about the data manipulated by LearnAPI models. These models can be supervised or
+not supervised, can generalize to new data observations, or not generalize.
 
 ## Methods
 
@@ -78,12 +77,6 @@ learned parameters, for passing to the optional `update!` and `ingest!` methods.
 training methods also return a `report` component, for exposing byproducts of training
 different from learned parameters. Similarly, all operations also return a `report`
 component (important for models that do not generalize to new data).
-
-Models can be supervised or not supervised, can generalize to new data observations, or
-not generalize. To ensure proper handling by client packages of probabilistic and other
-non-literal forms of target predictions (pdfs, confidence intervals, survival functions,
-etc) the output of `predict` and `predict_joint` can be flagged appropriately; see more at
-"target" below.
 
 
 ## [Scope and undefined notions](@id scope)
@@ -125,21 +118,21 @@ It is useful to have a guide to the interface, linked below, organized around co
 *informally defined* patterns or "tasks". However, the definitive specification of the
 interface is the [Reference](@ref) section.
 
-- [Anatomy of an Implementation](@ref) (Overview)
+- Overview: [Anatomy of an Implementation](@ref) 
 
-- [Reference](@ref) (Official Specification)
+- Official Specification: [Reference](@ref) 
 
-- [Common Implementation Patterns](@ref) (User Guide)
+- User guide: [Common Implementation Patterns](@ref) [under construction]
 
-- [Testing an Implementation](@ref)
+- [Testing an Implementation](@ref) [under construction]
 
 !!! info
 
-	It is strongly recommended users read  [Anatomy of an Implementation](@ref) before
+	It is recommended users read  [Anatomy of an Implementation](@ref) before
 	consulting the guide or reference sections.
 
-
-**Note.** In the future, LearnAPI.jl will become the new foundation for the
+**Note.** In the future, LearnAPI.jl may become the new foundation for the
 [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) toolbox created by the same
-developers. However, LearnAPI.jl is meant as a general purpose, standalone, lightweight
-API for machine learning algorithms (and has no reference to the "machines" used there).
+developers. However, LearnAPI.jl is meant as a general purpose, standalone, lightweight,
+low level API for machine learning algorithms (and has no reference to the "machines" used
+there).

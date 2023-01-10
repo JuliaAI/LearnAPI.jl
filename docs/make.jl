@@ -1,5 +1,6 @@
 using Documenter
 using LearnAPI
+using ScientificTypesBase
 
 const REPO="github.com/JuliaAI/LearnAPI.jl"
 
@@ -7,7 +8,7 @@ makedocs(;
     modules=[LearnAPI,],
     format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     pages=[
-        "Introduction" => "index.md",
+        "Overview" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
         "Reference" => "reference.md",
         "Fit, update and ingest" => "fit_update_and_ingest.md",

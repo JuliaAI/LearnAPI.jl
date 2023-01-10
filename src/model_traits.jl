@@ -1,10 +1,14 @@
 # There are two types of traits - ordinary traits that an implemenation overloads to make
 # promises of model behaviour, and derived traits, which are never overloaded.
 
-const DERIVED_TRAITS = (:name, :ismodel)
+const DOC_UNKNOWN =
+    "Returns \"unknown\" if the model implementation has failed to overload the trait. "
+const DOC_ON_TYPE = "The value of the trait must depend only on the type of `model`. "
+
 const ORDINARY_TRAITS = (
     :functions,
-    :target_proxies,
+    :predict_proxy,
+    :predict_joint_proxy,
     :position_of_target,
     :position_of_weights,
     :descriptors,
@@ -26,61 +30,124 @@ const ORDINARY_TRAITS = (
     :output_scitypes,
     :output_types,
 )
-
-# # DERIVED TRAITS
-
-name(M::Type) = string(typename(M))
-ismodel(M::Type) = !isempty(functions(M))
-
+const DERIVED_TRAITS = (:name, :ismodel)
 
 # # ORDINARY TRAITS
 
-functions() = METHODS = (OPERATIONS..., ACCESSOR_FUNCTIONS...)
+functions() = METHODS = (TRAINING_FUNCTIONS..., OPERATIONS..., ACCESSOR_FUNCTIONS...)
+const FUNCTIONS = map(d -> "`:$d`", functions())
 
 """
-   LearnAPI.functions(m)
+    LearnAPI.functions(model)
 
-Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI.jl
-methods implemented for objects having the same type as `m`.
+Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI
+methods specifically implemented for objects having the same type as `model`.
 
-If non-empty, this also guarantees `m` is a *model*, in the LearnAPI.jl
-sense.
-
-Specifically, this means:
-
-$DOC_MODEL
+If non-empty, this also guarantees `model` is a model, in the LearnAPI sense. See the
+Reference section of the manual for details.
 
 # New model implementations
 
-Elements of the returned tuple must come from this list: $(join(string.(functions()), ", ")).
-
-A new type whose instances are intended to be LearnAPI models can guarantee that by
-subtyping [`LearnAPI.Model`](@ref).
+Every LearnAPI method that is not a trait and which is specifically implemented for
+`typeof(model)` must be included in the return value of this trait. Specifically, the
+return value is a tuple of symbols from this list: $(join(FUNCTIONS, ", ")). To regenerate
+this list, do `LearnAPI.functions()`.
 
 See also [`LearnAPI.Model`](@ref).
 
 """
 functions(::Type) = ()
 
-target_proxies() = subtypes(TargetProxy)
 
 """
-    target_proxies(model)
+    LearnAPI.predict_proxy(model)
 
-Return a named tuple of target proxies, keyed on operation name, applying to `model`. For
-example, a value of
+Returns an object with abstract type `LearnAPI.TargetProxy` indicating the kind of proxy
+for the target returned by the `predict` method, when called on `model` and some data. For
+example, a value of `LearnAPI.Distribution()` means that `predict` returns probability
+distributions, rather than actual values of the target. (`LearnAPI.predict` also retuns a
+report as second value). A value of `LearnAPI.TrueTarget()` indicates that ordinary
+(non-proxy) target values are returned.
 
-    (predict=LearnAPI.Distribution(),)
+# New implementations
 
-means that `LearnAPI.predict` returns probability distributions, rather than actual values
-of the target. View all target proxy types with `target_proxies()`. For more information
-on target variables and target proxies, refer to the LearnAPI documentation.
+For more on target variables and target proxies, refer to the "Predict and Other
+Operations" section of the LearnAPI documentation.
+
+A model with a concept of "target" must overload this trait.
+
+The trait must return a lone instance `T()` for some subtype `T <: LearnAPI.TargetProxy`.
+Here's a sample implementation for a supervised model where predictions are ordinary
+values of the target variable:
+
+```julia
+@trait MyNewModel predict_proxy = LearnAPI.TrueTarget()
+```
+
+which is shorthand for
+
+```julia
+LearnAPI.predict_proxy(::Type{<:MyNewModelType}) = LearnAPI.TrueTarget()
+```
 
 """
-target_proxies(::Type) = NamedTuple()
+predict_proxy(::Type) = NamedTuple()
 
+"""
+    LearnAPI.predict_joint_proxy(model)
+
+Returns an object with abstract type `LearnAPI.TargetProxy` indicating the kind of proxy
+for the target returned by the `predict_joint` method, when called on `model` and some
+data. For example, a value of `LearnAPI.Distribution()` means that `predict_joint` returns
+a probability distribution, rather than, say a merely sampleable object.
+
+# New implementations
+
+For more on target variables and target proxies, refer to the LearnAPI documentation.
+
+Any model implementing `LearnAPI.predict_joint` must overload this trait.
+
+The possible return values for this trait are: `LearnAPI.Sampleable()`,
+`LearnAPI.Distribution()` and `LearnAPI.LogDistribution()`.
+
+Here's a sample implementation:
+
+```julia
+@trait MyNewModel predict_joint_proxy = LearnAPI.Distribution()
+```
+
+which is shorthand for
+
+```julia
+LearnAPI.predict_joint_proxy(::Type{<:MyNewModelType}) = LearnAPI.Distribution()
+```
+
+"""
+predict_joint_proxy(::Type) = NamedTuple()
+
+"""
+    LearnAPI.position_of_target(model)
+
+Return the expected position of the target variable within `data` in calls of the form
+[`LearnAPI.fit`](@ref)(model, verbosity, data...)`.
+
+If this number is `0`, then no target is expected. If this number exceeds `length(data)`,
+then `data` is understood to exclude the target variable.
+
+"""
 position_of_target(::Type) = 0
 
+"""
+    LearnAPI.position_of_weights(model)
+
+Return the expected position of per-observation weights within `data` in
+calls of the form [`LearnAPI.fit`](@ref)(model, verbosity, data...)`.
+
+If this number is `0`, then no weights are expected. If this number exceeds
+`length(data)`, then `data` is understood to exclude weights, which are assumed to be
+uniform.
+
+"""
 position_of_weights(::Type) = 0
 
 descriptors() = [
@@ -104,22 +171,115 @@ descriptors() = [
     :outlier_detection,
     :collaborative_filtering,
     :text_analysis,
-    :natural_language,
+    :audio_analysis,
+    :natural_language_processing,
     :image_processing,
-    :audio_processing,
 ]
+
+const DESCRIPTORS = map(d -> "`:$d`", descriptors())
+
+"""
+    LearnAPI.descriptors(model)
+
+Lists one or more suggestive model descriptors from this list: $(join(DESCRIPTORS, ", ")).
+
+!!! warning
+    The value of this trait guarantees no particular behaviour. The trait is
+    intended for informal classification purposes only.
+
+# New model implementations
+
+This trait should return a tuple of symbols, as in `(:classifier, :probabilistic)`.
+
+"""
 descriptors(::Type) = ()
 
+"""
+    LearnAPI.is_pure_julia(model)
+
+Returns `true` if training `model` requires evaluation of pure Julia code only.
+
+# New model implementations
+
+The fallback is `false`.
+
+"""
 is_pure_julia(::Type) = false
 
+"""
+    LearnAPI.pkg_name(model)
+
+Return the name of the package module which supplies the core training algorithm for
+`model`.  This is not necessarily the package providing the LearnAPI
+interface.
+
+$DOC_UNKNOWN
+
+# New model implemetations
+
+Must return a string, as in "DecisionTree".
+
+"""
 pkg_name(::Type) = "Unknown"
 
+"""
+    LearnAPI.doc_url(model)
+
+Return a url where the core algorithm for `model` is documented.
+
+$DOC_UNKNOWN
+
+# New model implementations
+
+Must return a string, such as "https://en.wikipedia.org/wiki/Decision_tree_learning".
+
+"""
 doc_url(::Type) = "unknown"
 
+"""
+    LearnAPI.pkg_license(model)
+
+Return the name of the software license, such as "MIT", applying to the package where the
+core algorithm for `model` is implemented.
+
+"""
 pkg_license(::Type) = "unknown"
 
+"""
+    LearnAPI.load_path(model)
+
+Return a string indicating where the `struct` for `typeof(model)` can be found, beginning
+with the name of the package module defining it. For example, a return value of
+"FastTrees.LearnAPI.DecisionTreeClassifier" means the following julia code will return the
+model type:
+
+```julia
+import FastTrees
+FastTrees.LearnAPI.DecisionTreeClassifier
+```
+
+$DOC_UNKNOWN
+
+
+"""
 load_path(::Type) = "unknown"
 
+
+"""
+    LearnAPI.is_wrapper(model)
+
+Returns `true` if one or more properties (fields) of `model` are themselves models, and
+`false` otherwise.
+
+# New model implementations
+
+This trait must be overloaded if one or more properties (fields) of `model` are themselves
+models.
+
+$DOC_ON_TYPE
+
+
+"""
 is_wrapper(::Type) = false
 
 fit_keywords(::Type) = ()
@@ -143,3 +303,9 @@ input_types(::Type) = NamedTuple()
 output_scitypes(::Type) = NamedTuple()
 
 output_types(::Type) = NamedTuple()
+
+
+# # DERIVED TRAITS
+
+name(M::Type) = string(typename(M))
+ismodel(M::Type) = !isempty(functions(M))
