@@ -139,7 +139,7 @@ LearnAPI.feature_importances(::MyRidge, fitted_params, report) =
 nothing # hide
 ```
 
-Another example of an accessor function is [`training_losses`](@ref).
+Another example of an accessor function is [`LearnAPI.training_losses`](@ref).
 
 
 ## [Model traits](@id traits)
@@ -208,15 +208,15 @@ nothing # hide
 Since LearnAPI.jl is a basement level API, one is discouraged from including explicit type
 checks in an implementation of `fit`. Instead one uses traits to make promisises about the
 acceptable type of `data` consumed by `fit`. In general, this can be a promise regarding
-the ordinary type of `data` and/or the [scientific
-type](https://github.com/JuliaAI/ScientificTypes.jl) of `data`. Alternatively, one may
-only make a promise about the type/scitype of *observations* in the data . See [Model
-Traits](@ref) for further details. In this case we'll be happy to restrict the scitype of
-the data:
+the ordinary type of `data` or the [scientific
+type](https://github.com/JuliaAI/ScientificTypes.jl) of `data` (but not
+both). Alternatively, one may only make a promise about the type/scitype of *observations*
+in the data . See [Model Traits](@ref) for further details. In this case we'll be happy to
+restrict the scitype of the data:
 
 ```@example anatomy
 import ScientificTypesBase: scitype, Table, Continuous
-@trait MyRidge fit_data_scitype = Tuple{Table(Continuous), AbstractVector{Continuous}}
+@trait MyRidge fit_scitype = Tuple{Table(Continuous), AbstractVector{Continuous}}
 nothing # hide
 ```
 
@@ -244,7 +244,7 @@ An optional promise that an operation, such as `predict`, returns an object of g
 scientific type is articulated in this way:
 
 ```@example anatomy
-@trait output_scitypes=(; predict=AbstractVector{<:Continuous})
+@trait predict_output_scitype=AbstractVector{<:Continuous}
 nothing # hide
 ```
 
@@ -252,19 +252,23 @@ If `predict` had instead returned probability distributions that implement the
 `Distributions.pdf` interface, then one could instead make the declaration
 
 ```julia
-@trait MyRidge output_scitypes = (; predict=AbstractVector{Density{<:Continuous}})
+@trait MyRidge predict_output_scitype=AbstractVector{Density{<:Continuous}}
 ```
 
-Similarly, there exists a trait called [`output_type`](@ref) for making promises on the
-ordinary type resturned by an operation.
+Similarly, there exists a trait called [`LearnAPI.predict_output_type`](@ref) for making promises
+on the ordinary type returned by an operation.
 
-Finally, we'll make a promise about what `data` is acceptable in a call like
+Finally, we'll make a promise about what `data` is guaranteed to work in a call like
 `predict(model, fitted_params, data...)`. Note that `data` is always a `Tuple`, even if it
 has only one component (the typical case).
 
 ```@example anatomy
-@trait MyRidge input_scitype = (; predict=Tuple{AbstractVector{<:Continuous}})
+@trait MyRidge predict_input_scitype = (; predict=Tuple{AbstractVector{<:Continuous}})
 ```
+
+Optionally, we may express our promise using regular types, using the
+[`LearnAPI.predict_input_type`](@ref) trait.
+
 
 ## [Illustrative fit/predict workflow](@id workflow)
 

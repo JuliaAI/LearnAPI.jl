@@ -1,4 +1,4 @@
-# Reference
+# [Reference](@id reference)
 
 > **Summary** In LearnAPI.jl a **model** is a container for hyper-parameters of some
 > learning algorithm. Functionality is created by overloading methods defined by the
@@ -80,7 +80,7 @@ or using the shorthand
 @trait SomeModelType functions=(:fit, :update!, :predict)
 ```
 
-For examples, see [Anatomy of an Interface](@ref).
+For examples, see [Anatomy of an Implementation](@ref).
 
 - [Fit, update! and ingest!](@ref): for models that "learn" (generalize to
   new data)

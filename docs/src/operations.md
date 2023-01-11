@@ -117,16 +117,15 @@ LearnAPI.@trait predict_proxy = (predict=LearnAPI.Distribution(),)
 ```
 
 If `predict_joint` is implemented, then an analogous
-[`LearnAPI.predict_joint_proxy`](@ref) declaration is required, but the interpretation is
-slightly different. This is because the output of `predict_joint` is not a number of
-observations but a single object. The trait value should be an instance of one of the
-following types:
+[`LearnAPI.predict_joint_proxy`](@ref) declaration is required. The output of
+`predict_joint` is not a number of observations but a single object, and the trait value
+must be an instance of one of the following types:
 
 |          type                   | form of output of `predict_joint(model, fitted_params, data)`
 |:-------------------------------:|:--------------------------------------------------|
-| `LearnAPI.Sampleable`      | object that can be sampled to obtain a *vector* whose elements have the form of target observations; the vector length matches the number of observations in `data`. |
-| `LearnAPI.Distribution`    | explicit probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
-| `LearnAPI.LogDistribution` | explicit log-probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
+| `LearnAPI.JointSampleable`      | object that can be sampled to obtain a *vector* whose elements have the form of target observations; the vector length matches the number of observations in `data`. |
+| `LearnAPI.JointDistribution`    | explicit probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
+| `LearnAPI.JointLogDistribution` | explicit log-probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
 
 
 See more at [`LearnAPI.predict_joint`](@ref) below.

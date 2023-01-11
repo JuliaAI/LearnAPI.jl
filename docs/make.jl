@@ -15,6 +15,7 @@ makedocs(;
         "Predict and other operations" => "operations.md",
         "Model Traits" => "model_traits.md",
         "Common Implementation Patterns" => "common_implementation_patterns.md",
+        "Testing an Implementation" => "testing_an_implementation.md",
     ],
     repo="https://$REPO/blob/{commit}{path}#L{line}",
     sitename="LearnAPI.jl"

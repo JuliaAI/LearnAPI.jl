@@ -116,11 +116,11 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
 
 It is useful to have a guide to the interface, linked below, organized around common
 *informally defined* patterns or "tasks". However, the definitive specification of the
-interface is the [Reference](@ref) section.
+interface is the [Reference](@ref reference) section.
 
 - Overview: [Anatomy of an Implementation](@ref) 
 
-- Official Specification: [Reference](@ref) 
+- Official Specification: [Reference](@ref reference) 
 
 - User guide: [Common Implementation Patterns](@ref) [under construction]
 

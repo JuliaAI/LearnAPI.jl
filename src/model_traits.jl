@@ -18,19 +18,31 @@ const ORDINARY_TRAITS = (
     :doc_url,
     :load_path,
     :is_wrapper,
-    :fit_keywords,
     :human_name,
     :iteration_parameter,
-    :fit_data_scitype,
-    :fit_data_type,
-    :fit_observation_scitypes,
-    :fit_observation_types,
-    :input_scitypes,
-    :input_types,
-    :output_scitypes,
-    :output_types,
+    :fit_keywords,
+    :fit_scitype,
+    :fit_observation_scitype,
+    :fit_type,
+    :fit_observation_type,
+    :predict_input_scitype,
+    :predict_output_scitype,
+    :predict_input_type,
+    :predict_output_type,
+    :predict_joint_input_scitype,
+    :predict_joint_output_scitype,
+    :predict_joint_input_type,
+    :predict_joint_output_type,
+    :transform_input_scitype,
+    :transform_output_scitype,
+    :transform_input_type,
+    :transform_output_type,
+    :inverse_transform_input_scitype,
+    :inverse_transform_output_scitype,
+    :inverse_transform_input_type,
+    :inverse_transform_output_type,
 )
-const DERIVED_TRAITS = (:name, :ismodel)
+const DERIVED_TRAITS = (:name, :is_model)
 
 # # ORDINARY TRAITS
 
@@ -107,19 +119,19 @@ For more on target variables and target proxies, refer to the LearnAPI documenta
 
 Any model implementing `LearnAPI.predict_joint` must overload this trait.
 
-The possible return values for this trait are: `LearnAPI.Sampleable()`,
-`LearnAPI.Distribution()` and `LearnAPI.LogDistribution()`.
+The possible return values for this trait are: `LearnAPI.JointSampleable()`,
+`LearnAPI.JointDistribution()` and `LearnAPI.JointLogDistribution()`.
 
 Here's a sample implementation:
 
 ```julia
-@trait MyNewModel predict_joint_proxy = LearnAPI.Distribution()
+@trait MyNewModel predict_joint_proxy = LearnAPI.JointDistribution()
 ```
 
 which is shorthand for
 
 ```julia
-LearnAPI.predict_joint_proxy(::Type{<:MyNewModelType}) = LearnAPI.Distribution()
+LearnAPI.predict_joint_proxy(::Type{<:MyNewModelType}) = LearnAPI.JointDistribution()
 ```
 
 """
@@ -282,30 +294,290 @@ $DOC_ON_TYPE
 """
 is_wrapper(::Type) = false
 
-fit_keywords(::Type) = ()
+"""
+    LearnAPI.human_name(model)
 
+A human-readable string representation of `typeof(model)`. Primarily intended for
+auto-generation of documentation.
+
+# New model implementations
+
+Optional. A fallback takes the type name, inserts spaces and removes capitalization. For
+example, `KNNRegressor` would become "knn regressor". Better would be to overload the
+trait to give "K-nearest neighbors regressor". Should be "concrete" noun like "regressor"
+rather than an "abstract" noun like "regression".
+
+"""
 human_name(M::Type{}) = snakecase(name(M), delim=' ') # `name` defined below
 
+"""
+    LearnAPI.iteration_parameter(model)
+
+The name of the iteration parameter of `model`, or `nothing` if the model is not
+iterative.
+
+"""
 iteration_parameter(::Type) = nothing
 
-fit_data_scitype(::Type) = Union{}
+"""
+    LearnAPI.fit_keywords(model)
 
-fit_data_type(::Type) = Union{}
+Return a list of keywords that can be provided to `fit` that correspond to
+metadata. $DOC_METADATA
 
-fit_observation_scitypes(::Type) = Union{}
+# New model implementations
 
-fit_observation_types(::Type) = Union{}
+If `LearnAPI.fit(model, ...)` supports keyword arguments, then this trait must be
+overloaded.
 
-input_scitypes(::Type) = NamedTuple()
+"""
+fit_keywords(::Type) = ()
 
-input_types(::Type) = NamedTuple()
+"""
+    LearnAPI.fit_scitype(model)
 
-output_scitypes(::Type) = NamedTuple()
+Return an upper bound on the scitype of data guaranteed to work when training `model`.
 
-output_types(::Type) = NamedTuple()
+Specifically, if the return value is `S` and `ScientificTypes.scitype(data) <: S`, then
+the following low-level calls are allowed (assuming `metadata` is also valid and
+`verbosity` is an integer):
+
+```julia
+# apply data front-end:
+data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
+
+# train:
+LearnAPI.fit(model, verbosity, data2...; metadata2...)
+```
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`.
+
+See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_observation_scitype`](@ref),
+[`LearnAPI.fit_observation_type`](@ref).
+
+"""
+fit_scitype(::Type) = Union{}
+
+"""
+    LearnAPI.fit_observation_scitype(model)
+
+Return an upper bound on the scitype of observations guaranteed to work when training
+`model` (independent of the type/scitype of the data container itself).
+
+Specifically, denoting the type returned above by `S`, suppose a user supplies training
+data, `data` - typically a tuple, such as `(X, y)` - and valid metadata, `metadata`, and
+one computes
+
+    data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
+
+Then, assuming
+
+    ScientificTypes.scitype(LearnAPI.getobs(model, LearnAPI.fit, data2, i)) <: S
+
+for any valid index `i`, the following is guaranteed to work:
+
+
+```julia
+LearnAPI.fit(model, verbosity, data2...; metadata2...)
+```
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`.
+
+See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
+[`LearnAPI.fit_observation_type`](@ref).
+
+"""
+fit_observation_scitype(::Type) = Union{}
+
+"""
+    LearnAPI.fit_type(model)
+
+Return an upper bound on the type of data guaranteed to work when training `model`.
+
+Specifically, if the return value is `T` and `typeof(data) <: T`, then the following
+low-level calls are allowed (assuming `metadata` is also valid and `verbosity` is an
+integer):
+
+```julia
+# apply data front-end:
+data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
+
+# train:
+LearnAPI.fit(model, verbosity, data2...; metadata2...)
+```
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`.
+
+See also [`LearnAPI.fit_scitype`](@ref)
+
+"""
+fit_type(::Type) = Union{}
+
+"""
+    LearnAPI.fit_observation_type(model)
+
+Return an upper bound on the type of observations guaranteed to work when training
+`model` (independent of the type/scitype of the data container itself).
+
+Specifically, denoting the type retuned above by `T`, suppose a user supplies training
+data, `data` - typically a tuple, such as `(X, y)` - and valid metadata, `metadata`, and
+one computes
+
+    data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
+
+Then, assuming
+
+    typeof(LearnAPI.getobs(model, LearnAPI.fit, data2, i)) <: T
+
+for any valid index `i`, the following is guaranteed to work:
+
+
+```julia
+LearnAPI.fit(model, verbosity, data2...; metadata2...)
+```
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`.
+
+See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
+[`LearnAPI.fit_observation_scitype`](@ref).
+
+"""
+fit_observation_type(::Type) = Union{}
+
+DOC_INPUT_SCITYPE(op) =
+    """
+        $(op)_input_scitype(model)
+
+    Return an upper bound on the scitype of input data guaranteed to work with the `$op`
+    operation.
+
+    Specifically, if `S` is the value returned and `ScientificTypes.scitype(data) <: S`,
+    then the following low-level calls are allowed
+
+        data2 = LearnAPI.reformat(model, LearnAPI.$op, data...)
+        LearnAPI.$op(model, fitted_params, data2...)
+
+    Here `fitted_params` are the learned parameters returned by an appropriate call to
+    `LearnAPI.fit`.
+
+    See also [`$(op)_input_type`](@ref).
+
+    """
+
+DOC_INPUT_TYPE(op) =
+    """
+        $(op)_input_type(model)
+
+    Return an upper bound on the type of input data guaranteed to work with the `$op`
+    operation.
+
+    Specifically, if `T` is the value returned and `typeof(data) <: S`, then the following
+    low-level calls are allowed
+
+        data2 = LearnAPI.reformat(model, LearnAPI.$op, data...)
+        LearnAPI.$op(model, fitted_params, data2...)
+
+    Here `fitted_params` are the learned parameters returned by an appropriate call to
+    `LearnAPI.fit`.
+
+    See also [`$(op)_input_scitype`](@ref).
+
+    """
+
+DOC_OUTPUT_SCITYPE(op) =
+    """
+        $(op)_output_scitype(model)
+
+    Return an upper bound on the scitype of the output of the `$op` operation.
+
+    Specifically, if `S` is the value returned, and if
+
+        output, report = LearnAPI.$op(model, fitted_params, data...)
+
+    for suitable `fitted_params` and `data`, then
+
+        ScientificTypes.scitype(output) <: S
+
+    See also [`$(op)_input_scitype`](@ref).
+
+    """
+
+DOC_OUTPUT_TYPE(op) =
+    """
+        $(op)_output_type(model)
+
+    Return an upper bound on the type of the output of the `$op` operation.
+
+    Specifically, if `T` is the value returned, and if
+
+        output, report = LearnAPI.$op(model, fitted_params, data...)
+
+    for suitable `fitted_params` and `data`, then
+
+        typeof(output) <: T
+
+    See also [`$(op)_input_type`](@ref).
+
+    """
+
+"$(DOC_INPUT_SCITYPE(:predict))"
+predict_input_scitype(::Type) = Union{}
+
+"$(DOC_OUTPUT_SCITYPE(:predict))"
+predict_output_scitype(::Type) = Any
+
+"$(DOC_INPUT_TYPE(:predict))"
+predict_input_type(::Type) = Union{}
+
+"$(DOC_OUTPUT_TYPE(:predict))"
+predict_output_type(::Type) = Any
+
+"$(DOC_INPUT_SCITYPE(:predict_joint))"
+predict_joint_input_scitype(::Type) = Union{}
+
+"$(DOC_OUTPUT_SCITYPE(:predict_joint))"
+predict_joint_output_scitype(::Type) = Any
+
+"$(DOC_INPUT_TYPE(:predict_joint))"
+predict_joint_input_type(::Type) = Union{}
+
+"$(DOC_OUTPUT_TYPE(:predict_joint))"
+predict_joint_output_type(::Type) = Any
+
+"$(DOC_INPUT_SCITYPE(:transform))"
+transform_input_scitype(::Type) = Union{}
+
+"$(DOC_OUTPUT_SCITYPE(:transform))"
+transform_output_scitype(::Type) = Any
+
+"$(DOC_INPUT_TYPE(:transform))"
+transform_input_type(::Type) = Union{}
+
+"$(DOC_OUTPUT_TYPE(:transform))"
+transform_output_type(::Type) = Any
+
+"$(DOC_INPUT_SCITYPE(:inverse_transform))"
+inverse_transform_input_scitype(::Type) = Union{}
+
+"$(DOC_OUTPUT_SCITYPE(:inverse_transform))"
+inverse_transform_output_scitype(::Type) = Any
+
+"$(DOC_INPUT_TYPE(:inverse_transform))"
+inverse_transform_input_type(::Type) = Union{}
+
+"$(DOC_OUTPUT_TYPE(:inverse_transform))"
+inverse_transform_output_type(::Type) = Any
 
 
 # # DERIVED TRAITS
 
 name(M::Type) = string(typename(M))
-ismodel(M::Type) = !isempty(functions(M))
+is_model(M::Type) = !isempty(functions(M))
