@@ -52,13 +52,13 @@ learning algorithm, and that's all. It does not include learned parameters.
 
 The following methods, dispatched on model type, are provided:
 
-- `fit` for regular training, overloaded if the model generalizes to new data, as in
+- `fit`, for regular training, overloaded if the model generalizes to new data, as in
   classical supervised learning
 
-- `update!` for adding model iterations, or responding efficiently to other
+- `update!`, for adding model iterations, or responding efficiently to other
   post-`fit`changes in hyperparameters
 
-- `ingest!` for incremental learning
+- `ingest!`, for incremental learning
 
 - **operations**, `predict`, `predict_joint`, `transform` and `inverse_transform` for
   applying the model to data not used for training
@@ -81,10 +81,10 @@ component (important for models that do not generalize to new data).
 
 ## [Scope and undefined notions](@id scope)
 
-LearnAPI.jl provides methods for training, applying, and saving machine learning models,
-and that is all. *It does not specify an interface for data access or data
-resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions (in
-**boldface**) which some higher-level interface might decide to formalize:
+The basic LearnAPI.jl interface provides methods for training and applying machine
+learning models, and that is all. The interface specification is predicated on a few basic
+undefined notions (in **boldface**) which some higher-level interface might decide to
+formalize:
 
 - An object which generates ordered sequences of individual **observations** is called
   **data**. For example a `DataFrame` instance, from
@@ -112,15 +112,40 @@ resampling*. However, LearnAPI.jl is predicated on a few basic undefined notions
   to [Target proxies](@ref).
 
 
+## Optional data interface
+
+It can be useful to distinguish between data that exists at some high level, convenient
+for the general user - such as a table (dataframe) or the path to a directory containing
+image files - and a performant, model-specific representation of that data, such as a
+matrix or image "data loader". When retraining using the same data with new
+hyper-parameters, one wants to avoid recreating the model-specific representation, and,
+accordingly, a higher level ML interface may want to cache model-specific
+representations. Furthermore, in resampling (e.g., performing cross-validation), a higher
+level interface wants only to resample the model-specific representation, so it needs to
+know how to do that. To meet these two ends, LearnAPI provides two additional **data
+methods** dispatched on model type:
+
+- `reformat(model, ...)`, for converting from a user data representation to a peformant model-specific
+  representation
+
+- `getobs(model, ...)`, for extracting a subsample of observations of the model-specific
+  representation
+
+It should be emphasized that LearnAPI is itself agnostic to particular representations of
+data or the particular methods of accessing observations within them. Each `model` is free
+to choose its own data interface.
+
+See [Optional data Interface](@ref data_interface) for more details. 
+
 ## Contents
 
 It is useful to have a guide to the interface, linked below, organized around common
 *informally defined* patterns or "tasks". However, the definitive specification of the
 interface is the [Reference](@ref reference) section.
 
-- Overview: [Anatomy of an Implementation](@ref) 
+- Overview: [Anatomy of an Implementation](@ref)
 
-- Official Specification: [Reference](@ref reference) 
+- Official Specification: [Reference](@ref reference)
 
 - User guide: [Common Implementation Patterns](@ref) [under construction]
 
