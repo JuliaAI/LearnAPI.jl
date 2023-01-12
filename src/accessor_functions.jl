@@ -33,6 +33,51 @@ $(DOC_IMPLEMENTED_METHODS(:feature_importances)).
 """
 function feature_importances end
 
-function training_labels end
+"""
+    training_losses(model, fitted_params, report)
+
+Return the training losses for `model`, given `fittted_params` and
+`report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
+[`LearnAPI.ingest!`](@ref).
+
+# New model implementations
+
+Implement for iterative models that compute and record training losses as part of training
+(e.g. neural networks).
+
+$(DOC_IMPLEMENTED_METHODS(:training_losses)).
+
+"""
 function training_losses end
+
+"""
+    training_scores(model, fitted_params, report)
+
+Return the training scores for `model`, given `fittted_params` and
+`report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
+[`LearnAPI.ingest!`](@ref).
+
+# New model implementations
+
+Implement for models, such as outlier detection models, which associate a score with each
+observation during training, where these scores are of interest in later processes (e.g, in
+defining normalized scores on new data).
+
+$(DOC_IMPLEMENTED_METHODS(:training_scores)).
+
+"""
 function training_scores end
+
+"""
+    training_labels(model, fitted_params, report)
+
+Return the training labels for `model`, given `fittted_params` and
+`report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
+[`LearnAPI.ingest!`](@ref).
+
+# New model implementations
+
+$(DOC_IMPLEMENTED_METHODS(:training_labels)).
+
+"""
+function training_labels end
