@@ -31,7 +31,7 @@ ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
   includes byproducts of the computation, typically `nothing` unless the model does not
   generalize to new data (does not implement `fit`). 
 
-- Only implement `predict_joint` for outputing a *single* multivariate probability
+- Only implement `predict_joint` for outputting a *single* multivariate probability
   distribution for multiple target predictions, as described further at
   [`LearnAPI.predict_joint`](@ref). 
 
@@ -91,7 +91,7 @@ have no fields.
 | `LearnAPI.LabelAmbiguousDistribution`| pdf/pmf version of `LabelAmbiguous`; see `Distribution`  above  |
 | `LearnAPI.ConfidenceInterval`   | confidence interval (possible requirement:  observation `isa Tuple{Real,Real}`) |
 | `LearnAPI.Set`                  | finite but possibly varying number of target observations (possible requirement: observation isa `Set{target_observation_type}`) |
-| `LearnAPI.ProbabilisticSet`      | as for `Set` but labelled with probabilities (not necessarily summing to one) |
+| `LearnAPI.ProbabilisticSet`      | as for `Set` but labeled with probabilities (not necessarily summing to one) |
 | `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time (possible requirement: observation have type `Distributions.ContinuousUnivariateDistribution`) |
 

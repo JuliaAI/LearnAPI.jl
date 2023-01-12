@@ -6,7 +6,7 @@
 > `transform`). In this example we also implement an **accessor function**, called
 > `feature_importance`, returning the absolute values of the linear coefficients. The
 > ridge regressor has a target variable and `predict` makes literal predictions of the
-> target (rather than, say, probablistic predictions); this behaviour is flagged by the
+> target (rather than, say, probabilistic predictions); this behavior is flagged by the
 > `predict_proxy` model trait.  Other traits articulate the model's training data type
 > requirements and the input/output type of `predict`.
 
@@ -35,7 +35,7 @@ nothing # hide
 ```
 
 The subtyping `MyRidge <: LearnAPI.Model` is optional but recommended where it is not
-otherwise disruptive (it allows models to be displayed in a standard way, for example).
+otherwise disruptive.
 
 Instances of `MyRidge` are called **models** and `MyRidge` is a **model type**.
 
@@ -75,7 +75,7 @@ function LearnAPI.fit(model::MyRidge, verbosity, X, y)
         feature_importances =
                 [features[j] => abs(coefficients[j]) for j in eachindex(features)]
         sort!(feature_importances, by=last) |> reverse!
-        verbosity > 1 && @info "Features in order of importance: $(first.(feature_importances))"
+        verbosity > 0 && @info "Features in order of importance: $(first.(feature_importances))"
         report = (; feature_importances)
 
         return fitted_params, state, report
@@ -92,15 +92,15 @@ Regarding the return value of `fit`:
   or [`LearnAPI.ingest!`](@ref) method (see [Fit, update! and ingest!](@ref)).
 
 - The `report` is for other byproducts of training, apart from the learned parameters (the
-  ones will need to provide `predict` below).
+  ones we'll need to provide `predict` below).
 
-Our `fit` method assumes that `X` is a table (satifies the [Tables.jl
+Our `fit` method assumes that `X` is a table (satisfies the [Tables.jl
 spec](https://github.com/JuliaData/Tables.jl)) whose rows are the observations; and it
 will need need `y` to be an `AbstractFloat` vector. A model implementation is free to
 dictate the representation of data that `fit` accepts but articulates its requirements
 using appropriate traits; see [Training data types](@ref) below. We recommend against data
 type checks internal to `fit`; this would ordinarily be the responsibility of a higher
-level API, using those trasits. 
+level API, using those traits. 
 
 
 ## Operations
@@ -146,7 +146,7 @@ Another example of an accessor function is [`LearnAPI.training_losses`](@ref).
 
 Our model has a target variable, in the sense outlined in [Scope and undefined
 notions](@ref scope), and `predict` returns an object with exactly the same form as the
-target. We indicate this behaviour by declaring
+target. We indicate this behavior by declaring
 
 ```@example anatomy
 LearnAPI.predict_proxy(::Type{<:MyRidge}) = LearnAPI.TrueTarget()
@@ -165,10 +165,6 @@ for details.
 
 `LearnAPI.predict_proxy` is an example of a **model trait**. A complete list of traits
 and the contracts they imply is given in [Model Traits](@ref).
-
-> **MLJ only.** The values of all traits constitute a model's **metadata**, which is
-> recorded in the searchable MLJ Model Registry, assuming the implementation-providing
-> package is registered there.
 
 We also need to indicate that a target variable appears in training (this is a supervised
 model). We do this by declaring *where* in the list of training data arguments (in this
@@ -206,7 +202,7 @@ nothing # hide
 ## Training data types
 
 Since LearnAPI.jl is a basement level API, one is discouraged from including explicit type
-checks in an implementation of `fit`. Instead one uses traits to make promisises about the
+checks in an implementation of `fit`. Instead one uses traits to make promises about the
 acceptable type of `data` consumed by `fit`. In general, this can be a promise regarding
 the ordinary type of `data` or the [scientific
 type](https://github.com/JuliaAI/ScientificTypes.jl) of `data` (but not
@@ -238,37 +234,23 @@ Or, in other words:
   AbstractVector{Continuous}` - meaning that it is an abstract vector with `<:AbstractFloat`
   elements.
 
-## Input/output types for operations
+## Input types for operations
 
-An optional promise that an operation, such as `predict`, returns an object of given
-scientific type is articulated in this way:
-
-```@example anatomy
-@trait predict_output_scitype=AbstractVector{<:Continuous}
-nothing # hide
-```
-
-If `predict` had instead returned probability distributions that implement the
-`Distributions.pdf` interface, then one could instead make the declaration
-
-```julia
-@trait MyRidge predict_output_scitype=AbstractVector{Density{<:Continuous}}
-```
-
-Similarly, there exists a trait called [`LearnAPI.predict_output_type`](@ref) for making promises
-on the ordinary type returned by an operation.
-
-Finally, we'll make a promise about what `data` is guaranteed to work in a call like
-`predict(model, fitted_params, data...)`. Note that `data` is always a `Tuple`, even if it
-has only one component (the typical case).
+An optional promise about what `data` is guaranteed to work in a call like
+`predict(model, fitted_params, data...)` is articulated this way:
 
 ```@example anatomy
-@trait MyRidge predict_input_scitype = (; predict=Tuple{AbstractVector{<:Continuous}})
+@trait MyRidge predict_input_scitype = Tuple{AbstractVector{<:Continuous}}
 ```
+
+Note that `data` is always a `Tuple`, even if it has only one component (the typical
+case), which explains the `Tuple` on the right-hand side.
 
 Optionally, we may express our promise using regular types, using the
 [`LearnAPI.predict_input_type`](@ref) trait.
 
+One can optionally make promises about the outut of an operation. See [Model Traits](@ref)
+for details.
 
 ## [Illustrative fit/predict workflow](@id workflow)
 
@@ -286,21 +268,21 @@ X = (; a, b, c) |> Tables.rowtable
 y = 2a - b + 3c + 0.05*rand(n)
 nothing # hide
 ```
-Instantiate a model with relevant hyperparameters:
+Instantiate a model with relevant hyperparameters (which is all the object stores):
 
 ```@example anatomy
 model = MyRidge(lambda=0.5)
 ```
 
-Train the model:
+Train the model (the `0` means do so silently):
 
 ```@example anatomy
 import LearnAPI: fit, predict, feature_importances
 
-fitted_params, state, fit_report = fit(model, 1, X[train], y[train])
+fitted_params, state, fit_report = fit(model, 0, X[train], y[train])
 ```
 
-Inspect the learned paramters and report:
+Inspect the learned parameters and report:
 
 ```@example anatomy
 @info "training outcomes" fitted_params fit_report

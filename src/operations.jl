@@ -1,4 +1,5 @@
 const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
+const DOC_OPERATIONS_LIST = join(map(op -> "`:$op`", OPERATIONS), ", ")
 
 const DOC_NEW_DATA =
     "The `report` contains ancilliary byproducts of the computation, or "*
@@ -16,7 +17,6 @@ Return `(ŷ, report)` where `ŷ` are the predictions, or prediction-like outpu
 probabilities), for a machine learning model `model`, with learned parameters
 `fitted_params` (first object returned by [`LearnAPI.fit`](@ref)`(model, ...)`).
 $DOC_NEW_DATA
-
 
 # New model implementations
 

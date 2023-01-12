@@ -13,7 +13,7 @@ In this document the word "model" has a very specific meaning that may differ fr
 reader's common understanding of the word - in statistics, for example.
 
 Here a **model** is some julia object storing the hyper-parameters of some learning
-algorithm. Typically the type of `m` will have a name reflecting that of the algormithm,
+algorithm. Typically the type of `m` will have a name reflecting that of the algorithm,
 such as `DecisionTreeRegressor`.
 
 Additionally, for `m::M` to be a LearnAPI model, we require:
@@ -92,6 +92,6 @@ For examples, see [Anatomy of an Implementation](@ref).
   
 - [Optional Data Interface](@ref data_interface)
 
-- [Model Traits](@ref): contracts for specific behaviour, such as "The second data
+- [Model Traits](@ref): contracts for specific behavior, such as "The second data
   argument of `fit` is a target variable" or "I predict probability distributions"
   

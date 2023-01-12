@@ -10,17 +10,17 @@ A basic Julia interface for training and applying machine learning models </span
 
 ## Quick tours
 
-- For developers wanting to **IMPLEMEMT** LearnAPI: [Anatomy of
-  an Implementation](@ref).
-
 - To see how to **USE** models implementing LearnAPI: [Basic fit/predict
   workflow](@ref workflow).
+
+- For developers wanting to **IMPLEMENT** LearnAPI: [Anatomy of
+  an Implementation](@ref).
 
 ## Approach
 
 Machine learning algorithms, also called *models*, have a complicated
-taxonomy. Grouping models, or modelling tasks, into a relatively small number of types,
-such as "classifier" and "clusterer", and attempting to impose uniform behaviour within
+taxonomy. Grouping models, or modeling tasks, into a relatively small number of types,
+such as "classifier" and "clusterer", and attempting to impose uniform behavior within
 each group, is challenging. In our experience developing the [MLJ
 ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads to
 limitations on the models that can be included in a general interface, or additional
@@ -28,10 +28,10 @@ complexity needed to cope with exceptional cases. Even if a complete user interf
 machine learning might benefit from such groupings, a basement-level API for ML should, in
 our view, avoid them.
 
-In a addition to basic methods, like `fit` and `predict`, LearnAPI provides a large number
+In addition to basic methods, like `fit` and `predict`, LearnAPI provides a number
 of optional model
 [traits](https://ahsmart.com/pub/holy-traits-design-patterns-and-best-practice-book/),
-each promising a specific kind of behaviour, such as "The predictions of this model are
+each promising a specific kind of behavior, such as "The predictions of this model are
 probability distributions".  There is no abstract type model hierarchy.
 
 Our preceding remarks notwithstanding, there is, for certain applications involving a
@@ -48,12 +48,12 @@ not supervised, can generalize to new data observations, or not generalize.
 ## Methods
 
 In LearnAPI.jl a *model* is just a container for the hyper-parameters of some machine
-learning algorithm, and that's all. It does not include learned parameters.
+learning algorithm, and does not typically include learned parameters.
 
 The following methods, dispatched on model type, are provided:
 
 - `fit`, for regular training, overloaded if the model generalizes to new data, as in
-  classical supervised learning
+  classical supervised learning; the principal output of `fit` is the learned parameters
 
 - `update!`, for adding model iterations, or responding efficiently to other
   post-`fit`changes in hyperparameters
@@ -66,11 +66,11 @@ The following methods, dispatched on model type, are provided:
 - common **accessor functions**, such as `feature_importances` and `training_losses`, for
   extracting, from training outcomes, information common to some models
 
-- **model traits**, such as `target_proxies(model)`, for promising specific behaviour
+- **model traits**, such as `predict_output_type(model)`, for promising specific behavior
 
-There is flexibility about how much of the interface is implemented by a given model
-object `model`. A special trait `functions(model)` declares what has been explicitly
-implemented to work with `model`, excluding traits.
+There is flexibility about how much of the interface is implemented by a given model type.
+A special trait `functions(model)` declares what has been explicitly implemented to work
+with `model`, excluding traits.
 
 Since this is a functional-style interface, `fit` returns model `state`, in addition to
 learned parameters, for passing to the optional `update!` and `ingest!` methods. These
@@ -89,10 +89,10 @@ formalize:
 - An object which generates ordered sequences of individual **observations** is called
   **data**. For example a `DataFrame` instance, from
   [DataFrames.jl](https://dataframes.juliadata.org/stable/), is considered data, the
-  observatons being the rows. A matrix can be considered data, but whether the
+  observations being the rows. A matrix can be considered data, but whether the
   observations are rows or columns is ambiguous and not fixed by LearnAPI.
 
-- Each machine learning model's behaviour is governed by a number of user-specified
+- Each machine learning model's behavior is governed by a number of user-specified
   **hyperparameters**. The regularization parameter in ridge regression is an
   example. Hyperparameters are data-independent. For example, the number of target classes
   is not a hyperparameter.
@@ -119,21 +119,20 @@ for the general user - such as a table (dataframe) or the path to a directory co
 image files - and a performant, model-specific representation of that data, such as a
 matrix or image "data loader". When retraining using the same data with new
 hyper-parameters, one wants to avoid recreating the model-specific representation, and,
-accordingly, a higher level ML interface may want to cache model-specific
+accordingly, a higher level ML interface may want to cache such
 representations. Furthermore, in resampling (e.g., performing cross-validation), a higher
 level interface wants only to resample the model-specific representation, so it needs to
 know how to do that. To meet these two ends, LearnAPI provides two additional **data
 methods** dispatched on model type:
 
-- `reformat(model, ...)`, for converting from a user data representation to a peformant model-specific
-  representation
+- `reformat(model, ...)`, for converting from a user data representation to a performant model-specific representation, whose output is for use in `fit`, `predict`, etc. above
 
 - `getobs(model, ...)`, for extracting a subsample of observations of the model-specific
   representation
 
 It should be emphasized that LearnAPI is itself agnostic to particular representations of
-data or the particular methods of accessing observations within them. Each `model` is free
-to choose its own data interface.
+data or the particular methods of accessing observations within them. By overloading these
+methods, Each `model` is free to choose its own data interface.
 
 See [Optional data Interface](@ref data_interface) for more details. 
 
@@ -158,6 +157,6 @@ interface is the [Reference](@ref reference) section.
 
 **Note.** In the future, LearnAPI.jl may become the new foundation for the
 [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) toolbox created by the same
-developers. However, LearnAPI.jl is meant as a general purpose, standalone, lightweight,
+developers. However, LearnAPI.jl is meant as a general purpose, stand-alone, lightweight,
 low level API for machine learning algorithms (and has no reference to the "machines" used
 there).

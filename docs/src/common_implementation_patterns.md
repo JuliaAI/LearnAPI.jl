@@ -21,7 +21,7 @@ implementations fall into one (or more) of the following informally understood p
 - [Incremental Models](@ref)
 
 - [Static Transformers](@ref): Transformations that do not learn but which have
-  hyper-parameters and/or deliver ancilliary information about the transformation
+  hyper-parameters and/or deliver ancillary information about the transformation
 
 - [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 

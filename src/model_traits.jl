@@ -286,7 +286,7 @@ Returns `true` if one or more properties (fields) of `model` are themselves mode
 # New model implementations
 
 This trait must be overloaded if one or more properties (fields) of `model` are themselves
-models.
+models. Fallback return value is `false`. 
 
 $DOC_ON_TYPE
 
@@ -303,9 +303,9 @@ auto-generation of documentation.
 # New model implementations
 
 Optional. A fallback takes the type name, inserts spaces and removes capitalization. For
-example, `KNNRegressor` would become "knn regressor". Better would be to overload the
-trait to give "K-nearest neighbors regressor". Should be "concrete" noun like "regressor"
-rather than an "abstract" noun like "regression".
+example, `KNNRegressor` becomes "knn regressor". Better would be to overload the trait to
+give "K-nearest neighbors regressor". Should be "concrete" noun like "ridge regressor"
+rather than an "abstract" noun like "ridge regression".
 
 """
 human_name(M::Type{}) = snakecase(name(M), delim=' ') # `name` defined below
@@ -315,6 +315,10 @@ human_name(M::Type{}) = snakecase(name(M), delim=' ') # `name` defined below
 
 The name of the iteration parameter of `model`, or `nothing` if the model is not
 iterative.
+
+# New model implementations
+
+Implement if model is iterative. Returns a symbol or nothing.
 
 """
 iteration_parameter(::Type) = nothing
@@ -328,7 +332,7 @@ metadata. $DOC_METADATA
 # New model implementations
 
 If `LearnAPI.fit(model, ...)` supports keyword arguments, then this trait must be
-overloaded.
+overloaded, and otherwise not. Fallback returns `()`.
 
 """
 fit_keywords(::Type) = ()
@@ -336,7 +340,8 @@ fit_keywords(::Type) = ()
 """
     LearnAPI.fit_scitype(model)
 
-Return an upper bound on the scitype of data guaranteed to work when training `model`.
+Return an upper bound on the scitype of data guaranteeing it to work when training
+`model`.
 
 Specifically, if the return value is `S` and `ScientificTypes.scitype(data) <: S`, then
 the following low-level calls are allowed (assuming `metadata` is also valid and
@@ -396,7 +401,7 @@ fit_observation_scitype(::Type) = Union{}
 """
     LearnAPI.fit_type(model)
 
-Return an upper bound on the type of data guaranteed to work when training `model`.
+Return an upper bound on the type of data guaranteeing it to work when training `model`.
 
 Specifically, if the return value is `T` and `typeof(data) <: T`, then the following
 low-level calls are allowed (assuming `metadata` is also valid and `verbosity` is an

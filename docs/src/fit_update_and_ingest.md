@@ -13,7 +13,7 @@
 
 All three methods above return a triple `(fitted_params, state, report)` whose components
 are explained under [`LearnAPI.fit`](@ref) below.  Items that might be returned in
-`report` include: feature rankings/importances, SVM support vectors, clustering centres,
+`report` include: feature rankings/importances, SVM support vectors, clustering centers,
 methods for visualizing training outcomes, methods for saving learned parameters in a
 custom format, degrees of freedom, deviances. Precisely what `report` includes might be
 controlled by model hyperparameters, especially if there is a performance cost to it's
