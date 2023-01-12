@@ -132,7 +132,7 @@ methods** dispatched on model type:
 
 It should be emphasized that LearnAPI is itself agnostic to particular representations of
 data or the particular methods of accessing observations within them. By overloading these
-methods, Each `model` is free to choose its own data interface.
+methods, each `model` is free to choose its own data interface.
 
 See [Optional data Interface](@ref data_interface) for more details. 
 
