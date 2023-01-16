@@ -1,6 +1,15 @@
 # Model Traits
 
-Traits are often called on instances but are frequently *defined* on model *types*, as in 
+> **Summary.** Traits allow one to promise particular behaviour for a model, such as:
+> *This model supports per-observation weights, which must appear as the third argument of
+> `fit`*, or *This model predicts probability distributions for the target*, or *This
+> model's `transform` method predicts `Real` vectors*.
+
+Traits are optional, except where required by the implementation of some LearnAPI method
+and documented in that method's docstring. Unless a model has no functionality whatsoever,
+[`LearnAPI.functions`](@ref)`(model)` will need to be overloaded.
+
+Traits are often called on instances but are frequently *defined* on model *types*, as in
 
 ```julia
 LearnAPI.is_pure_julia(::Type{<:MyModelType}) = true
@@ -19,11 +28,13 @@ t(model) = t(typeof(model))
 ```
 
 This means `LearnAPI.is_pure_julia(model) = true` whenever `model isa MyModelType` in the
-above example. 
+above example.
 
-Traits that vary from instance to instance of the same type are discouraged, except in
-the case of composite models (`is_wrapper(model) = true`) where this is unavoidable. One
-reason for this so one can associate with each model type a unique set of trait-based
+Every trait has a global fallback implementation for `::Type`. 
+
+Traits that vary from instance to instance of the same type are discouraged, except in the
+case of composite models (`is_wrapper(model) = true`) where this is unavoidable. One
+reason for this is so one can associate with each model type a unique set of trait-based
 "model metadata" for inclusion in searchable model databases. This requirement
 occasionally requires that an existing model implementation be split into several separate
 LearnAPI implementations (e.g., one for regression and another for classification).
@@ -33,14 +44,14 @@ traits are not.
 
 ## Ordinary traits
 
-In the examples column of the table below, `Table` and `Continuous` are names owned by the
+In the examples column of the table below, `Table`, `Continuous`, `Sampleable` are names owned by the
 package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
 
 | trait                                            | fallback value        | return value  | example |
 |:-------------------------------------------------|:----------------------|:--------------|:--------|
 | [`LearnAPI.functions`](@ref)`(model)`            | `()`                  | implemented LearnAPI functions (traits excluded) | `(:fit, :predict)` |
-| [`LearnAPI.predict_proxy`](@ref)`(model)`        | `NamedTuple()`        | form of target proxy output by `predict` | `LearnAPI.Distribution()` |
-| [`LearnAPI.predict_joint_proxy`](@ref)`(model)`  | `NamedTuple()`        | form of target proxy output by `predict_joint` | `LearnAPI.Distribution()` |
+| [`LearnAPI.predict_proxy`](@ref)`(model)`        | `LearnAPI.None()`     | form of target proxy output by `predict` | `LearnAPI.Distribution()` |
+| [`LearnAPI.predict_joint_proxy`](@ref)`(model)`  | `LearnAPI.None()`     | form of target proxy output by `predict_joint` | `LearnAPI.Distribution()` |
 | [`LearnAPI.position_of_target`](@ref)`(model)`   | `0`                   | † the positional index of the **target** in `data` in `fit(..., data...; metadata)` calls | 2 |
 | [`LearnAPI.position_of_weights`](@ref)`(model)`  | `0`                   | † the positional index of **per-observation weights** in `data` in `fit(..., data...; metadata)` | 3 |
 | [`LearnAPI.descriptors`](@ref)`(model)`          | `()`                  | lists one or more suggestive model descriptors from `LearnAPI.descriptors()` | (:classifier, :probabilistic) |
@@ -48,31 +59,31 @@ package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.
 | [`LearnAPI.pkg_name`](@ref)`(model)`             | `"unknown"`           | name of package providing core algorithm (may be different from package providing LearnAPI.jl implementation) | `"DecisionTree"` |
 | [`LearnAPI.pkg_license`](@ref)`(model)`          | `"unknown"`             | name of license of package providing core algorithm | `"MIT"` |
 | [`LearnAPI.doc_url`](@ref)`(model)`               | `"unknown"`             | url providing documentation of the core algorithm  | `"https://en.wikipedia.org/wiki/Decision_tree_learning"` |
-| [`LearnAPI.load_path`](@ref)`(model)`            | `"unknown"`             | a string indicating where the struct `typeof(model)` is defined, beginning with name of package providing implementation | `FastTrees.LearnAPI.DecisionTreeClassifier` |
-| [`LearnAPI.is_wrapper`](@ref)`(model)`          | `false`                | is `true` if one or more properties (fields) are themselves models | `true` |
+| [`LearnAPI.load_path`](@ref)`(model)`            | `"unknown"`             | a string indicating where the struct for `typeof(model)` is defined, beginning with name of package providing implementation | `FastTrees.LearnAPI.DecisionTreeClassifier` |
+| [`LearnAPI.is_wrapper`](@ref)`(model)`          | `false`                | is `true` if one or more properties (fields) of `model` may be a model | `true` |
 | [`LearnAPI.human_name`](@ref)`(model)`          | type name with spaces  | human name for the model; should be a noun | "elastic net regressor" |
-| [`LearnAPI.iteration_parameter`](@ref)`(model)` | nothing                | symbolic name of an iteration parameter | :epochs |
-| [`LearnAPI.fit_keywords`](@ref)`(model)`        |  `()`                  | tuple of symbols for keyword arguments accepted by `fit` (metadata) | `(:class_weights,)` |
+| [`LearnAPI.iteration_parameter`](@ref)`(model)` | `nothing`                | symbolic name of an iteration parameter | :epochs |
+| [`LearnAPI.fit_keywords`](@ref)`(model)`        |  `()`                  | tuple of symbols for keyword arguments accepted by `fit` (corresponding  to metadata) | `(:class_weights,)` |
 | [`LearnAPI.fit_scitype`](@ref)`(model)`      | `Union{}` | upper bound on `scitype(data)` in `fit(model, verbosity, data...)`†† | `Tuple{Table(Continuous), AbstractVector{Continuous}}` |
+| [`LearnAPI.fit_observation_scitype`](@ref)`(model)` | `Union{}`| upper bound on `scitype(observation)` for `observation` in `data` and `data` in `fit(model, verbosity, data...)`†† | `Tuple{AbstractVector{Continuous}, Continuous}` |
 | [`LearnAPI.fit_type`](@ref)`(model)`            | `Union{}` | upper bound on `type(data)` in `fit(model, verbosity, data...)`†† | `Tuple{AbstractMatrix{<:Real}, AbstractVector{<:Real}}` |
-| [`LearnAPI.fit_observation_scitype`](@ref)`(model)` | `Union{}`| upper bound on `scitype(data)` in `fit(model, verbosity, data...)`†† | `Tuple{AbstractVector{Continuous}, Continuous}` |
-| [`LearnAPI.fit_observation_type`](@ref)`(model)`    | `Union{}`| upper bound on `type(data)` in `fit(model, verbosity, data...)`*    | `Tuple{AbstractVector{<:Real}, Real}` |
-| [`LearnAPI.predict_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `predict(model, fitted_params, data...)`††   | `Tuple{AbstractVector{Continuous}}` |
+| [`LearnAPI.fit_observation_type`](@ref)`(model)`    | `Union{}`| upper bound on `type(observation)` for `observation` in `data` and `data` in `fit(model, verbosity, data...)`*    | `Tuple{AbstractVector{<:Real}, Real}` |
+| [`LearnAPI.predict_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `predict(model, fitted_params, data...)`††   | `Table(Continuous)` |
 | [`LearnAPI.predict_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(predict(model, ...)))`                          | `AbstractVector{Continuous}` |
-| [`LearnAPI.predict_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `predict(model, fitted_params, data...)`††    | `Tuple{AbstractVector{<:Real}}` |
+| [`LearnAPI.predict_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `predict(model, fitted_params, data...)`††    | `AbstractMatrix{<:Real}` |
 | [`LearnAPI.predict_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(predict(model, ...)))`                           | `AbstractVector{<:Real}` |
-| [`LearnAPI.predict_joint_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `predict_joint(model, fitted_params, data...)`††   | `Tuple{AbstractVector{Continuous}}` |
-| [`LearnAPI.predict_joint_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(predict_joint(model, ...)))`                          | `AbstractVector{Continuous}` |
-| [`LearnAPI.predict_joint_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `predict_joint(model, fitted_params, data...)`††    | `Tuple{AbstractVector{<:Real}}` |
-| [`LearnAPI.predict_joint_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(predict_joint(model, ...)))`                           | `AbstractVector{<:Real}` |
-| [`LearnAPI.transform_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `transform(model, fitted_params, data...)`††   | `Tuple{AbstractVector{Continuous}}` |
-| [`LearnAPI.transform_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(transform(model, ...)))`                          | `AbstractVector{Continuous}` |
-| [`LearnAPI.transform_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `transform(model, fitted_params, data...)`††    | `Tuple{AbstractVector{<:Real}}` |
-| [`LearnAPI.transform_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(transform(model, ...)))`                           | `AbstractVector{<:Real}` |
-| [`LearnAPI.inverse_transform_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `inverse_transform(model, fitted_params, data...)`††   | `Tuple{AbstractVector{Continuous}}` |
-| [`LearnAPI.inverse_transform_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(inverse_transform(model, ...)))`                          | `AbstractVector{Continuous}` |
-| [`LearnAPI.inverse_transform_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `inverse_transform(model, fitted_params, data...)`††    | `Tuple{AbstractVector{<:Real}}` |
-| [`LearnAPI.inverse_transform_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(inverse_transform(model, ...)))`                           | `AbstractVector{<:Real}` |
+| [`LearnAPI.predict_joint_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `predict_joint(model, fitted_params, data...)`††   |`Table(Continuous)` |
+| [`LearnAPI.predict_joint_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(predict_joint(model, ...)))`                          | `Sampleable{<:AbstractVector{Continuous}}` |
+| [`LearnAPI.predict_joint_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `predict_joint(model, fitted_params, data...)`††    | `AbstractMatrix{<:Real}` |
+| [`LearnAPI.predict_joint_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(predict_joint(model, ...)))`                           | `Distributions.Sampleable{Distributions.Multivariate,Distributions.Continuous}` |
+| [`LearnAPI.transform_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `transform(model, fitted_params, data...)`††   | `Table(Continuous)` |
+| [`LearnAPI.transform_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(transform(model, ...)))`                          |  `Table(Continuous)` |
+| [`LearnAPI.transform_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `transform(model, fitted_params, data...)`††    | `AbstractMatrix{<:Real}}` |
+| [`LearnAPI.transform_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(transform(model, ...)))`                           | `AbstractMatrix{<:Real}` |
+| [`LearnAPI.inverse_transform_input_scitype`](@ref)`(model)`  | `Union{}` | upper bound on `scitype(data)` in `inverse_transform(model, fitted_params, data...)`††  | `Table(Continuous)` |
+| [`LearnAPI.inverse_transform_output_scitype`](@ref)`(model)` | `Any`     | upper bound on `scitype(first(inverse_transform(model, ...)))`                          | `Table(Continuous)` |
+| [`LearnAPI.inverse_transform_input_type`](@ref)`(model)`     | `Union{}` | upper bound on `typeof(data)` in `inverse_transform(model, fitted_params, data...)`††   | `AbstractMatrix{<:Real}` |
+| [`LearnAPI.inverse_transform_output_type`](@ref)`(model)`    | `Any`     | upper bound on `typeof(first(inverse_transform(model, ...)))`                           | `AbstractMatrix{<:Real}` |
 
 
 † If the value is `0`, then the variable in boldface type is not supported and not

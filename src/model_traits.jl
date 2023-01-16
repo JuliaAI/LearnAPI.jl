@@ -1,9 +1,14 @@
-# There are two types of traits - ordinary traits that an implemenation overloads to make
-# promises of model behaviour, and derived traits, which are never overloaded.
+# There are two types of traits - ordinary traits that an implementation overloads to make
+# promises of model behavior, and derived traits, which are never overloaded.
 
 const DOC_UNKNOWN =
-    "Returns \"unknown\" if the model implementation has failed to overload the trait. "
+    "Returns `\"unknown\"` if the model implementation has failed to overload the trait. "
 const DOC_ON_TYPE = "The value of the trait must depend only on the type of `model`. "
+
+const DOC_ONLY_ONE =
+    "No more than one of the following should be overloaded for a model type: "*
+    "`LearnAPI.fit_scitype`, `LearnAPI.fit_type`, `LearnAPI.fit_observation_scitype`, "*
+    "`LearnAPI.fit_observation_type`."
 
 const ORDINARY_TRAITS = (
     :functions,
@@ -54,7 +59,6 @@ const FUNCTIONS = map(d -> "`:$d`", functions())
 
 Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI
 methods specifically implemented for objects having the same type as `model`.
-
 If non-empty, this also guarantees `model` is a model, in the LearnAPI sense. See the
 Reference section of the manual for details.
 
@@ -77,16 +81,19 @@ functions(::Type) = ()
 Returns an object with abstract type `LearnAPI.TargetProxy` indicating the kind of proxy
 for the target returned by the `predict` method, when called on `model` and some data. For
 example, a value of `LearnAPI.Distribution()` means that `predict` returns probability
-distributions, rather than actual values of the target. (`LearnAPI.predict` also retuns a
+distributions, rather than actual values of the target. (`LearnAPI.predict` also returns a
 report as second value). A value of `LearnAPI.TrueTarget()` indicates that ordinary
-(non-proxy) target values are returned.
+(non-proxy) target values are returned. A value of `LearnAPI.None()`, implies the output
+of `predict` has no declared relationship with any target variable.
 
 # New implementations
 
+A model with a concept of "target" must overload this trait. The fallback return value is
+`LearnAPI.None()`.
+
+
 For more on target variables and target proxies, refer to the "Predict and Other
 Operations" section of the LearnAPI documentation.
-
-A model with a concept of "target" must overload this trait.
 
 The trait must return a lone instance `T()` for some subtype `T <: LearnAPI.TargetProxy`.
 Here's a sample implementation for a supervised model where predictions are ordinary
@@ -103,7 +110,7 @@ LearnAPI.predict_proxy(::Type{<:MyNewModelType}) = LearnAPI.TrueTarget()
 ```
 
 """
-predict_proxy(::Type) = NamedTuple()
+predict_proxy(::Type) = LearnAPI.None()
 
 """
     LearnAPI.predict_joint_proxy(model)
@@ -115,9 +122,9 @@ a probability distribution, rather than, say a merely sampleable object.
 
 # New implementations
 
-For more on target variables and target proxies, refer to the LearnAPI documentation.
-
 Any model implementing `LearnAPI.predict_joint` must overload this trait.
+
+For more on target variables and target proxies, refer to the LearnAPI documentation.
 
 The possible return values for this trait are: `LearnAPI.JointSampleable()`,
 `LearnAPI.JointDistribution()` and `LearnAPI.JointLogDistribution()`.
@@ -135,13 +142,13 @@ LearnAPI.predict_joint_proxy(::Type{<:MyNewModelType}) = LearnAPI.JointDistribut
 ```
 
 """
-predict_joint_proxy(::Type) = NamedTuple()
+predict_joint_proxy(::Type) = LearnAPI.None()
 
 """
     LearnAPI.position_of_target(model)
 
 Return the expected position of the target variable within `data` in calls of the form
-[`LearnAPI.fit`](@ref)(model, verbosity, data...)`.
+[`LearnAPI.fit`](@ref)`(model, verbosity, data...)`.
 
 If this number is `0`, then no target is expected. If this number exceeds `length(data)`,
 then `data` is understood to exclude the target variable.
@@ -153,7 +160,7 @@ position_of_target(::Type) = 0
     LearnAPI.position_of_weights(model)
 
 Return the expected position of per-observation weights within `data` in
-calls of the form [`LearnAPI.fit`](@ref)(model, verbosity, data...)`.
+calls of the form [`LearnAPI.fit`](@ref)`(model, verbosity, data...)`.
 
 If this number is `0`, then no weights are expected. If this number exceeds
 `length(data)`, then `data` is understood to exclude weights, which are assumed to be
@@ -188,15 +195,16 @@ descriptors() = [
     :image_processing,
 ]
 
-const DESCRIPTORS = map(d -> "`:$d`", descriptors())
+const DOC_DESCRIPTORS_LIST = join(map(d -> "`:$d`", descriptors()), ", ")
 
 """
     LearnAPI.descriptors(model)
 
-Lists one or more suggestive model descriptors from this list: $(join(DESCRIPTORS, ", ")).
+Lists one or more suggestive model descriptors from this list: $DOC_DESCRIPTORS_LIST (do
+`LearnAPI.descriptors()` to reproduce).
 
 !!! warning
-    The value of this trait guarantees no particular behaviour. The trait is
+    The value of this trait guarantees no particular behavior. The trait is
     intended for informal classification purposes only.
 
 # New model implementations
@@ -227,12 +235,21 @@ interface.
 
 $DOC_UNKNOWN
 
-# New model implemetations
+# New model implementations
 
-Must return a string, as in "DecisionTree".
+Must return a string, as in `"DecisionTree"`.
 
 """
-pkg_name(::Type) = "Unknown"
+pkg_name(::Type) = "unknown"
+
+"""
+    LearnAPI.pkg_license(model)
+
+Return the name of the software license, such as `"MIT"`, applying to the package where the
+core algorithm for `model` is implemented.
+
+"""
+pkg_license(::Type) = "unknown"
 
 """
     LearnAPI.doc_url(model)
@@ -243,26 +260,17 @@ $DOC_UNKNOWN
 
 # New model implementations
 
-Must return a string, such as "https://en.wikipedia.org/wiki/Decision_tree_learning".
+Must return a string, such as `"https://en.wikipedia.org/wiki/Decision_tree_learning"`.
 
 """
 doc_url(::Type) = "unknown"
-
-"""
-    LearnAPI.pkg_license(model)
-
-Return the name of the software license, such as "MIT", applying to the package where the
-core algorithm for `model` is implemented.
-
-"""
-pkg_license(::Type) = "unknown"
 
 """
     LearnAPI.load_path(model)
 
 Return a string indicating where the `struct` for `typeof(model)` can be found, beginning
 with the name of the package module defining it. For example, a return value of
-"FastTrees.LearnAPI.DecisionTreeClassifier" means the following julia code will return the
+`"FastTrees.LearnAPI.DecisionTreeClassifier"` means the following julia code will return the
 model type:
 
 ```julia
@@ -280,13 +288,13 @@ load_path(::Type) = "unknown"
 """
     LearnAPI.is_wrapper(model)
 
-Returns `true` if one or more properties (fields) of `model` are themselves models, and
+Returns `true` if one or more properties (fields) of `model` may themselves be models, and
 `false` otherwise.
 
 # New model implementations
 
-This trait must be overloaded if one or more properties (fields) of `model` are themselves
-models. Fallback return value is `false`. 
+This trait must be overloaded if one or more properties (fields) of `model` may take model
+values. Fallback return value is `false`.
 
 $DOC_ON_TYPE
 
@@ -303,9 +311,9 @@ auto-generation of documentation.
 # New model implementations
 
 Optional. A fallback takes the type name, inserts spaces and removes capitalization. For
-example, `KNNRegressor` becomes "knn regressor". Better would be to overload the trait to
-give "K-nearest neighbors regressor". Should be "concrete" noun like "ridge regressor"
-rather than an "abstract" noun like "ridge regression".
+example, `KNNRegressor` becomes `"knn regressor"`. Better would be to overload the trait
+to return `"K-nearest neighbors regressor"`. Ideally, this is a "concrete" noun like
+`"ridge regressor"` rather than an "abstract" noun like `"ridge regression"`.
 
 """
 human_name(M::Type{}) = snakecase(name(M), delim=' ') # `name` defined below
@@ -318,7 +326,7 @@ iterative.
 
 # New model implementations
 
-Implement if model is iterative. Returns a symbol or nothing.
+Implement if model is iterative. Returns a symbol or `nothing`.
 
 """
 iteration_parameter(::Type) = nothing
@@ -327,12 +335,26 @@ iteration_parameter(::Type) = nothing
     LearnAPI.fit_keywords(model)
 
 Return a list of keywords that can be provided to `fit` that correspond to
-metadata. $DOC_METADATA
+metadata; $DOC_METADATA
 
 # New model implementations
 
 If `LearnAPI.fit(model, ...)` supports keyword arguments, then this trait must be
 overloaded, and otherwise not. Fallback returns `()`.
+
+Here's a sample implementation for a classifier that implements a `LearnAPI.fit` method
+with signature `fit(model::MyClassifier, verbosity, X, y; class_weights=nothing)`:
+
+```
+LearnAPI.fit_keywords(::Type{<:MyClassifier}) = (:class_weights,)
+```
+
+or the shorthand
+
+```
+@trait MyClassifier fit_keywords=(:class_weights,)
+```
+
 
 """
 fit_keywords(::Type) = ()
@@ -355,12 +377,12 @@ data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
 LearnAPI.fit(model, verbosity, data2...; metadata2...)
 ```
 
-# New model implementations
-
-Optional. The fallback return value is `Union{}`.
-
 See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_observation_scitype`](@ref),
 [`LearnAPI.fit_observation_type`](@ref).
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`.  $DOC_ONLY_ONE
 
 """
 fit_scitype(::Type) = Union{}
@@ -388,12 +410,12 @@ for any valid index `i`, the following is guaranteed to work:
 LearnAPI.fit(model, verbosity, data2...; metadata2...)
 ```
 
-# New model implementations
-
-Optional. The fallback return value is `Union{}`.
-
 See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
 [`LearnAPI.fit_observation_type`](@ref).
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
 fit_observation_scitype(::Type) = Union{}
@@ -415,11 +437,12 @@ data2, metadata2 = LearnAPI.reformat(model, LearnAPI.fit, data...; metadata...)
 LearnAPI.fit(model, verbosity, data2...; metadata2...)
 ```
 
+See also [`LearnAPI.fit_scitype`](@ref), [`LearnAPI.fit_observation_type`](@ref).
+[`LearnAPI.fit_observation_scitype`](@ref)
+
 # New model implementations
 
-Optional. The fallback return value is `Union{}`.
-
-See also [`LearnAPI.fit_scitype`](@ref)
+Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
 fit_type(::Type) = Union{}
@@ -430,7 +453,7 @@ fit_type(::Type) = Union{}
 Return an upper bound on the type of observations guaranteed to work when training
 `model` (independent of the type/scitype of the data container itself).
 
-Specifically, denoting the type retuned above by `T`, suppose a user supplies training
+Specifically, denoting the type returned above by `T`, suppose a user supplies training
 data, `data` - typically a tuple, such as `(X, y)` - and valid metadata, `metadata`, and
 one computes
 
@@ -447,19 +470,19 @@ for any valid index `i`, the following is guaranteed to work:
 LearnAPI.fit(model, verbosity, data2...; metadata2...)
 ```
 
-# New model implementations
-
-Optional. The fallback return value is `Union{}`.
-
 See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
 [`LearnAPI.fit_observation_scitype`](@ref).
+
+# New model implementations
+
+Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
 fit_observation_type(::Type) = Union{}
 
 DOC_INPUT_SCITYPE(op) =
     """
-        $(op)_input_scitype(model)
+        LearnAPI.$(op)_input_scitype(model)
 
     Return an upper bound on the scitype of input data guaranteed to work with the `$op`
     operation.
@@ -473,13 +496,18 @@ DOC_INPUT_SCITYPE(op) =
     Here `fitted_params` are the learned parameters returned by an appropriate call to
     `LearnAPI.fit`.
 
-    See also [`$(op)_input_type`](@ref).
+    See also [`LearnAPI.$(op)_input_type`](@ref).
 
-    """
+    # New model implementations
+
+    Implementation is optional. The fallback return value is `Union{}`. Should not be
+    overloaded if `LearnAPI.$(op)_input_type` is overloaded.
+
+   """
 
 DOC_INPUT_TYPE(op) =
     """
-        $(op)_input_type(model)
+        LearnAPI.$(op)_input_type(model)
 
     Return an upper bound on the type of input data guaranteed to work with the `$op`
     operation.
@@ -493,13 +521,18 @@ DOC_INPUT_TYPE(op) =
     Here `fitted_params` are the learned parameters returned by an appropriate call to
     `LearnAPI.fit`.
 
-    See also [`$(op)_input_scitype`](@ref).
+    See also [`LearnAPI.$(op)_input_scitype`](@ref).
+
+    # New model implementations
+
+    Implementation is optional. The fallback return value is `Union{}`. Should not be
+    overloaded if `LearnAPI.$(op)_input_scitype` is overloaded.
 
     """
 
 DOC_OUTPUT_SCITYPE(op) =
     """
-        $(op)_output_scitype(model)
+        LearnAPI.$(op)_output_scitype(model)
 
     Return an upper bound on the scitype of the output of the `$op` operation.
 
@@ -511,13 +544,17 @@ DOC_OUTPUT_SCITYPE(op) =
 
         ScientificTypes.scitype(output) <: S
 
-    See also [`$(op)_input_scitype`](@ref).
+    See also [`LearnAPI.$(op)_input_scitype`](@ref).
+
+    # New model implementations
+
+    Implementation is optional. The fallback return value is `Any`.
 
     """
 
 DOC_OUTPUT_TYPE(op) =
     """
-        $(op)_output_type(model)
+        LearnAPI.$(op)_output_type(model)
 
     Return an upper bound on the type of the output of the `$op` operation.
 
@@ -529,7 +566,11 @@ DOC_OUTPUT_TYPE(op) =
 
         typeof(output) <: T
 
-    See also [`$(op)_input_type`](@ref).
+    See also [`LearnAPI.$(op)_input_type`](@ref).
+
+    # New model implementations
+
+    Implementation is optional. The fallback return value is `Any`.
 
     """
 

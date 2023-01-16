@@ -23,8 +23,8 @@ of `fit` and operation implemented for `model`.
 
 $(DOC_IMPLEMENTED_METHODS(:reformat))
 
-The subsample returned must be acceptable in place of `data` in the call function named in
-the second argument.
+The subsample returned must be acceptable in place of `data` in calls of the function
+named in the second argument.
 
 ## Example implementation
 
@@ -56,10 +56,11 @@ Return the model-specific representation `data` of user-supplied `user_data`, fo
 consumption, after splatting, by the specified `operation`, dispatched on `model`. Here
 `operation` is one of: $DOC_OPERATIONS_LIST.
 
-The following sample workflow illustrates the use of both versions of `reformat`above:
+The following sample workflow illustrates the use of both versions of `reformat`above. The
+data objects `X`, `y`, and `Xtest` are the user-supplied versions of data.
 
 ```julia
-data, metadata = LearnAPI.reformat(model, LearnAPI.fit, X, y; class_weights=dic)
+data, metadata = LearnAPI.reformat(model, LearnAPI.fit, X, y; class_weights=some_dictionary)
 fitted_params, state, fit_report = LearnAPI.fit(model, 0, data...; metadata...)
 
 test_data = LearnAPI.reformat(model, LearnAPI.predict, Xtest)
@@ -89,9 +90,10 @@ no metadata, a `NamedTuple()` can be returned in its place.
 Suppose that `MyClassifier` is a model type for simple supervised classification, with
 `LearnAPI.fit(model::MyClassifier, verbosity, A, y; names=...)` and
 `predict(model::MyClassifier, fitted_params, A)` implemented assuming that the target `y`
-is an ordinary vector, the features `A`is a matrix with columns as observations, and
+is an ordinary vector, the features `A` is a matrix with columns as observations, and
 `names` are the names of the features. Then, supposing users supply features in tabular
-form, but target as expected, then we provide the following implementation of `reformat`:
+form, but target as expected, then we can provide the following implementation of
+`reformat`:
 
 ```julia
 using Tables

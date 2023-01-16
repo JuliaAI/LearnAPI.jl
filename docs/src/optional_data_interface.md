@@ -1,12 +1,17 @@
 # [Optional Data Interface](@id data_interface)
 
+> **Summary.** Implement `getobs` to articulate how to generate individual observations
+> from data consumed by a LearnAPI model. Implement `reformat` to provide a higher level
+> interface the means to avoid repeating transformations from user representations of data
+> (such as a dataframe) and model-specific representations (such as a matrix).
+
 ## Resampling
 
 To aid in programmatic resampling, such as cross-validation, it is helpful if each machine
 learning model articulates how the data it consumes can be subsampled - that is, how a
-subset of observations can be extracted from that data. Another advantage of doing so is to
-mitigate some of the ambiguities around structuring observations within the container (are
-the observations in a matrix the rows or the columns?).
+subset of observations can be extracted from that data. Another advantage of doing so is
+to mitigate some of the ambiguities around structuring observations within the container:
+Are the observations in a matrix the rows or the columns?
 
 In LearnAPI, an implementation can articulate a subsampling method by implementing
 `LearnAPI.getobs(model, func, I, data...)` for each function `func` consuming data, such

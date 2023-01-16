@@ -1,9 +1,11 @@
 # Fit, update! and ingest!
 
-> **Summary.** Models that learn, i.e., generalize to new data, must overload `fit`;
-> the fallback performs no operation and returns all `nothing`. Implement `update!` if
-> certain hyper-parameter changes do not necessitate retraining from scratch (e.g.,
-> increasing iteration parameters). Implement `ingest!` to implement incremental learning.
+> **Summary.** Models that learn, i.e., generalize to new data, must overload `fit`; the
+> fallback performs no operation and returns all `nothing`. Implement `update!` if certain
+> hyper-parameter changes do not necessitate retraining from scratch (e.g., increasing an
+> iteration parameter). Implement `ingest!` to implement incremental learning. All
+> training methods implemented must be named in the return value of the
+> `functions` trait.
 
 | method                     | fallback                                           | compulsory? | requires          |
 |:---------------------------|:---------------------------------------------------|-------------|-------------------|

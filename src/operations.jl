@@ -184,6 +184,7 @@ function restore end
 
 abstract type TargetProxy end
 
+struct None <: TargetProxy end 
 struct TrueTarget <: TargetProxy end
 struct Sampleable <: TargetProxy end
 struct Distribution <: TargetProxy end

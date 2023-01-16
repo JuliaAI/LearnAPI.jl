@@ -15,7 +15,8 @@ end
 
 const DOC_METADATA =
     "`metadata` is for extra information pertaining to the data that is never "*
-    "iterated or subsampled, eg., weights for target classes. Another example "*
+    "iterated or subsampled, eg., weights for target classes, or feature names "*
+    "(if these are not embedded in the representation of `data`). Another example "*
     "would be feature groupings "*
     "in the group lasso algorithm. "
 
@@ -42,8 +43,8 @@ Fit `model` to the provided `data` and `metadata`. With the exception of warning
 training will be silent if `verbosity == 0`. Lower values should suppress warnings; any
 integer ought to be admissible. Here:
 
-- `model` is a property-accessible object whose properties are the hyper-parameters of some
-   machine learning algorithm.
+- `model` is a property-accessible object whose properties are the hyper-parameters of
+   some machine learning algorithm.
 
 - `data` is a tuple of data objects with a common number of observations, for example,
   `data = (X, y, w)` where `X` is a table of features, `y` is a target vector with the
@@ -75,6 +76,9 @@ Returns a tuple (`fitted_params`, `state`, `report`) where:
 Overloading this method for new models is optional.  A fallback performs no
 computation, returning `(nothing, nothing, nothing)`.
 
+See the LearnAPI.jl documentation for the detailed requirements of LearnAPI.jl model
+objects.
+
 $DOC_WHAT_IS_DATA
 
 $DOC_MUTATING_MODELS
@@ -97,24 +101,14 @@ fit(::Any, ::Any, ::Integer, data...; metadata...) = nothing, nothing, nothing
 
 Based on the values of `state`, and `fitted_params` returned by a preceding call to
 [`LearnAPI.fit`](ref), [`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), update a
-model's learned parameters, returning new (or mutated) `state` and `fitted_params`.
+model's fitted parameters, returning new (or mutated) `state` and `fitted_params`.
 
 Intended for retraining a model when the training data has not changed, but `model`
-properties (hyperparameters) may have changed. Specifically, the assumption is that `data`
-and `metadata` have the same values seen in the most recent call to `fit/update!/ingest!`
-(and will typically be ignored).
-
-The most common use case is for continuing the training of an iterative model: `state` is
-simply a copy of the model used in the last training call (`fit`, `update!` or `ingest!`)
-and this will include the current number of iterations as a property. If `model` and
-`state` differ only in the number of iterations (e.g., epochs in a neural network), which
-has increased, then the learned parameters (weights) are updated, rather computed ab
-initio. Otherwise, `update!` simply calls `fit`, to force retraining from scratch.
-
-It is permitted to return mutated versions of `state` and `fitted_params`.
+properties (hyperparameters) may have changed, e.g., when increasing an iteration
+parameter. Specifically, the assumption is that `data` and `metadata` have the same values
+seen in the most recent call to `fit/update!/ingest!` (and will typically be ignored).
 
 For incremental training (same model, new data) see instead [`LearnAPI.ingest!`](@ref).
-
 
 # Return value
 
@@ -130,12 +124,20 @@ Overloading this method is optional. A fallback calls `LearnAPIperforms.fit`:
 LearnAPI.update!(model, verbosity, fitted_params, state, data...; metadata...) =
     fit(model, verbosity, data; metadata...)
 ```
+$(DOC_IMPLEMENTED_METHODS(:fit))
 
 $DOC_WHAT_IS_DATA
 
-$DOC_MUTATING_MODELS
+The most common use case is for continuing the training of an iterative model: `state` is
+simply a copy of the model used in the last training call (`fit`, `update!` or `ingest!`)
+and this will include the current number of iterations as a property. If `model` and
+`state` differ only in the number of iterations (e.g., epochs in a neural network), which
+has increased, then the fitted parameters (weights) are updated, rather than computed from
+scratch. Otherwise, `update!` simply calls `fit`, to force retraining from scratch.
 
-$(DOC_IMPLEMENTED_METHODS(:fit))
+It is permitted to return mutated versions of `state` and `fitted_params`.
+
+$DOC_MUTATING_MODELS
 
 See also [`LearnAPI.fit`](@ref), [`LearnAPI.ingest!`](@ref).
 
@@ -147,18 +149,19 @@ update!(model, verbosity, fitted_params, state, data...; metadata...) =
 # # INGEST
 
 """
-    LearnAPI.ingest!(model, verbosity, fitted_params, state, data...; metadata...)
+    LernAPI.ingest!(model, verbosity, fitted_params, state, data...; metadata...)
 
-For a model that supports incremental learning, update the learned parameters using
+For a model that supports incremental learning, update the fitted parameters using
 `data`, which has typically not been seen before.  The arguments `state` and
 `fitted_params` are the output of a preceding call to [`LearnAPI.fit`](ref),
 [`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), of which mutated or new
 versions are returned.
 
-For updating learned parameters using the *same* data but new hyperparameters, see instead
+For updating fitted parameters using the *same* data but new hyperparameters, see instead
 [`LearnAPI.update!`](@ref).
 
-For incremental training, see instead [`LearnAPI.ingest!`](@ref).
+For training a model with new hyperparameters bue *unchanged* data, see instead
+[`LearnAPI.update!`](@ref).
 
 
 # Return value
@@ -169,11 +172,11 @@ Same as [`LearnAPI.fit`](@ref), namely a tuple (`fitted_params`, `state`, `repor
 
 # New model implementations
 
-Implementing this method is an optional. It has no fallback.
-
-$DOC_MUTATING_MODELS
+Implementing this method is optional. It has no fallback.
 
 $(DOC_IMPLEMENTED_METHODS(:fit))
+
+$DOC_MUTATING_MODELS
 
 See also [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref).
 

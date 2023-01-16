@@ -1,11 +1,14 @@
 # [Reference](@id reference)
 
 > **Summary** In LearnAPI.jl a **model** is a container for hyper-parameters of some
-> learning algorithm. Functionality is created by overloading methods defined by the
-> interface and promises of certain behavior are articulated by model traits.
+> learning algorithm. Functionality is created by overloading **methods**
+> provided by the interface, which are divided into training methods (e.g., `fit`),
+> operations (e.g.,. `predict` and `transform`) and accessor functions (e.g.,
+> `feature_importances`). Promises of particular behavior are articulated by **model
+> traits**.
 
 Here we give the definitive specification of the interface provided by LearnAPI.jl. For a
-more informal guide see [Common Implementation Patterns](@ref).
+more informal guide see  [Anatomy of an Implementation](@ref) and [Common Implementation Patterns](@ref).
 
 ## Models
 
@@ -26,11 +29,11 @@ Additionally, for `m::M` to be a LearnAPI model, we require:
   corresponding properties are `==`. This includes properties that are random number
   generators (which should be copied in training to avoid mutation).
 
-- A keyword constructor for `M` exists, providing default values for *all* non-model
-  hyper-parameters.
-
 - If a model has other models as hyper-parameters, then [`LearnAPI.is_wrapper`](@ref)`(m)`
   must be `true`.
+
+- A keyword constructor for `M` exists, providing default values for *all* non-model
+  hyper-parameters.
 
 Whenever any LearnAPI method (excluding traits) is overloaded for some type `M` (e.g.,
 `predict`, `transform`, `fit`) then that is a promise that all instances of `M` are
@@ -58,7 +61,7 @@ end
 
 The same is true if we omit the subtyping `<: LearnAPI.Model`, but not if we also make
 this a `mutable struct`. In that case we will need to overload `Base.==` for
-`SomeModel`.
+`GradientRidgeRegressor`.
 
 ```@docs
 LearnAPI.Model
@@ -80,10 +83,8 @@ or using the shorthand
 @trait SomeModelType functions=(:fit, :update!, :predict)
 ```
 
-For examples, see [Anatomy of an Implementation](@ref).
-
-- [Fit, update! and ingest!](@ref): for models that "learn" (generalize to
-  new data)
+- [Fit, update! and ingest!](@ref) (training methods): for models that "learn" (generalize
+  to new data)
 
 - [Operations](@ref operations): `predict`, `transform` and their relatives
 
