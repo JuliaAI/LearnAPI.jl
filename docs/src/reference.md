@@ -10,6 +10,10 @@
 Here we give the definitive specification of the interface provided by LearnAPI.jl. For a
 more informal guide see  [Anatomy of an Implementation](@ref) and [Common Implementation Patterns](@ref).
 
+The reader is assumed to be familiar with the LearnAPI-specific meanings of the following
+terms, as outlined in [Scope and undefined notions](@ref scope): **data**, **metadata**,
+**hyperparameter**, **observation**, and **target**.
+	
 ## Models
 
 In this document the word "model" has a very specific meaning that may differ from the
