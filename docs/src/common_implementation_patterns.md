@@ -3,10 +3,10 @@
 !!! warning
 
 	This section is only an implementation guide. The definitive specification of the
-	Learn API is given in [Reference](@ref).
+	Learn API is given in [Reference](@ref reference).
 
-This guide is intended to be consulted after reading [Anatomy of a Model
-Implementation](@ref), which introduces the main interface objects and terminology.
+This guide is intended to be consulted after reading [Anatomy of an Implementation](@ref),
+which introduces the main interface objects and terminology.
 
 Although an implementation is defined purely by the methods and traits it implements, most
 implementations fall into one (or more) of the following informally understood patterns or
@@ -21,7 +21,7 @@ implementations fall into one (or more) of the following informally understood p
 - [Incremental Models](@ref)
 
 - [Static Transformers](@ref): Transformations that do not learn but which have
-  hyper-parameters and/or deliver ancilliary information about the transformation
+  hyper-parameters and/or deliver ancillary information about the transformation
 
 - [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 

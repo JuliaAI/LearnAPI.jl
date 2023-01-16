@@ -1,4 +1,5 @@
 const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
+const DOC_OPERATIONS_LIST = join(map(op -> "`:$op`", OPERATIONS), ", ")
 
 const DOC_NEW_DATA =
     "The `report` contains ancilliary byproducts of the computation, or "*
@@ -17,36 +18,26 @@ probabilities), for a machine learning model `model`, with learned parameters
 `fitted_params` (first object returned by [`LearnAPI.fit`](@ref)`(model, ...)`).
 $DOC_NEW_DATA
 
-
 # New model implementations
 
 $(DOC_IMPLEMENTED_METHODS(:predict))
 
-If `performance_measureable = true`, then `ŷ` must be:
-
-- either an array or table with the same number of observations as each element of `data`;
-  it cannot be a lazy object, such as a `DataLoader`
-
-- **target-like**; see  [`LearnAPI.paradigm`](@ref) for specifics.
-
-Otherwise there are no restrictions on what `predict` may return, apart from what the
-implementation itself promises, by making an optional [`LearnAPI.output_scitypes`](@ref)
-declaration.
-
-If `predict` is computing a target proxy, as defined in the MLJLearn documentation, then a
-[`LearnAPI.target_proxies`](@ref) declaration is required, as in
+If `predict` is computing a target proxy, as defined in the LearnAPI documentation, then a
+[`LearnAPI.predict_proxy`](@ref) declaration is required, as in
 
 ```julia
-LearnAPI.target_proxies(::Type{<:SomeModel}) = (predict=LearnAPI.Distribution,)
+LearnAPI.predict_proxy(::Type{<:SomeModel}) = LearnAPI.Distribution()
 ```
 
-Do `LearnAPI.target_proxies()` to list the available kinds.
+which has the shorthand
 
-By default, it is expected that `data` has length one. Otherwise,
-[`LearnAPI.input_scitypes`](@ref) must be overloaded.
+```julia
+@trait SomeModel predict_proxy=LearnAPI.Distribution()
+```
 
-See also [`LearnAPI.fit`](@ref), [`LearnAPI.predict_mean`](@ref),
-[`LearnAPI.predict_mode`](@ref), [`LearnAPI.predict_median`](@ref).
+The value of this trait must be an instance `T()`, where `T <: LearnAPI.TargetProxy`.
+
+See also [`LearnAPI.fit`](@ref).
 
 """
 function predict end
@@ -94,27 +85,34 @@ For a supervised learning model, return `(d, report)`, where `d` is some represe
 the *single* probability distribution for the sample space ``Y^n``. Here ``Y`` is the
 space in which the target variable associated with `model` takes its values, and `n` is
 the number of observations in `data`. The specific form of the representation is given by
-[`LearnAPI.target_proxies(model)`](@ref).
+[`LearnAPI.predict_joint_proxy(model)`](@ref).
 
 Here `fitted_params` are the model's learned parameters (the first object returned by
 [`LearnAPI.fit`](@ref)). $DOC_NEW_DATA.
 
 While the interpretation of this distribution depends on the model, marginalizing
-component-wise will generally deliver *correlated* univariate distributions, and these will
-generally not agree with those returned by `LearnAPI.predict`, if also implemented.
+component-wise will generally deliver `n` *correlated* distributions, and these will
+generally not agree with those returned by `LearnAPI.predict` on the same the same `n`
+input observations, if also implemented.
 
 # New model implementations
 
 Only implement this method if `model` has an associated concept of target variable, as
-defined in the LearnAPI.jl documentation. A trait declaration
-[`LearnAPI.target_proxies`](@ref), such as
+defined in the LearnAPI.jl documentation. A trait declaration for
+[`LearnAPI.predict_joint_proxy`](@ref) is required, such as
 
 ```julia
-LearnAPI.target_proxies(::Type{SomeModel}) = (; predict_joint=Sampleable())
+LearnAPI.predict_joint_proxy(::Type{SomeModel}) = JointSampleable()
 ```
 
-is required. Here the possible kinds of target proxies are `LearnAPI.Sampleable`,
-`LearnAPI.Distribution`, and `LearnAPI.LogDistribution`.
+which has the shorhand
+
+```julia
+@trait SomeModel predict_joint_proxy=JointSampleable()
+```
+
+The possible values for this trait are: `LearnAPI.JointSampleable()`,
+`LearnAPI.JointDistribution`, and `LearnAPI.JointLogDistribution()`.
 
 $(DOC_IMPLEMENTED_METHODS(:predict_joint)).
 
@@ -186,6 +184,7 @@ function restore end
 
 abstract type TargetProxy end
 
+struct None <: TargetProxy end 
 struct TrueTarget <: TargetProxy end
 struct Sampleable <: TargetProxy end
 struct Distribution <: TargetProxy end
@@ -201,3 +200,7 @@ struct Set <: TargetProxy end
 struct ProbabilisticSet <: TargetProxy end
 struct SurvivalFunction <: TargetProxy end
 struct SurvivalDistribution <: TargetProxy end
+
+struct JointSampleable <: TargetProxy end
+struct JointDistribution <: TargetProxy end
+struct JointLogDistribution <: TargetProxy end

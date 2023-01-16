@@ -1,1 +1,1 @@
-# Time Series Classifiction
+# Time Series Classification
