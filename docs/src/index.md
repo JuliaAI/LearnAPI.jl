@@ -58,7 +58,8 @@ The following methods, dispatched on model type, are provided:
 - `update!`, for adding model iterations, or responding efficiently to other
   post-`fit`changes in hyperparameters
 
-- `ingest!`, for incremental learning
+- `ingest!`, for incremental learning (training further using *new* data, without
+  re-initializing learned parameters)
 
 - **operations**, `predict`, `predict_joint`, `transform` and `inverse_transform` for
   applying the model to data not used for training
