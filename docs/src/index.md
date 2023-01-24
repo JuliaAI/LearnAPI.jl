@@ -4,13 +4,29 @@
 LearnAPI.jl</span>
 <br>
 <span style="color: #9558B2;font-size:1.6em;font-style:italic;">
-A basic Julia interface for training and applying machine learning models </span>
+A basement-level Julia interface for training and applying machine learning models </span>
 <br><br>
 ```
 
+## Goals
+
+- Ease of implementation for existing machine learning algorithms
+
+- Applicability to a large variety of algorithms
+
+- Provision of clear interface points for model-generic tooling, such as performance
+  evaluation through resampling, hyperparameter optimization, and iterative model control.
+
+- Should be data container agnostic
+
+- Should be documented in detail
+
+It is *not* a design goal of LearnAPI.jl to provide a convenient interface for the general
+user to directly interact with ML models. 
+
 ## Quick tours
 
-- To see how to **USE** models implementing LearnAPI: [Basic fit/predict
+- To see how to **INTERACT WITH** models implementing LearnAPI: [Basic fit/predict
   workflow](@ref workflow).
 
 - For developers wanting to **IMPLEMENT** LearnAPI: [Anatomy of
