@@ -8,18 +8,18 @@ const ACCESSOR_FUNCTIONS = (
 """
     LearnAPI.feature_importances(model, fitted_params, report)
 
-Return the model-specific feature importances of `model`, given `fittted_params` and
+Return the model-specific feature importances of `model`, given `fitted_params` and
 `report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
 [`LearnAPI.ingest!`](@ref). The value returned has the form of an abstract vector of
-`feature::Symbol => importance::Real` pairs (e.g `[:gender =>0.23, :height =>0.7, :weight
+`feature::Symbol => importance::Real` pairs (e.g `[:gender => 0.23, :height => 0.7, :weight
 => 0.1]`).
 
 The `model` supports feature importances if `:feature_importance in
 LearnAPI.functions(model)`.
 
 If for some reason a model is sometimes unable to report feature importances, then
-`feature_importances` will return all importances as 0.0, as in `[:gender =>0.0, :height
-=>0.0, :weight => 0.0]`.
+`feature_importances` will return all importances as 0.0, as in `[:gender => 0.0, :height
+=> 0.0, :weight => 0.0]`.
 
 # New model implementations
 
@@ -36,7 +36,7 @@ function feature_importances end
 """
     training_losses(model, fitted_params, report)
 
-Return the training losses for `model`, given `fittted_params` and
+Return the training losses for `model`, given `fitted_params` and
 `report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
 [`LearnAPI.ingest!`](@ref).
 
@@ -53,7 +53,7 @@ function training_losses end
 """
     training_scores(model, fitted_params, report)
 
-Return the training scores for `model`, given `fittted_params` and
+Return the training scores for `model`, given `fitted_params` and
 `report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
 [`LearnAPI.ingest!`](@ref).
 
@@ -71,7 +71,7 @@ function training_scores end
 """
     training_labels(model, fitted_params, report)
 
-Return the training labels for `model`, given `fittted_params` and
+Return the training labels for `model`, given `fitted_params` and
 `report`, as returned by [`LearnAPI.fit`](@ref), [`LearnAPI.update!`](@ref) or
 [`LearnAPI.ingest!`](@ref).
 
