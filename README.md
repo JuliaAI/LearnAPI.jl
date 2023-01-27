@@ -13,6 +13,8 @@ A Julia interface for training and applying machine learning models.
 - [ ] Polish
 - [ ] Registration
 
+You can join a discussion on the LearnAPI proposal at [this](https://discourse.julialang.org/t/mlj-for-xgboost-extracting-feature-gain/93518/1) Julia Discourse thread.
+
 To do:
 
 - [ ] Add methods to create/save persistent representation of learned parameters
