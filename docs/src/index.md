@@ -71,6 +71,8 @@ The following methods, dispatched on model type, are provided:
 - `fit`, for regular training, overloaded if the model generalizes to new data, as in
   classical supervised learning; the principal output of `fit` is the learned parameters
 
+- `fit_transform`, for training transformations and transforming data in a single function call (specially usefull to avoid iterating over the data several times).
+
 - `update!`, for adding model iterations, or responding efficiently to other
   post-`fit`changes in hyperparameters
 
