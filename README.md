@@ -13,6 +13,8 @@ A Julia interface for training and applying machine learning models.
 - [ ] Polish
 - [ ] Registration
 
+You can join a discussion on the LearnAPI proposal at [this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048) Julia Discourse thread.
+
 To do:
 
 - [ ] Add methods to create/save persistent representation of learned parameters
