@@ -17,7 +17,7 @@ packages. It also provides a number of Julia traits for making specific promises
 behaviour. 
 
 It is designed to be powerful, from the point of view of adding model-generic
-functionality, while minimising the burden on devlopers implementing the API for a
+functionality, while minimising the burden on developers implementing the API for a
 specific model.
 
 - To see how to **INTERACT WITH** models implementing LearnAPI: [Basic fit/predict
