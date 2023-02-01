@@ -64,7 +64,7 @@ different from learned parameters. Similarly, all operations also return a `repo
 component (important for models that do not generalize to new data).
 
 
-## [Scope, undefined notions](@id scope)
+## [Scope and undefined notions](@id scope)
 
 The basic LearnAPI.jl interface provides methods for training and applying machine
 learning models, and that is all. The interface specification is predicated on a few basic
