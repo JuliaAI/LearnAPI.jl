@@ -8,23 +8,17 @@ A basement-level Julia interface for training and applying machine learning mode
 <br><br>
 ```
 
-## Goals
+## Accelerated overview
 
-- Ease of implementation for existing machine learning algorithms
+LearnAPI provides a collection methods stubs, such as `fit` and `predict`, to be
+implemented by machine learning (ML) models wishing to buy into model-generic
+functionality, such as hyperparameter optimization, provided by ML toolboxes and other
+packages. It also provides a number of Julia traits for making specific promises of
+behaviour. 
 
-- Applicability to a large variety of algorithms
-
-- Provision of clear interface points for model-generic tooling, such as performance
-  evaluation through resampling, hyperparameter optimization, and iterative model control.
-
-- Should be data container agnostic
-
-- Should be documented in detail
-
-It is *not* a design goal of LearnAPI.jl to provide a convenient interface for the general
-user to directly interact with ML models. 
-
-## Quick tours
+It is designed to be powerful, from the point of view of adding model-generic
+functionality, while minimising the burden on devlopers implementing the API for a
+specific model.
 
 - To see how to **INTERACT WITH** models implementing LearnAPI: [Basic fit/predict
   workflow](@ref workflow).
@@ -32,34 +26,8 @@ user to directly interact with ML models.
 - For developers wanting to **IMPLEMENT** LearnAPI: [Anatomy of
   an Implementation](@ref).
 
-## Approach
+For more on package goals and philosophy, see [Goals and Approach](@ref).
 
-Machine learning algorithms, also called *models*, have a complicated
-taxonomy. Grouping models, or modeling tasks, into a relatively small number of types,
-such as "classifier" and "clusterer", and attempting to impose uniform behavior within
-each group, is challenging. In our experience developing the [MLJ
-ecosystem](https://github.com/alan-turing-institute/MLJ.jl), this either leads to
-limitations on the models that can be included in a general interface, or additional
-complexity needed to cope with exceptional cases. Even if a complete user interface for
-machine learning might benefit from such groupings, a basement-level API for ML should, in
-our view, avoid them.
-
-In addition to basic methods, like `fit` and `predict`, LearnAPI provides a number
-of optional model
-[traits](https://ahsmart.com/pub/holy-traits-design-patterns-and-best-practice-book/),
-each promising a specific kind of behavior, such as "The predictions of this model are
-probability distributions".  There is no abstract type model hierarchy.
-
-Our preceding remarks notwithstanding, there is, for certain applications involving a
-"target" variable (understood in a rather general way - see below) a clear-cut distinction
-between models, based on the proxy for the target that is actually output by the
-model. Probability distributions, confidence intervals and survival functions are examples
-of [Target proxies](@ref). LearnAPI provides a trait for distinguishing such models based
-on the target proxy.
-
-LearnAPI is a basement-level interface and not a general ML toolbox. Almost no assumptions
-are made about the data manipulated by LearnAPI models. These models can be supervised or
-not supervised, can generalize to new data observations, or not generalize.
 
 ## Methods
 
@@ -96,12 +64,12 @@ different from learned parameters. Similarly, all operations also return a `repo
 component (important for models that do not generalize to new data).
 
 
-## [Scope and undefined notions](@id scope)
+## [Scope, undefined notions](@id scope)
 
 The basic LearnAPI.jl interface provides methods for training and applying machine
 learning models, and that is all. The interface specification is predicated on a few basic
 undefined notions (in **boldface**) which some higher-level interface might decide to
-formalize:
+formalize. 
 
 - An object which generates ordered sequences of individual **observations** is called
   **data**. For example a `DataFrame` instance, from
@@ -115,18 +83,22 @@ formalize:
   is not a hyperparameter.
 
 - Information needed for training that is not a model hyperparameter and not data is
-  called **metadata**. Examples, include target *class* weights and group lasso feature
-  groupings.
+  called **metadata**. Examples, include target *class* weights, group lasso feature
+  groupings. Other examples are feature names and the pool of target classes, when these
+  are not embedded in the data representation.
 
-- Some models involve the notion of a **target** variable and generate output with the
-  same form as the target, or, more generally, some kind of target proxy, such as
-  probability distributions. A *target proxy* is something that can be *paired* with target
-  data to obtain useful information about the model and the data that has been presented
-  to it, typically a measure of the model's expected performance on unseen data. A target
-  variable is not necessarily encountered during training, i.e., target variables can make
-  sense for unsupervised models, and also for models that do not generalize to new
-  observations.  For examples, and an informal classification of target proxy types, refer
-  to [Target proxies](@ref).
+
+### Targets and target proxies
+
+Some models involve the notion of a **target** variable, and generate output with the same
+form as the target, or, more generally, some kind of target proxy, such as probability
+distributions, or survival functions. A *target proxy* is something that can be *paired*
+with target data to obtain useful information about the model and the data that has been
+presented to it, typically a measure of the model's expected performance on unseen
+data. A target variable is not necessarily encountered during training, i.e., target
+variables can make sense for unsupervised models, and also for models that do not
+generalize to new observations.  For examples, and an informal classification of target
+proxy types, refer to [Target proxies](@ref).
 
 
 ## Optional data interface
