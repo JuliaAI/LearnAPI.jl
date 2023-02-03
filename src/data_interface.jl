@@ -12,7 +12,7 @@ Always returns a tuple of the same length as `data`.
 Return a subsample of `data` consisting of all observations with indices in `I`. Here
 `data` is data of the form expected in a call of the specified `operation`, e.g., in a
 call like `LearnAPI.predict(model, data...)`, if `operation = LearnAPI.predict`. Possible
-values for `operation` are: $DOC_OPERATIONS_LIST.
+values for `operation` are: $DOC_OPERATIONS_LIST_FUNCTION.
 
 Always returns a tuple of the same length as `data`.
 
@@ -54,7 +54,7 @@ or `LearnAPI.ingest!`.
 
 Return the model-specific representation `data` of user-supplied `user_data`, for
 consumption, after splatting, by the specified `operation`, dispatched on `model`. Here
-`operation` is one of: $DOC_OPERATIONS_LIST.
+`operation` is one of: $DOC_OPERATIONS_LIST_FUNCTION.
 
 The following sample workflow illustrates the use of both versions of `reformat`above. The
 data objects `X`, `y`, and `Xtest` are the user-supplied versions of data.

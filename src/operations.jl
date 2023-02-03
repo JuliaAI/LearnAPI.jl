@@ -1,5 +1,6 @@
 const OPERATIONS = (:predict, :predict_joint, :transform, :inverse_transform)
-const DOC_OPERATIONS_LIST = join(map(op -> "`:$op`", OPERATIONS), ", ")
+const DOC_OPERATIONS_LIST_SYMBOL = join(map(op -> "`:$op`", OPERATIONS), ", ")
+const DOC_OPERATIONS_LIST_FUNCTION = join(map(op -> "`LearnAPI.$op`", OPERATIONS), ", ")
 
 const DOC_NEW_DATA =
     "The `report` contains ancilliary byproducts of the computation, or "*
