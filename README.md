@@ -6,8 +6,8 @@ A Julia interface for training and applying machine learning models.
 **Devlopement Status:**
 
 - [X] Detailed proposal stage ([this
-      documentation](https://juliaai.github.io/LearnAPI.jl/dev/))
-- [ ] Initial feedback stage (opened mid-January, 2023)
+      documentation](https://juliaai.github.io/LearnAPI.jl/dev/)). 
+- [ ] Initial feedback stage (opened mid-January, 2023). General feedback can be provided at [this Julia Discourse thread](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048/20). 
 - [ ] Implement feedback and finish "To do" list (below)
 - [ ] Proof of concept implementation
 - [ ] Polish
