@@ -160,7 +160,7 @@ versions are returned.
 For updating fitted parameters using the *same* data but new hyperparameters, see instead
 [`LearnAPI.update!`](@ref).
 
-For training a model with new hyperparameters bue *unchanged* data, see instead
+For training a model with new hyperparameters but *unchanged* data, see instead
 [`LearnAPI.update!`](@ref).
 
 
