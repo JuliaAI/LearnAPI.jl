@@ -1,6 +1,6 @@
 # LearnAPI.jl
 
-A Julia interface for training and applying machine learning models. 
+A base Julia interface for machine learning and statistics
 
 
 **Devlopement Status:**

@@ -1,1 +1,1 @@
-# Supervised Bayesian Models
+# Supervised Bayesian Algorithms

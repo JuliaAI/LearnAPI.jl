@@ -8,13 +8,13 @@ function name_value_pair(ex)
     return (ex.args[1], ex.args[2])
 end
 
-macro trait(model_ex, exs...)
+macro trait(algorithm_ex, exs...)
     program = quote end
     for ex in exs
         trait_ex, value_ex = name_value_pair(ex)
         push!(
             program.args,
-            :($LearnAPI.$trait_ex(::Type{<:$model_ex}) = $value_ex),
+            :($LearnAPI.$trait_ex(::Type{<:$algorithm_ex}) = $value_ex),
         )
     end
     return esc(program)
@@ -27,7 +27,7 @@ end
 Return a symbol corresponding to the name of the type `T`, stripped of
 any type-parameters and module qualifications. For example:
 
-    _typename(MLJBase.Machine{MLJModels.ConstantRegressor,true})
+    _typename(MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true})
 
 returns `:Machine`. Where this does not make sense (eg, instances of
 `Union`) `Symbol(string(M))` is returned.

@@ -16,12 +16,12 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Regressors](@ref): Supervised learners for continuous targets
 
-- [Iterative Models](@ref)
+- [Iterative Algorithms](@ref)
 
-- [Incremental Models](@ref)
+- [Incremental Algorithms](@ref)
 
 - [Static Transformers](@ref): Transformations that do not learn but which have
-  hyper-parameters and/or deliver ancillary information about the transformation
+  hyperparameters and/or deliver ancillary information about the transformation
 
 - [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 
@@ -33,14 +33,14 @@ implementations fall into one (or more) of the following informally understood p
 - [Outlier Detection](@ref): Supervised, unsupervised, or semi-supervised learners for
   anomaly detection.
 
-- [Learning a Probability Distribution](@ref): Models that fit a distribution or
+- [Learning a Probability Distribution](@ref): Algorithms that fit a distribution or
   distribution-like object to data
 
 - [Time Series Forecasting](@ref)
 
 - [Time Series Classification](@ref)
 
-- [Supervised Bayesian Models](@ref)
+- [Supervised Bayesian Algorithms](@ref)
 
 - [Survival Analysis](@ref)
 
