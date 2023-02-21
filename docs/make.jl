@@ -16,7 +16,7 @@ makedocs(;
         "Predict and other operations" => "operations.md",
         "Accessor Functions" => "accessor_functions.md",
         "Optional Data Interface" => "optional_data_interface.md",
-        "Model Traits" => "model_traits.md",
+        "Algorithm Traits" => "algorithm_traits.md",
         "Common Implementation Patterns" => "common_implementation_patterns.md",
         "Testing an Implementation" => "testing_an_implementation.md",
     ],
