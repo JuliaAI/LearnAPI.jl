@@ -2,18 +2,18 @@
 
 > **Summary** Methods like `predict` and `transform`, that generally depend on learned
 > parameters, are called **operations**. All implemented operations must be included in
-> the output of the `functions` model trait. When an operation returns a [target
+> the output of the `functions` trait. When an operation returns a [target
 > proxy](@ref scope), it must make a `target_proxies` trait declaration.
 
-An *operation* is any method with signature `some_operation(model, fitted_params,
+An *operation* is any method with signature `some_operation(algorithm, fitted_params,
 data...)`. Here `fitted_params` is the learned parameters object, as returned by
-[`LearnAPI.fit`](@ref)`(model, ...)`, which will be `nothing` if `fit` is not implemented
-(true for models that do not generalize to new data). For example, `LearnAPI.predict` in
+[`LearnAPI.fit`](@ref)`(algorithm, ...)`, which will be `nothing` if `fit` is not implemented
+(true for algorithms that do not generalize to new data). For example, `LearnAPI.predict` in
 the following code snippet is an operation:
 
 ```julia
-fitted_params, state, fit_report = LearnAPI.fit(some_model, 1, X, y)
-ŷ, predict_report = LearnAPI.predict(some_model, fitted_params, Xnew)
+fitted_params, state, fit_report = LearnAPI.fit(some_algorithm, 1, X, y)
+ŷ, predict_report = LearnAPI.predict(some_algorithm, fitted_params, Xnew)
 ```
 
 LearnAPI.jl only provides these operations:
@@ -30,7 +30,7 @@ LearnAPI.jl only provides these operations:
 
 - Operations always return a tuple `(output, report)` where `output` is the usual output
   (e.g., the target predictions if the operation is `predict`) and `report`
-  includes byproducts of the computation, typically `nothing` unless the model does not
+  includes byproducts of the computation, typically `nothing` unless the algorithm does not
   generalize to new data (does not implement `fit`). 
 
 - Only implement `predict_joint` for outputting a *single* multivariate probability
@@ -42,7 +42,7 @@ LearnAPI.jl only provides these operations:
 
 ## Predict or transform?
 
-- If the model has a target, as defined under [Scope and undefined notions](@ref scope),
+- If the algorithm has a target, as defined under [Scope and undefined notions](@ref scope),
   then only `predict` or `predict_joint` can be used to compute a corresponding target
   proxy.
 
@@ -60,12 +60,12 @@ inverses.
 
 ## Target proxies
 
-In the case that a model has the concept of a **target** variable, as described under
-[Scope and undefined notions](@ref scope), the output of `predict` may have the form of a
+In the case that an algorithm has the concept of a **target** variable, as described under
+[Targets and target proxies](@ref proxy), the output of `predict` may have the form of a
 proxy for the target, such as a vector of truth-probabilities for binary targets.
 
 We assume the reader is already familiar with the notion of a target variable in
-supervised learning, but target variables are not limited to supervised models. For
+supervised learning, but target variables are not limited to supervised learners. For
 example, we may regard the "outlier"/"inlier" assignments in unsupervised anomaly
 detection as a target. A target proxy in this example would be probabilities for
 outlierness, as these can be paired with "outlier"/"inlier" labels assigned by humans,
@@ -114,7 +114,7 @@ When `predict` outputs a target proxy, there must be [`LearnAPI.predict_proxy`](
 declaration, as in
 
 ```julia
-LearnAPI.predict_proxy(::Type{<:SomeModel}) = LearnAPI.Distribution()
+LearnAPI.predict_proxy(::Type{<:SomeAlgorithm}) = LearnAPI.Distribution()
 ```
 
 which has the short form
@@ -128,7 +128,7 @@ If `predict_joint` is implemented, then an analogous
 `predict_joint` is not a number of observations but a single object, and the trait value
 must be an instance of one of the following types:
 
-|          type                   | form of output of `predict_joint(model, fitted_params, data...)`
+|          type                   | form of output of `predict_joint(algorithm, fitted_params, data...)`
 |:-------------------------------:|:--------------------------------------------------|
 | `LearnAPI.JointSampleable`      | object that can be sampled to obtain a *vector* whose elements have the form of target observations; the vector length matches the number of observations in `data`. |
 | `LearnAPI.JointDistribution`    | explicit probability density/mass function whose sample space is vectors of target observations;  the vector length matches the number of observations in `data` |
