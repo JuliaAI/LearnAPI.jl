@@ -2,37 +2,30 @@
 
 const TRAINING_FUNCTIONS = (:fit, :update!, :ingest!)
 
-const DOC_OPERATIONS =
-    "An *operation* is a method, like [`LearnAPI.predict`](@ref) or "*
-    "[`LearnAPI.transform`](@ref), that has signature "*
-    "`(algorithm, fitted_params, data....)`; do `LearnAPI.OPERATIONS` to list."
-
-function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
-    word = overloaded ? "overloaded" : "implemented"
-    "If $word, you must include `:$name` in the tuple returned by the "*
-    "[`LearnAPI.functions`](@ref) trait. "
-end
+const DOC_OPERATIONS = "An *operation* is a method dispatched on an algorithm, "*
+    "associated learned parameters, and data. "*
+    "The LearnAPI operations are: $DOC_OPERATIONS_LIST_FUNCTION. "
 
 const DOC_METADATA =
     "`metadata` is for extra information pertaining to the data that is never "*
-    "iterated or subsampled, eg., weights for target classes, or feature names "*
-    "(if these are not embedded in the representation of `data`). Another example "*
-    "would be feature groupings "*
-    "in the group lasso algorithm. "
+    "iterated or subsampled. Examples, include target *class* weights and group "*
+    "lasso feature groupings. Further examples include feature names, and the "*
+    "pool of target classes, when these are not embedded in the data representation. "
 
 const DOC_WHAT_IS_DATA =
     """
-    Note that in LearnAPI.jl the word "data" is only defined informally, as an object
-    generating "observations", which are not defined at all.
+    In LearnAPI, *data* is any tuple of objects sharing a
+    common number of "observations. "
     """
 
 const DOC_MUTATING_MODELS =
     """
     !!! note
 
-        The method is not permitted to mutate `algorithm`. In particular, if `algorithm` has a
-        random number generator as a hyperparameter (property) then it must be copied
-        before use.  """
+        The method is not permitted to mutate `algorithm`. In particular, if `algorithm`
+        has a random number generator as a hyperparameter (property) then it must be
+        copied before use.
+    """
 
 # # FIT
 
@@ -100,7 +93,7 @@ fit(::Any, ::Any, ::Integer, data...; metadata...) = nothing, nothing, nothing
     LearnAPI.update!(algorithm, verbosity, fitted_params, state, data...; metadata...)
 
 Based on the values of `state`, and `fitted_params` returned by a preceding call to
-[`LearnAPI.fit`](ref), [`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), update a
+[`LearnAPI.fit`](@ref), [`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), update a
 algorithm's fitted parameters, returning new (or mutated) `state` and `fitted_params`.
 
 Intended for retraining when the training data has not changed, but `algorithm`
@@ -153,7 +146,7 @@ update!(algorithm, verbosity, fitted_params, state, data...; metadata...) =
 
 For an algorithm that supports incremental learning, update the fitted parameters using
 `data`, which has typically not been seen before.  The arguments `state` and
-`fitted_params` are the output of a preceding call to [`LearnAPI.fit`](ref),
+`fitted_params` are the output of a preceding call to [`LearnAPI.fit`](@ref),
 [`LearnAPI.ingest!`](@ref), or [`LearnAPI.update!`](@ref), of which mutated or new
 versions are returned.
 

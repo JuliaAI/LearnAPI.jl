@@ -9,7 +9,8 @@
 - Flexibility in extending functionality
 
 - Provision of clear interface points for algorithm-generic tooling, such as performance
-  evaluation through resampling, hyperparameter optimization, and iterative algorithm control.
+  evaluation through resampling, hyperparameter optimization, and iterative algorithm
+  control.
 
 - Should make minimal assumptions about data containers
 
@@ -35,14 +36,14 @@ In addition to basic methods, like `fit` and `predict`, LearnAPI provides a numb
 optional algorithm
 [traits](https://ahsmart.com/pub/holy-traits-design-patterns-and-best-practice-book/),
 each promising a specific kind of behavior, such as "This algorithm supports class
-weights"b.  There is no abstract type hierarchy for ML/Statistics algorithms.
+weights".  There is no abstract type hierarchy for ML/statistics algorithms.
 
 LearnAPI.jl intentionally focuses on the notion of [target variables and target
 proxies](@ref proxy), which can exist in both the superised and unsupervised setting,
 rather than on the supervised/unsupervised dichotomy. In this view a supervised model is
 simply one which has a target variable *and* whose target variable appears in training.
 
-LearnAPI is a basement-level interface and not a general ML/Statistics toolbox. Algorithms
-can be supervised or not supervised, can generalize to new data observations (i.e., "learn") or not
-generalize (e.g., "one-shot" clusterers).
+LearnAPI is a basement-level interface and not a general ML/statistics toolbox. Algorithms
+can be supervised or not supervised, can generalize to new data observations (i.e.,
+"learn") or not generalize (e.g., "one-shot" clusterers).
 

@@ -1,17 +1,19 @@
 # Anatomy of an Implementation
 
-> **Summary.** An **algorithm** is a container for hyperparameters. A basic
-> implementation of the ridge regressor requires implementing `fit` and `predict` methods
-> dispatched on the algorithm type; `predict` is an example of an **operation** (another is
-> `transform`). In this example we also implement an **accessor function**, called
-> `feature_importance`, returning the absolute values of the linear coefficients. The
-> ridge regressor has a target variable and `predict` makes literal predictions of the
-> target (rather than, say, probabilistic predictions); this behavior is flagged by the
-> `predict_proxy` algorithm trait.  Other traits articulate the algorithm's training data type
+> **Summary.** Formally, an **algorithm** is a container for the hyperparameters of some
+> ML/statistics algorithm.  A basic implementation of the ridge regressor requires
+> implementing `fit` and `predict` methods dispatched on the algorithm type; `predict` is
+> an example of an **operation**, the others are `transform` and `inverse_transform`. In
+> this example we also implement an **accessor function**, called `feature_importance`,
+> returning the absolute values of the linear coefficients. The ridge regressor has a
+> target variable and outputs literal predictions of the target (rather than, say,
+> probabilistic predictions); accordingly the overloaded `predict` method is dispatched on
+> the `TrueTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type as the
+> preferred kind of target proxy. Other traits articulate the algorithm's training data type
 > requirements and the input/output type of `predict`.
 
-We begin by describing an implementation of LearnAPI.jl for basic ridge
-regression (no intercept) to introduce the main actors in any implementation.
+We begin by describing an implementation of LearnAPI.jl for basic ridge regression
+(without intercept) to introduce the main actors in any implementation.
 
 
 ## Defining an algorithm type
@@ -108,7 +110,7 @@ level API, using those traits.
 Now we need a method for predicting the target on new input features:
 
 ```@example anatomy
-function LearnAPI.predict(::MyRidge, fitted_params, Xnew)
+function LearnAPI.predict(::MyRidge, ::LearnAPI.TrueTarget, fitted_params, Xnew)
     Xmatrix = Tables.matrix(Xnew)
     report = nothing
     return Xmatrix*fitted_params.coefficients, report
@@ -116,22 +118,29 @@ end
 nothing # hide
 ```
 
+The second argument of `predict` is always an instance of `KindOfProxy`, and will always
+be `TrueTarget()` in this case, as only literal values of the target (rather than, say
+probabilistic predictions) are being supported.
+
 In some algorithms `predict` computes something of interest in addition to the target
 prediction, and this `report` item is returned as the second component of the return
 value. When there's nothing to report, we must return `nothing`, as here.
 
 Our `predict` method is an example of an **operation**. Other operations include
-`transform` and `inverse_transform` and an algorithm can implement more than one. For example,
-a K-means clustering algorithm might implement a `transform` for dimension reduction, and a
-`predict` to return cluster labels.
+`transform` and `inverse_transform` and an algorithm can implement more than one. For
+example, a K-means clustering algorithm might implement `transform` for dimension
+reduction, and `predict` to return cluster labels. 
+
+The `predict` method is reserved for predictions of a [target variable](@ref proxy), and
+only `predict` has the extra `::KindOfProxy` argument.
 
 
 ## Accessor functions
 
-The arguments of an operation are always `(algorithm, fitted_params, data...)`. The interface
-also provides **accessor functions** for extracting information, from the `fitted_params`
-and/or fit `report`, that is shared by several algorithm types.  There is one for feature
-importances that we can implement for `MyRidge`:
+The arguments of an operation are always `(algorithm, fitted_params, data...)`. The
+interface also provides **accessor functions** for extracting information, from the
+`fitted_params` and/or fit `report`, that is shared by several algorithm types.  There is
+one for feature importances that we can implement for `MyRidge`:
 
 ```@example anatomy
 LearnAPI.feature_importances(::MyRidge, fitted_params, report) =
@@ -144,27 +153,24 @@ Another example of an accessor function is [`LearnAPI.training_losses`](@ref).
 
 ## [Algorithm traits](@id traits)
 
-As we are doing supervised learning here, we have a target variable (in the sense outlined
-in [Scope and undefined notions](@ref scope)) and `predict` returns an object with exactly
-the same form as the target. We indicate this behavior by declaring
+We have implemented `predict`, and it is possible to implement `predict` methods for
+multiple `KindOfProxy` types (see See [Target proxies](@ref) for a complete
+list). Accordingly, we are required to declare a preferred target proxy, which we do using
+[`LearnAPI.preferred_kind_of_proxy`](@ref):
 
 ```@example anatomy
-LearnAPI.predict_proxy(::Type{<:MyRidge}) = LearnAPI.TrueTarget()
+LearnAPI.preferred_kind_of_proxy(::Type{<:MyRidge}) = LearnAPI.TrueTarget()
 nothing # hide
 ```
 Or, you can use the shorthand
 
 ```@example anatomy
-@trait MyRidge predict_proxy=LearnAPI.TrueTarget()
+@trait MyRidge preferred_kind_of_proxy=LearnAPI.TrueTarget()
 nothing # hide
 ```
 
-More generally, `predict` only returns a *proxy* for the target, such as probability
-distributions, and we would make a different declaration here. See [Target proxies](@ref)
-for details.
-
-`LearnAPI.predict_proxy` is an example of a **algorithm trait**. A complete list of traits
-and the contracts they imply is given in [Algorithm Traits](@ref).
+[`LearnAPI.preferred_kind_of_proxy`](@ref) is an example of a **algorithm trait**. A
+complete list of traits and the contracts they imply is given in [Algorithm Traits](@ref).
 
 We also need to indicate that a target variable appears in training (this is a supervised
 algorithm). We do this by declaring *where* in the list of training data arguments (in this
@@ -206,9 +212,9 @@ checks in an implementation of `fit`. Instead one uses traits to make promises a
 acceptable type of `data` consumed by `fit`. In general, this can be a promise regarding
 the ordinary type of `data` or the [scientific
 type](https://github.com/JuliaAI/ScientificTypes.jl) of `data` (but not
-both). Alternatively, one may only make a promise about the type/scitype of *observations*
-in the data . See [Algorithm Traits](@ref) for further details. In this case we'll be happy to
-restrict the scitype of the data:
+both). Alternatively, one may only promise a bound on the type/scitype of *observations*
+in the data . See [Algorithm Traits](@ref) for further details. In this case we'll be
+happy to restrict the scitype of the data:
 
 ```@example anatomy
 import ScientificTypesBase: scitype, Table, Continuous
@@ -249,10 +255,14 @@ case), which explains the `Tuple` on the right-hand side.
 Optionally, we may express our promise using regular types, using the
 [`LearnAPI.predict_input_type`](@ref) trait.
 
-One can optionally make promises about the outut of an operation. See [Algorithm Traits](@ref)
-for details.
+One can optionally make promises about the outut of an operation. See [Algorithm
+Traits](@ref) for details.
+
 
 ## [Illustrative fit/predict workflow](@id workflow)
+
+We now illustrate how to interact directly with `MyRidge` instances using the methods we
+have implemented:
 
 Here's some toy data for supervised learning:
 
@@ -297,7 +307,7 @@ feature_importances(algorithm, fitted_params, fit_report)
 Make a prediction using new data:
 
 ```@example anatomy
-yhat, predict_report = predict(algorithm, fitted_params, X[test])
+yhat, predict_report = predict(algorithm, LearnAPI.TrueTarget(), fitted_params, X[test])
 ```
 
 Compare predictions with ground truth

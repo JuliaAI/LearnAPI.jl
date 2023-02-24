@@ -11,10 +11,10 @@ const DOC_ONLY_ONE =
     "`LearnAPI.fit_scitype`, `LearnAPI.fit_type`, `LearnAPI.fit_observation_scitype`, "*
     "`LearnAPI.fit_observation_type`."
 
-const ORDINARY_TRAITS = (
+
+const TRAITS = [
     :functions,
-    :predict_proxy,
-    :predict_joint_proxy,
+    :preferred_kind_of_proxy,
     :position_of_target,
     :position_of_weights,
     :descriptors,
@@ -35,22 +35,15 @@ const ORDINARY_TRAITS = (
     :predict_output_scitype,
     :predict_input_type,
     :predict_output_type,
-    :predict_joint_input_scitype,
-    :predict_joint_output_scitype,
-    :predict_joint_input_type,
-    :predict_joint_output_type,
     :transform_input_scitype,
     :transform_output_scitype,
     :transform_input_type,
     :transform_output_type,
-    :inverse_transform_input_scitype,
-    :inverse_transform_output_scitype,
-    :inverse_transform_input_type,
-    :inverse_transform_output_type,
-)
-const DERIVED_TRAITS = (:name, :is_algorithm)
+    :name,
+    :is_algorithm,
+]
 
-# # ORDINARY TRAITS
+# # OVERLOADABLE TRAITS
 
 functions() = METHODS = (TRAINING_FUNCTIONS..., OPERATIONS..., ACCESSOR_FUNCTIONS...)
 const FUNCTIONS = map(d -> "`:$d`", functions())
@@ -58,10 +51,10 @@ const FUNCTIONS = map(d -> "`:$d`", functions())
 """
     LearnAPI.functions(algorithm)
 
-Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI
-methods specifically implemented for objects having the same type as `algorithm`.
-If non-empty, this also guarantees `algorithm` is an algorithm, in the LearnAPI sense. See the
-Reference section of the manual for details.
+Return a tuple of symbols, such as `(:fit, :predict)`, corresponding to LearnAPI methods
+specifically implemented for objects having the same type as `algorithm`.  If non-empty,
+this also guarantees `algorithm` is an algorithm, in the LearnAPI sense. See the Reference
+section of the manual for details.
 
 # New implementations
 
@@ -77,73 +70,47 @@ functions(::Type) = ()
 
 
 """
-    LearnAPI.predict_proxy(algorithm)
+    LearnAPI.preferred_kind_of_proxy(algorithm)
 
-Returns an object with abstract type `LearnAPI.TargetProxy` indicating the kind of proxy
-for the target returned by the `predict` method, when called on `algorithm` and some
-data. For example, a value of `LearnAPI.Distribution()` means that `predict` returns
-probability distributions, rather than actual values of the target. (`LearnAPI.predict`
-also returns a report as second value). A value of `LearnAPI.TrueTarget()` indicates that
-ordinary (non-proxy) target values are returned. A value of `LearnAPI.None()`, implies the
-output of `predict` has no declared relationship with any target variable.
+Returns an instance of [`LearnAPI.KindOfProxy`](@ref), unless `LearnAPI.predict` is not
+implemented for objects of type `typeof(algorithm)`, in which case it returns `nothing`.
+
+The returned target proxy is generally the one with the smallest computational cost, if
+more than one type is supported.
+
+See also [`LearnAPI.predict`](@ref), [`LearnAPI.KindOfProxy`](@ref).
 
 # New implementations
 
-an algorithm with a concept of "target" must overload this trait. The fallback return
-value is `LearnAPI.None()`.
+Any algorithm implementing `LearnAPI.predict` must overload this trait.
 
+The trait must return a lone instance `T()` for some concrete subtype `T <:
+LearnAPI.KindOfProxy`. List these with `subtypes(LearnAPI.KindOfProxy)` and
+`subtypes(LearnAPI.IID)`.
 
-For more on target variables and target proxies, refer to the "Predict and Other
-Operations" section of the LearnAPI documentation.
-
-The trait must return a lone instance `T()` for some subtype `T <: LearnAPI.TargetProxy`.
-Here's a sample implementation for a supervised algorithm where predictions are ordinary
-values of the target variable:
+Suppose, for example, we have the following implementation of a supervised learner
+returning only probablistic predictions:
 
 ```julia
-@trait MyNewAlgorithm predict_proxy = LearnAPI.TrueTarget()
+LearnAPI.predict(algorithm::MyNewAlgorithmType, LearnAPI.Distribution(), Xnew) = ...
+```
+
+Then we can declare
+
+```julia
+@trait MyNewAlgorithmType  preferred_kind_of_proxy = LearnAPI.TrueTarget()
 ```
 
 which is shorthand for
 
 ```julia
-LearnAPI.predict_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.TrueTarget()
+LearnAPI.preferred_kind_of_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.Distribution()
 ```
-
-"""
-predict_proxy(::Type) = LearnAPI.None()
-
-"""
-    LearnAPI.predict_joint_proxy(algorithm)
-
-Returns an object with abstract type `LearnAPI.TargetProxy` indicating the kind of proxy
-for the target returned by the `predict_joint` method, when called on `algorithm` and some
-data. For example, a value of `LearnAPI.Distribution()` means that `predict_joint` returns
-a probability distribution, rather than, say a merely sampleable object.
-
-# New implementations
-
-Any algorithm implementing `LearnAPI.predict_joint` must overload this trait.
 
 For more on target variables and target proxies, refer to the LearnAPI documentation.
 
-The possible return values for this trait are: `LearnAPI.JointSampleable()`,
-`LearnAPI.JointDistribution()` and `LearnAPI.JointLogDistribution()`.
-
-Here's a sample implementation:
-
-```julia
-@trait MyNewAlgorithmType predict_joint_proxy = LearnAPI.JointDistribution()
-```
-
-which is shorthand for
-
-```julia
-LearnAPI.predict_joint_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.JointDistribution()
-```
-
 """
-predict_joint_proxy(::Type) = LearnAPI.None()
+preferred_kind_of_proxy(::Type) = nothing
 
 """
     LearnAPI.position_of_target(algorithm)
@@ -578,26 +545,8 @@ DOC_OUTPUT_TYPE(op) =
 "$(DOC_INPUT_SCITYPE(:predict))"
 predict_input_scitype(::Type) = Union{}
 
-"$(DOC_OUTPUT_SCITYPE(:predict))"
-predict_output_scitype(::Type) = Any
-
 "$(DOC_INPUT_TYPE(:predict))"
 predict_input_type(::Type) = Union{}
-
-"$(DOC_OUTPUT_TYPE(:predict))"
-predict_output_type(::Type) = Any
-
-"$(DOC_INPUT_SCITYPE(:predict_joint))"
-predict_joint_input_scitype(::Type) = Union{}
-
-"$(DOC_OUTPUT_SCITYPE(:predict_joint))"
-predict_joint_output_scitype(::Type) = Any
-
-"$(DOC_INPUT_TYPE(:predict_joint))"
-predict_joint_input_type(::Type) = Union{}
-
-"$(DOC_OUTPUT_TYPE(:predict_joint))"
-predict_joint_output_type(::Type) = Any
 
 "$(DOC_INPUT_SCITYPE(:transform))"
 transform_input_scitype(::Type) = Union{}
@@ -611,20 +560,92 @@ transform_input_type(::Type) = Union{}
 "$(DOC_OUTPUT_TYPE(:transform))"
 transform_output_type(::Type) = Any
 
-"$(DOC_INPUT_SCITYPE(:inverse_transform))"
-inverse_transform_input_scitype(::Type) = Union{}
 
-"$(DOC_OUTPUT_SCITYPE(:inverse_transform))"
-inverse_transform_output_scitype(::Type) = Any
+# # TWO-ARGUMENT TRAITS
 
-"$(DOC_INPUT_TYPE(:inverse_transform))"
-inverse_transform_input_type(::Type) = Union{}
+# Here `s` is `:type` or `:scitype`:
+const DOC_PREDICT_OUTPUT(s)  =
+    """
+        LearnAPI.predict_output_$s(algorithm, kind_of_proxy::KindOfProxy)
 
-"$(DOC_OUTPUT_TYPE(:inverse_transform))"
-inverse_transform_output_type(::Type) = Any
+    Return an upper bound for the $(s)s of predictions of the specified form where
+    supported, and otherwise return `Any`. For example, if
+
+        ŷ, report = LearnAPI.predict(algorithm, LearnAPI.Distribution(), data...)
+
+    successfully returns (i.e., `algorithm` supports predictions of target probability
+    distributions) then the following is guaranteed to hold:
+
+        $(s)(ŷ) <: LearnAPI.predict_output_$(s)(algorithm, LearnAPI.Distribution())
+
+    **Note.** This trait has a single-argument "convenience" version
+    `LearnAPI.predict_output_$(s)(algorithm)` derived from this one, which returns a
+    dictionary keyed on target proxy types.
+
+    See also [`LearnAPI.KindOfProxy`](@ref), [`LearnAPI.predict`](@ref),
+    [`LearnAPI.predict_input_$(s)`](@ref).
+
+    # New implementations
+
+    Overloading the trait is optional. Here's a sample implementation for a supervised
+    regressor type `MyRgs` that only predicts actual values of the target:
+
+        LearnAPI.predict(alogrithm::MyRgs, ::LearnAPI.TrueTarget, data...) = ...
+        LearnAPI.predict_output_$(s)(::Type{<:MyRgs}, ::LearnAPI.TrueTarget) =
+            AbstractVector{ScientificTypesBase.Continuous}
+
+    The fallback method returns `Any`.
+
+    """
+
+"$(DOC_PREDICT_OUTPUT(:scitype))"
+predict_output_scitype(algorithm, kind_of_proxy) = Any
+
+"$(DOC_PREDICT_OUTPUT(:type))"
+predict_output_type(algorithm, kind_of_proxy) = Any
 
 
 # # DERIVED TRAITS
 
-name(M::Type) = string(typename(M))
-is_algorithm(M::Type) = !isempty(functions(M))
+name(A::Type) = string(typename(A))
+
+is_algorithm(A::Type) = !isempty(functions(A))
+
+const DOC_PREDICT_OUTPUT2(s) =
+    """
+        LearnAPI.predict_output_$(s)(algorithm)
+
+    Return a dictionary of upper bounds on the $(s) of predictions, keyed on concrete
+    subtypes of [`LearnAPI.KindOfProxy`](@ref). Each of these subtypes respresents a
+    different form of target prediction (`TrueTarget`, `Distribution`, `SurvivalFunction`,
+    etc) possibly supported by `algorithm`, but the existence of a key does not guarantee
+    that form is supported.
+
+    As an example, if
+
+        ŷ, report = LearnAPI.predict(algorithm, LearnAPI.Distribution(), data...)
+
+    successfully returns (i.e., `algorithm` supports predictions of target probability
+    distributions) then the following is guaranteed to hold:
+
+        $(s)(ŷ) <: LearnAPI.predict_output_$(s)(algorithm)[LearnAPI.Distribution]
+
+    See also [`LearnAPI.KindOfProxy`](@ref), [`LearnAPI.predict`](@ref),
+    [`LearnAPI.predict_input_$(s)`](@ref).
+
+    # New implementations
+
+    This single argument trait should not be overloaded. Instead, overload
+    [`LearnAPI.predict_output_$(s)`](@ref)(algorithm, kind_of_proxy). See above.
+
+    """
+
+"$(DOC_PREDICT_OUTPUT2(:scitype))"
+predict_output_scitype(algorithm) =
+    Dict(T => predict_output_scitype(algorithm, T())
+         for T in CONCRETE_TARGET_PROXY_TYPES)
+
+"$(DOC_PREDICT_OUTPUT2(:type))"
+predict_output_type(algorithm) =
+    Dict(T => predict_output_type(algorithm, T())
+         for T in CONCRETE_TARGET_PROXY_TYPES)
