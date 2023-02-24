@@ -1,21 +1,19 @@
-abstract type MLType end
+abstract type LearnAPIType end
 
 """
-    LearnAPI.Model
+    LearnAPI.Algorithm
 
-An optional abstract type for models implementing LearnAPI.jl.
+An optional abstract type for algorithms implementing LearnAPI.jl.
 
-If `typeof(m) <: LearnAPI.Model`, then `m` is guaranteed to be a model in the LearnAPI
-sense.
+If `typeof(alg) <: LearnAPI.Algorithm`, then `alg` is guaranteed to be an ML/statistical
+algorithm in the strict LearnAPI sense.
 
-# New model implementations
+# New implementations
 
-While not a formal requirement, model types implementing the LearnAPI interface are
-encouraged to subtype `LearnAPI.Model`, unless it is disruptive to do so.
+While not a formal requirement, algorithm types implementing the LearnAPI.jl are
+encouraged to subtype `LearnAPI.Algorithm`, unless it is disruptive to do so.
 
 See also [`LearnAPI.functions`](@ref).
 
 """
-abstract type Model <: MLType end
-
-# See src/model_traits.jl for the `methods` trait definition.
+abstract type Algorithm <: LearnAPIType end

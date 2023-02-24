@@ -69,7 +69,7 @@ Every LearnAPI method that is not a trait and which is specifically implemented 
 return value is a tuple of symbols from this list: $(join(FUNCTIONS, ", ")). To regenerate
 this list, do `LearnAPI.functions()`.
 
-See also [`LearnAPI.Model`](@ref).
+See also [`LearnAPI.Algorithm`](@ref).
 
 """
 functions(::Type) = ()
@@ -100,13 +100,13 @@ Here's a sample implementation for a supervised model where predictions are ordi
 values of the target variable:
 
 ```julia
-@trait MyNewModel predict_proxy = LearnAPI.TrueTarget()
+@trait MyNewAlgorithm predict_proxy = LearnAPI.TrueTarget()
 ```
 
 which is shorthand for
 
 ```julia
-LearnAPI.predict_proxy(::Type{<:MyNewModelType}) = LearnAPI.TrueTarget()
+LearnAPI.predict_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.TrueTarget()
 ```
 
 """
@@ -132,13 +132,13 @@ The possible return values for this trait are: `LearnAPI.JointSampleable()`,
 Here's a sample implementation:
 
 ```julia
-@trait MyNewModel predict_joint_proxy = LearnAPI.JointDistribution()
+@trait MyNewAlgorithmType predict_joint_proxy = LearnAPI.JointDistribution()
 ```
 
 which is shorthand for
 
 ```julia
-LearnAPI.predict_joint_proxy(::Type{<:MyNewModelType}) = LearnAPI.JointDistribution()
+LearnAPI.predict_joint_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.JointDistribution()
 ```
 
 """
