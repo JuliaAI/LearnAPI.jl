@@ -17,7 +17,7 @@ Here's a snippet of code with a `LearnAPI.predict` call:
 ```julia
 fitted_params, state, fit_report = LearnAPI.fit(some_algorithm, 1, X, y)
 ŷ, predict_report = 
-    LearnAPI.predict(some_algorithm, LearnAPI.TrueTarget(), fitted_params, Xnew)
+    LearnAPI.predict(some_algorithm, LearnAPI.LiteralTarget(), fitted_params, Xnew)
 ```
 
 | method                             | compulsory? | fallback | requires    |
@@ -43,7 +43,7 @@ ŷ, predict_report =
 ## Predict or transform?
 
 If the algorithm has a notion of [target variable](@ref proxy), then implement a `predict`
-method for each supported kind of target proxy (`TrueTarget()`, `Distribution()`,
+method for each supported kind of target proxy (`LiteralTarget()`, `Distribution()`,
 etc). See [Target proxies](@ref) below.
 
 If an operation is to have an inverse operation, then it cannot be `predict` - use
@@ -70,7 +70,7 @@ LearnAPI.IID
 |          type                   | form of an observation                              | 
 |:-------------------------------:|:----------------------------------------------------|
 | `LearnAPI.None`                 | has no declared relationship with a target variable |
-| `LearnAPI.TrueTarget`           | same as target observations |
+| `LearnAPI.LiteralTarget`           | same as target observations |
 | `LearnAPI.Sampleable`           | object that can be sampled to obtain object of the same form as target observation |
 | `LearnAPI.Distribution`         | explicit probability density/mass function whose sample space is all possible target observations |
 | `LearnAPI.LogDistribution`      | explicit log-probability density/mass function whose sample space is possible target observations |

@@ -8,7 +8,7 @@
 > returning the absolute values of the linear coefficients. The ridge regressor has a
 > target variable and outputs literal predictions of the target (rather than, say,
 > probabilistic predictions); accordingly the overloaded `predict` method is dispatched on
-> the `TrueTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type as the
+> the `LiteralTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type as the
 > preferred kind of target proxy. Other traits articulate the algorithm's training data type
 > requirements and the input/output type of `predict`.
 
@@ -110,7 +110,7 @@ level API, using those traits.
 Now we need a method for predicting the target on new input features:
 
 ```@example anatomy
-function LearnAPI.predict(::MyRidge, ::LearnAPI.TrueTarget, fitted_params, Xnew)
+function LearnAPI.predict(::MyRidge, ::LearnAPI.LiteralTarget, fitted_params, Xnew)
     Xmatrix = Tables.matrix(Xnew)
     report = nothing
     return Xmatrix*fitted_params.coefficients, report
@@ -119,7 +119,7 @@ nothing # hide
 ```
 
 The second argument of `predict` is always an instance of `KindOfProxy`, and will always
-be `TrueTarget()` in this case, as only literal values of the target (rather than, say
+be `LiteralTarget()` in this case, as only literal values of the target (rather than, say
 probabilistic predictions) are being supported.
 
 In some algorithms `predict` computes something of interest in addition to the target
@@ -159,13 +159,13 @@ list). Accordingly, we are required to declare a preferred target proxy, which w
 [`LearnAPI.preferred_kind_of_proxy`](@ref):
 
 ```@example anatomy
-LearnAPI.preferred_kind_of_proxy(::Type{<:MyRidge}) = LearnAPI.TrueTarget()
+LearnAPI.preferred_kind_of_proxy(::Type{<:MyRidge}) = LearnAPI.LiteralTarget()
 nothing # hide
 ```
 Or, you can use the shorthand
 
 ```@example anatomy
-@trait MyRidge preferred_kind_of_proxy=LearnAPI.TrueTarget()
+@trait MyRidge preferred_kind_of_proxy=LearnAPI.LiteralTarget()
 nothing # hide
 ```
 
@@ -307,7 +307,7 @@ feature_importances(algorithm, fitted_params, fit_report)
 Make a prediction using new data:
 
 ```@example anatomy
-yhat, predict_report = predict(algorithm, LearnAPI.TrueTarget(), fitted_params, X[test])
+yhat, predict_report = predict(algorithm, LearnAPI.LiteralTarget(), fitted_params, X[test])
 ```
 
 Compare predictions with ground truth

@@ -98,7 +98,7 @@ LearnAPI.predict(algorithm::MyNewAlgorithmType, LearnAPI.Distribution(), Xnew) =
 Then we can declare
 
 ```julia
-@trait MyNewAlgorithmType  preferred_kind_of_proxy = LearnAPI.TrueTarget()
+@trait MyNewAlgorithmType  preferred_kind_of_proxy = LearnAPI.LiteralTarget()
 ```
 
 which is shorthand for
@@ -590,8 +590,8 @@ const DOC_PREDICT_OUTPUT(s)  =
     Overloading the trait is optional. Here's a sample implementation for a supervised
     regressor type `MyRgs` that only predicts actual values of the target:
 
-        LearnAPI.predict(alogrithm::MyRgs, ::LearnAPI.TrueTarget, data...) = ...
-        LearnAPI.predict_output_$(s)(::Type{<:MyRgs}, ::LearnAPI.TrueTarget) =
+        LearnAPI.predict(alogrithm::MyRgs, ::LearnAPI.LiteralTarget, data...) = ...
+        LearnAPI.predict_output_$(s)(::Type{<:MyRgs}, ::LearnAPI.LiteralTarget) =
             AbstractVector{ScientificTypesBase.Continuous}
 
     The fallback method returns `Any`.
@@ -617,7 +617,7 @@ const DOC_PREDICT_OUTPUT2(s) =
 
     Return a dictionary of upper bounds on the $(s) of predictions, keyed on concrete
     subtypes of [`LearnAPI.KindOfProxy`](@ref). Each of these subtypes respresents a
-    different form of target prediction (`TrueTarget`, `Distribution`, `SurvivalFunction`,
+    different form of target prediction (`LiteralTarget`, `Distribution`, `SurvivalFunction`,
     etc) possibly supported by `algorithm`, but the existence of a key does not guarantee
     that form is supported.
 

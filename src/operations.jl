@@ -25,7 +25,7 @@ as observations) or a proxy for these, for the specified `algorithm` having lear
 parameters `fitted_params` (first object returned by [`LearnAPI.fit`](@ref)`(algorithm,
 ...)`).  $DOC_NEW_DATA
 
-Where available, use `kind_of_proxy=TrueTarget()` for ordinary target predictions, and
+Where available, use `kind_of_proxy=LiteralTarget()` for ordinary target predictions, and
 `kind_of_proxy=Distribution()` for PDF/PMF predictions. Always available is
 `kind_of_proxy=`LearnAPI.preferred_kind_of_proxy(algorithm)`.
 
@@ -157,7 +157,7 @@ See also [`LearnAPI.KindOfProxy`](@ref).
 """
 abstract type IID <: KindOfProxy end
 
-struct TrueTarget <: IID end
+struct LiteralTarget <: IID end
 struct Sampleable <: IID end
 struct Distribution <: IID end
 struct LogDistribution <: IID end
