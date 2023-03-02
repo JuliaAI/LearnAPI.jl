@@ -1,35 +1,35 @@
 """
-    LearnAPI.getobs(model, LearnAPI.fit, I, data...)
+    LearnAPI.getobs(algorithm, LearnAPI.fit, I, data...)
 
 Return a subsample of `data` consisting of all observations with indices in `I`. Here
-`data` is data of the form expected in a call like `LearnAPI.fit(model, verbosity,
+`data` is data of the form expected in a call like `LearnAPI.fit(algorithm, verbosity,
 data...; metadata...)`.
 
 Always returns a tuple of the same length as `data`.
 
-    LearnAPI.getobs(model, operation, I, data...)
+    LearnAPI.getobs(algorithm, operation, I, data...)
 
 Return a subsample of `data` consisting of all observations with indices in `I`. Here
 `data` is data of the form expected in a call of the specified `operation`, e.g., in a
-call like `LearnAPI.predict(model, data...)`, if `operation = LearnAPI.predict`. Possible
+call like `LearnAPI.predict(algorithm, data...)`, if `operation = LearnAPI.predict`. Possible
 values for `operation` are: $DOC_OPERATIONS_LIST_FUNCTION.
 
 Always returns a tuple of the same length as `data`.
 
-# New model implementations
+# New implementations
 
 Implementation is optional. If implemented, then ordinarily implemented for each signature
-of `fit` and operation implemented for `model`.
+of `fit` and operation implemented for `algorithm`.
 
 $(DOC_IMPLEMENTED_METHODS(:reformat))
 
 The subsample returned must be acceptable in place of `data` in calls of the function
 named in the second argument.
 
-## Example implementation
+## Sample implementation
 
-Suppose that `MyClassifier` is a model type for simple supervised classification, with
-`LearnAPI.fit(model::MyClassifier, verbosity, A, y)` and `predict(model::MyClassifier,
+Suppose that `MyClassifier` is an algorithm type for simple supervised classification, with
+`LearnAPI.fit(algorithm::MyClassifier, verbosity, A, y)` and `predict(algorithm::MyClassifier,
 fitted_params, A)` implemented assuming the target `y` is an ordinary abstract vector and
 the features `A` is an abstract matrix with columns as observations. Then the following is
 a valid implementation of `getobs`:
@@ -44,34 +44,34 @@ LearnAPI.getobs(::MyClassifier, ::typeof(LearnAPI.predict), I, A) = (view(A, :, 
 function getobs end
 
 """
-    LearnAPI.reformat(model, LearnAPI.fit, user_data...; metadata...)
+    LearnAPI.reformat(algorithm, LearnAPI.fit, user_data...; metadata...)
 
-Return the model-specific representations `(data, metadata)` of user-supplied `(user_data,
+Return the algorithm-specific representations `(data, metadata)` of user-supplied `(user_data,
 user_metadata)`, for consumption, after splatting, by `LearnAPI.fit`, `LearnAPI.update!`
 or `LearnAPI.ingest!`.
 
-    LearnAPI.reformat(model, operation, user_data...)
+    LearnAPI.reformat(algorithm, operation, user_data...)
 
-Return the model-specific representation `data` of user-supplied `user_data`, for
-consumption, after splatting, by the specified `operation`, dispatched on `model`. Here
+Return the algorithm-specific representation `data` of user-supplied `user_data`, for
+consumption, after splatting, by the specified `operation`, dispatched on `algorithm`. Here
 `operation` is one of: $DOC_OPERATIONS_LIST_FUNCTION.
 
 The following sample workflow illustrates the use of both versions of `reformat`above. The
 data objects `X`, `y`, and `Xtest` are the user-supplied versions of data.
 
 ```julia
-data, metadata = LearnAPI.reformat(model, LearnAPI.fit, X, y; class_weights=some_dictionary)
-fitted_params, state, fit_report = LearnAPI.fit(model, 0, data...; metadata...)
+data, metadata = LearnAPI.reformat(algorithm, LearnAPI.fit, X, y; class_weights=some_dictionary)
+fitted_params, state, fit_report = LearnAPI.fit(algorithm, 0, data...; metadata...)
 
-test_data = LearnAPI.reformat(model, LearnAPI.predict, Xtest)
-ŷ, predict_report = LearnAPI.predict(model, fitted_params, test_data...)
+test_data = LearnAPI.reformat(algorithm, LearnAPI.predict, Xtest)
+ŷ, predict_report = LearnAPI.predict(algorithm, fitted_params, test_data...)
 ```
 
-# New model implementations
+# New implementations
 
 Implementation of `reformat` is optional. The fallback simply slurps the supplied
 data/metadata. You will want to implement for each `fit` or operation signature
-implemented for `model`.
+implemented for `algorithm`.
 
 $(DOC_IMPLEMENTED_METHODS(:reformat, overloaded=true))
 
@@ -87,9 +87,9 @@ no metadata, a `NamedTuple()` can be returned in its place.
 
 ## Example implementation
 
-Suppose that `MyClassifier` is a model type for simple supervised classification, with
-`LearnAPI.fit(model::MyClassifier, verbosity, A, y; names=...)` and
-`predict(model::MyClassifier, fitted_params, A)` implemented assuming that the target `y`
+Suppose that `MyClassifier` is an algorithm type for simple supervised classification, with
+`LearnAPI.fit(algorithm::MyClassifier, verbosity, A, y; names=...)` and
+`predict(algorithm::MyClassifier, fitted_params, A)` implemented assuming that the target `y`
 is an ordinary vector, the features `A` is a matrix with columns as observations, and
 `names` are the names of the features. Then, supposing users supply features in tabular
 form, but target as expected, then we can provide the following implementation of
@@ -104,4 +104,4 @@ end
 LearnAPI.reformat(::MyClassifier, ::typeof(LearnAPI.predict), X) = (Tables.matrix(X)',)
 ```
 """
-reformat(::Any, ::Any, data...; model_data...) = (data, model_data)
+reformat(::Any, ::Any, data...; algorithm_data...) = (data, algorithm_data)
