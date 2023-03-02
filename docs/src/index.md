@@ -105,14 +105,15 @@ by the clustering algorithm can can be paired with human labels using, say, the 
 index. In survival analysis, predicted survival functions or probability distributions are
 compared with censored ground truth survival times.
 
-More generally, whenever we have predicted variable (e.g., a class label) paired with
+More generally, whenever we have a predicted variable (e.g., a class label) paired with
 itself or some proxy (such as a class probability) we call the variable a *target*
 variable, and the predicted output a *target proxy*. It is immaterial whether or not the
 target appears in training (is supervised) or whether the model generalizes to new
-observations (learns) or not. The target and the kind of predicted proxy are crucial
-features of ML/statistics performance measures and LearnAPI.jl provides a detailed list of
-proxy dispatch types (see [Target proxies](@ref)), as well as algorithm traits to
-articulate target type /scitype and a preferred kind of target proxy.
+observations (learns) or not. 
+
+The target and the kind of predicted proxy are crucial features of ML/statistics
+performance measures and LearnAPI.jl provides a detailed list of proxy dispatch types (see
+[Target proxies](@ref)), as well as algorithm traits to articulate target type /scitype.
 
 
 ## Optional data interface

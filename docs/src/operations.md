@@ -85,6 +85,8 @@ LearnAPI.IID
 | `LearnAPI.ProbabilisticSet`     | as for `Set` but labeled with probabilities (not necessarily summing to one) |
 | `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time |
+| `LearnAPI.OutlierScore`         | numerical score reflecting degree of outlierness (not necessarily normalized) |
+| `LearnAPI.Continuous`           | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls) |
 
 † Provided for completeness but discouraged to avoid [ambiguities in
 representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation).

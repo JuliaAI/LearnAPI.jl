@@ -172,6 +172,8 @@ struct Set <: IID end
 struct ProbabilisticSet <: IID end
 struct SurvivalFunction <: IID end
 struct SurvivalDistribution <: IID end
+struct OutlierScore <: IID end
+struct Continuous <: IID end
 
 struct JointSampleable <: KindOfProxy end
 struct JointDistribution <: KindOfProxy end
