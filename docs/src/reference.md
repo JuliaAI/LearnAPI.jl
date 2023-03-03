@@ -19,9 +19,9 @@ more informal guide see  [Anatomy of an Implementation](@ref) and [Common Implem
 ## Algorithms
 
 In LearnAPI.jl an **algorithm** is some julia object `alg` storing the hyperparameters of
-some algorithm from machine learning or statistics used manipulating data. Typically the
-algorithm "learns" from data in a training event, but this is not essential; "static" data
-processing, with parameters, is included. 
+some MLJ/statistics algorithm that transforms data in some way. Typically the algorithm
+"learns" from data in a training event, but this is not essential; "static" data
+processing, with parameters, is included.
 
 The type of `alg` will have a name reflecting that of the algorithm, such as
 `DecisionTreeRegressor`.
