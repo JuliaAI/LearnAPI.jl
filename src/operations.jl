@@ -139,12 +139,9 @@ abstract type KindOfProxy end
 """
     LearnAPI.IID <: LearnAPI.KindOfProxy
 
-Abstract subtype of [`LearnAPI.KindOfProxy`](@ref) appropriate when requesting target
-predictions for statistical models where input-target pairs `(x, y)` are generated
-by an iid process.
-
-More generally, if `kind_of_proxy` is an instance of `LearnAPI.IID` then, given `data`
-constisting of ``n`` observations, the following must hold:
+Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). If `kind_of_proxy` is an instance of
+`LearnAPI.IID` then, given `data` constisting of ``n`` observations, the following must
+hold:
 
 - `LearnAPI.predict(algorithm, kind_of_proxy, data...) == (ŷ, report)` where `ŷ` is data
   also consisting of ``n`` observations; and
