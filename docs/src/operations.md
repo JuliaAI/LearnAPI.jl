@@ -60,9 +60,6 @@ proxy). The available kinds of target proxy are classified by subtypes of
 ```@docs
 LearnAPI.KindOfProxy
 ```
-
-### Predictions for i.i.d  models
-
 ```@docs
 LearnAPI.IID
 ```
