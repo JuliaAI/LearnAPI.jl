@@ -649,3 +649,13 @@ predict_output_scitype(algorithm) =
 predict_output_type(algorithm) =
     Dict(T => predict_output_type(algorithm, T())
          for T in CONCRETE_TARGET_PROXY_TYPES)
+
+
+# # FALLBACK FOR INSTANCES
+
+for trait in TRAITS
+    ex = quote
+        $trait(x) = $trait(typeof(x))
+    end
+    eval(ex)
+end
