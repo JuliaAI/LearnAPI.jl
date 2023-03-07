@@ -8,9 +8,9 @@
 > returning the absolute values of the linear coefficients. The ridge regressor has a
 > target variable and outputs literal predictions of the target (rather than, say,
 > probabilistic predictions); accordingly the overloaded `predict` method is dispatched on
-> the `LiteralTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type as the
-> preferred kind of target proxy. Other traits articulate the algorithm's training data type
-> requirements and the input/output type of `predict`.
+> the `LiteralTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type
+> as the preferred kind of target proxy. Other traits articulate the algorithm's training
+> data type requirements and the input/output type of `predict`.
 
 We begin by describing an implementation of LearnAPI.jl for basic ridge regression
 (without intercept) to introduce the main actors in any implementation.
@@ -159,7 +159,7 @@ list). Accordingly, we are required to declare a preferred target proxy, which w
 [`LearnAPI.preferred_kind_of_proxy`](@ref):
 
 ```@example anatomy
-LearnAPI.preferred_kind_of_proxy(::Type{<:MyRidge}) = LearnAPI.LiteralTarget()
+LearnAPI.preferred_kind_of_proxy(::MyRidge) = LearnAPI.LiteralTarget()
 nothing # hide
 ```
 Or, you can use the shorthand

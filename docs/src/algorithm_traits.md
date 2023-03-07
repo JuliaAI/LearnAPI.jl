@@ -4,46 +4,41 @@
 > *This algorithm supports per-observation weights, which must appear as the third
 > argument of `fit`*, or *This algorithm's `transform` method predicts `Real` vectors*.
 
-For any (non-trivial) algorithm, [`LearnAPI.functions`](@ref)`(algorithm)` must be
-overloaded to list the LearnAPI methods that have been explicitly implemented/overloaded
-(algorithm traits excluded). Overloading other traits is optional, except where required
-by the implementation of some LearnAPI method and explicitly documented in that method's
-docstring.
-
-Traits are often called on instances but are usually *defined* on algorithm *types*, as in
+Algorithm traits are functions whose first (and usually only) argument is an algorithm. In
+a new implementation, a single-argument trait is declared following this pattern:
 
 ```julia
-LearnAPI.is_pure_julia(::Type{<:MyAlgorithmType}) = true
+LearnAPI.is_pure_julia(algorithm::MyAlgorithmType) = true
 ```
 
-which has the shorthand
+!!! important
+
+    The value of a trait must be the same for all algorithms of the same type, 
+	even if the types differ only in type parameters.  There are exceptions for 
+	some traits, if 
+    `is_wrapper(algorithm) = true` for all instances `algorithm` of some type 
+	(composite algorithms).  This requirement occasionally requires that 
+	an existing algorithm implementation be split into 	separate LearnAPI 
+	implementations (e.g., one for regression and another for classification).
+
+The declaration above has the shorthand
 
 ```julia
 @trait MyAlgorithmType is_pure_julia=true
 ```
 
-So, for convenience, every trait `t` is provided the fallback implementation
+Multiple traits can be declared like this:
+
 
 ```julia
-t(algorithm) = t(typeof(algorithm))
+@trait(
+    MyAlgorithmType,
+    is_pure_julia = true,
+    pkg_name = "MyPackage",
+)
 ```
 
-This means `LearnAPI.is_pure_julia(algorithm) = true` whenever `algorithm isa MyAlgorithmType` in the
-above example.
-
-Every trait has a global fallback implementation for `::Type`. See the table below.
-
-## When traits depdend on more than algorithm type
-
-Traits that vary from instance to instance of the same type are disallowed, except in the
-case of composite algorithms (`is_wrapper(algorithm) = true`) where this is typically
-unavoidable. The reason for this is so one can associate, with each non-composite
-algorithm type, unique trait-based "algorithm metadata", for inclusion in searchable
-algorithm databases. This requirement occasionally requires that an existing algorithm
-implementation be split into separate LearnAPI implementations (e.g., one for regression
-and another for classification).
-
-## Special two-argument traits
+### Special two-argument traits
 
 The two-argument version of [`LearnAPI.predict_output_scitype`](@ref) and
 [`LearnAPI.predict_output_scitype`](@ref) are the only overloadable traits with more than
@@ -55,7 +50,7 @@ one argument. They cannot be declared using the `@trait` macro.
 implementation. **Derived traits** are not, and should not be called by performance
 critical code
 
-## Overloadable traits
+### Overloadable traits
 
 In the examples column of the table below, `Table`, `Continuous`, `Sampleable` are names owned by the
 package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
@@ -100,7 +95,7 @@ include the variable.
 for the general case.
 
 
-## Derived Traits
+### Derived Traits
 
 The following convenience methods are provided but intended for overloading:
 

@@ -66,7 +66,7 @@ this list, do `LearnAPI.functions()`.
 See also [`LearnAPI.Algorithm`](@ref).
 
 """
-functions(::Type) = ()
+functions(::Any) = ()
 
 
 """
@@ -104,13 +104,13 @@ Then we can declare
 which is shorthand for
 
 ```julia
-LearnAPI.preferred_kind_of_proxy(::Type{<:MyNewAlgorithmType}) = LearnAPI.Distribution()
+LearnAPI.preferred_kind_of_proxy(::MyNewAlgorithmType) = LearnAPI.Distribution()
 ```
 
 For more on target variables and target proxies, refer to the LearnAPI documentation.
 
 """
-preferred_kind_of_proxy(::Type) = nothing
+preferred_kind_of_proxy(::Any) = nothing
 
 """
     LearnAPI.position_of_target(algorithm)
@@ -122,7 +122,7 @@ If this number is `0`, then no target is expected. If this number exceeds `lengt
 then `data` is understood to exclude the target variable.
 
 """
-position_of_target(::Type) = 0
+position_of_target(::Any) = 0
 
 """
     LearnAPI.position_of_weights(algorithm)
@@ -135,7 +135,7 @@ If this number is `0`, then no weights are expected. If this number exceeds
 uniform.
 
 """
-position_of_weights(::Type) = 0
+position_of_weights(::Any) = 0
 
 descriptors() = [
     :regression,
@@ -180,7 +180,7 @@ Lists one or more suggestive algorithm descriptors from this list: $DOC_DESCRIPT
 This trait should return a tuple of symbols, as in `(:classifier, :probabilistic)`.
 
 """
-descriptors(::Type) = ()
+descriptors(::Any) = ()
 
 """
     LearnAPI.is_pure_julia(algorithm)
@@ -192,7 +192,7 @@ Returns `true` if training `algorithm` requires evaluation of pure Julia code on
 The fallback is `false`.
 
 """
-is_pure_julia(::Type) = false
+is_pure_julia(::Any) = false
 
 """
     LearnAPI.pkg_name(algorithm)
@@ -208,7 +208,7 @@ $DOC_UNKNOWN
 Must return a string, as in `"DecisionTree"`.
 
 """
-pkg_name(::Type) = "unknown"
+pkg_name(::Any) = "unknown"
 
 """
     LearnAPI.pkg_license(algorithm)
@@ -217,7 +217,7 @@ Return the name of the software license, such as `"MIT"`, applying to the packag
 core algorithm for `algorithm` is implemented.
 
 """
-pkg_license(::Type) = "unknown"
+pkg_license(::Any) = "unknown"
 
 """
     LearnAPI.doc_url(algorithm)
@@ -231,7 +231,7 @@ $DOC_UNKNOWN
 Must return a string, such as `"https://en.wikipedia.org/wiki/Decision_tree_learning"`.
 
 """
-doc_url(::Type) = "unknown"
+doc_url(::Any) = "unknown"
 
 """
     LearnAPI.load_path(algorithm)
@@ -250,7 +250,7 @@ $DOC_UNKNOWN
 
 
 """
-load_path(::Type) = "unknown"
+load_path(::Any) = "unknown"
 
 
 """
@@ -268,7 +268,7 @@ $DOC_ON_TYPE
 
 
 """
-is_wrapper(::Type) = false
+is_wrapper(::Any) = false
 
 """
     LearnAPI.human_name(algorithm)
@@ -284,7 +284,7 @@ to return `"K-nearest neighbors regressor"`. Ideally, this is a "concrete" noun 
 `"ridge regressor"` rather than an "abstract" noun like `"ridge regression"`.
 
 """
-human_name(M::Type{}) = snakecase(name(M), delim=' ') # `name` defined below
+human_name(M) = snakecase(name(M), delim=' ') # `name` defined below
 
 """
     LearnAPI.iteration_parameter(algorithm)
@@ -297,7 +297,7 @@ iterative.
 Implement if algorithm is iterative. Returns a symbol or `nothing`.
 
 """
-iteration_parameter(::Type) = nothing
+iteration_parameter(::Any) = nothing
 
 """
     LearnAPI.fit_keywords(algorithm)
@@ -314,7 +314,7 @@ Here's a sample implementation for a classifier that implements a `LearnAPI.fit`
 with signature `fit(algorithm::MyClassifier, verbosity, X, y; class_weights=nothing)`:
 
 ```
-LearnAPI.fit_keywords(::Type{<:MyClassifier}) = (:class_weights,)
+LearnAPI.fit_keywords(::Any{<:MyClassifier}) = (:class_weights,)
 ```
 
 or the shorthand
@@ -325,7 +325,7 @@ or the shorthand
 
 
 """
-fit_keywords(::Type) = ()
+fit_keywords(::Any) = ()
 
 """
     LearnAPI.fit_scitype(algorithm)
@@ -353,7 +353,7 @@ See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_observation_scitype`](@ref)
 Optional. The fallback return value is `Union{}`.  $DOC_ONLY_ONE
 
 """
-fit_scitype(::Type) = Union{}
+fit_scitype(::Any) = Union{}
 
 """
     LearnAPI.fit_observation_scitype(algorithm)
@@ -386,7 +386,7 @@ See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
 Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
-fit_observation_scitype(::Type) = Union{}
+fit_observation_scitype(::Any) = Union{}
 
 """
     LearnAPI.fit_type(algorithm)
@@ -413,7 +413,7 @@ See also [`LearnAPI.fit_scitype`](@ref), [`LearnAPI.fit_observation_type`](@ref)
 Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
-fit_type(::Type) = Union{}
+fit_type(::Any) = Union{}
 
 """
     LearnAPI.fit_observation_type(algorithm)
@@ -446,7 +446,7 @@ See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
 Optional. The fallback return value is `Union{}`. $DOC_ONLY_ONE
 
 """
-fit_observation_type(::Type) = Union{}
+fit_observation_type(::Any) = Union{}
 
 DOC_INPUT_SCITYPE(op) =
     """
@@ -543,22 +543,22 @@ DOC_OUTPUT_TYPE(op) =
     """
 
 "$(DOC_INPUT_SCITYPE(:predict))"
-predict_input_scitype(::Type) = Union{}
+predict_input_scitype(::Any) = Union{}
 
 "$(DOC_INPUT_TYPE(:predict))"
-predict_input_type(::Type) = Union{}
+predict_input_type(::Any) = Union{}
 
 "$(DOC_INPUT_SCITYPE(:transform))"
-transform_input_scitype(::Type) = Union{}
+transform_input_scitype(::Any) = Union{}
 
 "$(DOC_OUTPUT_SCITYPE(:transform))"
-transform_output_scitype(::Type) = Any
+transform_output_scitype(::Any) = Any
 
 "$(DOC_INPUT_TYPE(:transform))"
-transform_input_type(::Type) = Union{}
+transform_input_type(::Any) = Union{}
 
 "$(DOC_OUTPUT_TYPE(:transform))"
-transform_output_type(::Type) = Any
+transform_output_type(::Any) = Any
 
 
 # # TWO-ARGUMENT TRAITS
@@ -591,7 +591,7 @@ const DOC_PREDICT_OUTPUT(s)  =
     regressor type `MyRgs` that only predicts actual values of the target:
 
         LearnAPI.predict(alogrithm::MyRgs, ::LearnAPI.LiteralTarget, data...) = ...
-        LearnAPI.predict_output_$(s)(::Type{<:MyRgs}, ::LearnAPI.LiteralTarget) =
+        LearnAPI.predict_output_$(s)(::MyRgs, ::LearnAPI.LiteralTarget) =
             AbstractVector{ScientificTypesBase.Continuous}
 
     The fallback method returns `Any`.
@@ -607,9 +607,9 @@ predict_output_type(algorithm, kind_of_proxy) = Any
 
 # # DERIVED TRAITS
 
-name(A::Type) = string(typename(A))
+name(A) = string(typename(A))
 
-is_algorithm(A::Type) = !isempty(functions(A))
+is_algorithm(A) = !isempty(functions(A))
 
 const DOC_PREDICT_OUTPUT2(s) =
     """
@@ -651,11 +651,3 @@ predict_output_type(algorithm) =
          for T in CONCRETE_TARGET_PROXY_TYPES)
 
 
-# # FALLBACK FOR INSTANCES
-
-for trait in TRAITS
-    ex = quote
-        $trait(x) = $trait(typeof(x))
-    end
-    eval(ex)
-end

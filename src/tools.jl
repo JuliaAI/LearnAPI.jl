@@ -14,7 +14,7 @@ macro trait(algorithm_ex, exs...)
         trait_ex, value_ex = name_value_pair(ex)
         push!(
             program.args,
-            :($LearnAPI.$trait_ex(::Type{<:$algorithm_ex}) = $value_ex),
+            :($LearnAPI.$trait_ex(::$algorithm_ex) = $value_ex),
         )
     end
     return esc(program)
