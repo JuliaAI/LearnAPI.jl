@@ -21,19 +21,18 @@ macro trait(algorithm_ex, exs...)
 end
 
 """
+    typename(x)
 
-    typename(T::Type)
+Return a symbolic representation of the name of `type(x)`, stripped of any type-parameters
+and module qualifications. For example, if
 
-Return a symbol corresponding to the name of the type `T`, stripped of
-any type-parameters and module qualifications. For example:
+    typeof(x) = MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true}
 
-    _typename(MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true})
-
-returns `:Machine`. Where this does not make sense (eg, instances of
-`Union`) `Symbol(string(M))` is returned.
+Then `typename(x)` returns `:Machine`.
 
 """
-function typename(M)
+function typename(x)
+    M = typeof(x)
     if isdefined(M, :name)
         return M.name.name
     elseif isdefined(M, :body)
