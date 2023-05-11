@@ -11,7 +11,7 @@ A base Julia interface for machine learning and statistics
 - [ ] Implement feedback and finish "To do" list (below)
 - [ ] Proof of concept implementation
 - [ ] Polish
-- [ ] Registration
+- [ ] **Register 0.2.0**
 
 You can join a discussion on the LearnAPI proposal at [this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048) Julia Discourse thread.
 
