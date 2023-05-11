@@ -19,14 +19,10 @@ import .Fruit
 ## HELPERS
 
 @testset "typename" begin
-    @test LearnAPI.typename(Fruit.RedApple) == :RedApple
-    @test LearnAPI.typename(Fruit.RedApple{Int}) == :RedApple
-    @test LearnAPI.typename(Nothing) == :Nothing
-    @test LearnAPI.typename(UnionAll) == :UnionAll
-    @test LearnAPI.typename(Union{Char,Int}) ==
-        Symbol("Union{Char, Int64}")
-    T = SparseArrays.sparse([1,2], [1,3], [0.5, 0.6]) |> typeof
-    @test LearnAPI.typename(T) == :SparseMatrixCSC
+    @test LearnAPI.typename(Fruit.RedApple(1)) == :RedApple
+    @test LearnAPI.typename(nothing) == :Nothing
+    m = SparseArrays.sparse([1,2], [1,3], [0.5, 0.6])
+    @test LearnAPI.typename(m) == :SparseMatrixCSC
 end
 
 @testset "snakecase" begin

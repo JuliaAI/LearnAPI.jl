@@ -112,8 +112,9 @@ target appears in training (is supervised) or whether the model generalizes to n
 observations (learns) or not. 
 
 The target and the kind of predicted proxy are crucial features of ML/statistics
-performance measures and LearnAPI.jl provides a detailed list of proxy dispatch types (see
-[Target proxies](@ref)), as well as algorithm traits to articulate target type /scitype.
+performance measures (not provided by this package) and LearnAPI.jl provides a detailed
+list of proxy dispatch types (see [Target proxies](@ref)), as well as algorithm traits to
+articulate target type /scitype.
 
 
 ## Optional data interface
