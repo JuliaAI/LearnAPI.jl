@@ -1,102 +1,104 @@
 # [Reference](@id reference)
 
-> **Summary** In LearnAPI.jl a **model** is a container for hyper-parameters of some
-> learning algorithm. Functionality is created by overloading **methods**
-> provided by the interface, which are divided into training methods (e.g., `fit`),
-> operations (e.g.,. `predict` and `transform`) and accessor functions (e.g.,
-> `feature_importances`). Promises of particular behavior are articulated by **model
-> traits**.
+> **Summary** In LearnAPI.jl an **algorithm** is a container for hyperparameters of some
+> ML/Statistics algorithm (which may or may not "learn"). Functionality is created by
+> overloading **methods** provided by the interface, which are divided into training
+> methods (e.g., `fit`), operations (e.g.,. `predict` and `transform`) and accessor
+> functions (e.g., `feature_importances`). Promises of particular behavior are articulated
+> by **algorithm traits**.
 
 Here we give the definitive specification of the interface provided by LearnAPI.jl. For a
 more informal guide see  [Anatomy of an Implementation](@ref) and [Common Implementation Patterns](@ref).
 
-The reader is assumed to be familiar with the LearnAPI-specific meanings of the following
-terms, as outlined in [Scope and undefined notions](@ref scope): **data**, **metadata**,
-**hyperparameter**, **observation**, and **target**.
+!!! important
+
+    The reader is assumed to be familiar with the LearnAPI-specific meanings of     the following terms, as outlined in 
+	[Scope and undefined notions](@ref scope): **data**, **metadata**, 
+	**hyperparameter**, **observation**, **target**, **target proxy**.
 	
-## Models
+## Algorithms
 
-In this document the word "model" has a very specific meaning that may differ from the
-reader's common understanding of the word - in statistics, for example.
+In LearnAPI.jl an **algorithm** is some julia object `alg` storing the hyperparameters of
+some MLJ/statistics algorithm that transforms data in some way. Typically the algorithm
+"learns" from data in a training event, but this is not essential; "static" data
+processing, with parameters, is included.
 
-Here a **model** is some julia object storing the hyper-parameters of some learning
-algorithm. Typically the type of `m` will have a name reflecting that of the algorithm,
-such as `DecisionTreeRegressor`.
+The type of `alg` will have a name reflecting that of the algorithm, such as
+`DecisionTreeRegressor`.
 
-Additionally, for `m::M` to be a LearnAPI model, we require:
+Additionally, for `alg::Alg` to be a LearnAPI algorithm, we require:
 
-- `Base.propertynames(m)` returns the hyper-parameters of `m`.
+- `Base.propertynames(alg)` returns the hyperparameters of `alg`.
 
-- If `m` is a model, then so are all instances of the same type.
+- If `alg` is an algorithm, then so are all instances of the same type.
 
-- If `n` is another model, then `m == n` if and only if `typeof(n) == typeof(m)` and
+- If `_alg` is another algorithm, then `alg == _alg` if and only if `typeof(alg) == typeof(_alg)` and
   corresponding properties are `==`. This includes properties that are random number
   generators (which should be copied in training to avoid mutation).
 
-- If a model has other models as hyper-parameters, then [`LearnAPI.is_wrapper`](@ref)`(m)`
+- If an algorithm has other algorithms as hyperparameters, then [`LearnAPI.is_wrapper`](@ref)`(alg)`
   must be `true`.
 
-- A keyword constructor for `M` exists, providing default values for *all* non-model
-  hyper-parameters.
+- A keyword constructor for `Alg` exists, providing default values for *all* non-algorithm
+  hyperparameters.
 
-Whenever any LearnAPI method (excluding traits) is overloaded for some type `M` (e.g.,
-`predict`, `transform`, `fit`) then that is a promise that all instances of `M` are
-models. (In particular, [`LearnAPI.functions`](@ref)`(M)` will be non-empty in this case.)
+Whenever any LearnAPI method (excluding traits) is overloaded for some type `Alg` (e.g.,
+`predict`, `transform`, `fit`) then that is a promise that all instances of `Alg` are
+algorithms (and the trait [`LearnAPI.functions`](@ref)`(Alg)` will be non-empty).
 
-It is supposed that making copies of model objects is a cheap operation. Consequently,
+It is supposed that making copies of algorithm objects is a cheap operation. Consequently,
 *learned* parameters, such as weights in a neural network (the `fitted_params` described
-in [Fit, update! and ingest!](@ref)) are not expected to be part of a model. Storing
-learned parameters in a model is not explicitly ruled out, but doing so might lead to
+in [Fit, update! and ingest!](@ref)) should not be stored in the algorithm object. Storing
+learned parameters in an algorithm is not explicitly ruled out, but doing so might lead to
 performance issues in packages adopting LearnAPI.jl.
 
-A **model type** is a type whose instances are models.
 
 ### Example
 
-Any instance of `GradientRidgeRegressor` defined below is a valid LearnAPI.jl model:
+Any instance of `GradientRidgeRegressor` defined below is a valid LearnAPI.jl algorithm:
 
 ```julia
-struct GradientRidgeRegressor{T<:Real} <: LearnAPI.Model
+struct GradientRidgeRegressor{T<:Real} <: LearnAPI.Algorithm
     learning_rate::T
     epochs::Int
     l2_regularization::T
 end
 ```
 
-The same is true if we omit the subtyping `<: LearnAPI.Model`, but not if we also make
+The same is true if we omit the subtyping `<: LearnAPI.Algorithm`, but not if we also make
 this a `mutable struct`. In that case we will need to overload `Base.==` for
 `GradientRidgeRegressor`.
 
 ```@docs
-LearnAPI.Model
+LearnAPI.Algorithm
 ```
 
 ## Methods
 
 None of the methods described in the linked sections below are compulsory, but any
-implemented or overloaded method that is not a model trait must be added to the return
+implemented or overloaded method that is not an algorithm trait must be added to the return
 value of [`LearnAPI.functions`](@ref), as in
 
 ```julia
-LearnAPI.functions(::Type{<SomeModelType}) = (:fit, :update!, :predict)
+LearnAPI.functions(::Type{<SomeAlgorithmType}) = (:fit, :update!, :predict)
 ```
 
 or using the shorthand
 
 ```julia
-@trait SomeModelType functions=(:fit, :update!, :predict)
+@trait SomeAlgorithmType functions=(:fit, :update!, :predict)
 ```
 
-- [Fit, update! and ingest!](@ref) (training methods): for models that "learn" (generalize
+- [Fit, update! and ingest!](@ref) (training methods): for algorithms that "learn" (generalize
   to new data)
 
 - [Operations](@ref operations): `predict`, `transform` and their relatives
 
-- [Accessor Functions](@ref): accessing certain byproducts of training that many models
+- [Accessor Functions](@ref): accessing certain byproducts of training that many algorithms
   share, such as feature importances and training losses
   
-- [Optional Data Interface](@ref data_interface)
+- [Optional Data Interface](@ref data_interface): `getobs` and `reformat`
 
-- [Model Traits](@ref): contracts for specific behavior, such as "The second data
+- [Algorithm Traits](@ref): contracts for specific behavior, such as "The second data
   argument of `fit` is a target variable" or "I predict probability distributions"
   
