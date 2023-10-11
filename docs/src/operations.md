@@ -77,7 +77,7 @@ LearnAPI.IID
 | `LearnAPI.LabelAmbiguous`       | collections of labels (in case of multi-class target) but without a known correspondence to the original target labels (and of possibly different number) as in, e.g., clustering | 
 | `LearnAPI.LabelAmbiguousSampleable`  | sampleable version of `LabelAmbiguous`; see `Sampleable` above  |
 | `LearnAPI.LabelAmbiguousDistribution`| pdf/pmf version of `LabelAmbiguous`; see `Distribution`  above  |
-| `LearnAPI.ConfidenceInterval`   | confidence interval (possible requirement:  observation `isa Tuple{Real,Real}`) |
+| `LearnAPI.ConfidenceInterval`   | confidence interval |
 | `LearnAPI.Set`                  | finite but possibly varying number of target observations |
 | `LearnAPI.ProbabilisticSet`     | as for `Set` but labeled with probabilities (not necessarily summing to one) |
 | `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
