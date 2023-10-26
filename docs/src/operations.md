@@ -80,7 +80,7 @@ LearnAPI.IID
 | `LearnAPI.ConfidenceInterval`   | confidence interval |
 | `LearnAPI.Set`                  | finite but possibly varying number of target observations |
 | `LearnAPI.ProbabilisticSet`     | as for `Set` but labeled with probabilities (not necessarily summing to one) |
-| `LearnAPI.SurvivalFunction`     | survival function (possible requirement: observation is single-argument function mapping `Real` to `Real`) |
+| `LearnAPI.SurvivalFunction`     | survival function |
 | `LearnAPI.SurvivalDistribution` | probability distribution for survival time |
 | `LearnAPI.OutlierScore`         | numerical score reflecting degree of outlierness (not necessarily normalized) |
 | `LearnAPI.Continuous`           | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls) |
