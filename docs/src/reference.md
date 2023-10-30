@@ -2,10 +2,10 @@
 
 > **Summary** In LearnAPI.jl an **algorithm** is a container for hyperparameters of some
 > ML/Statistics algorithm (which may or may not "learn"). Functionality is created by
-> overloading **methods** provided by the interface, which are divided into training
-> methods (e.g., `fit`), operations (e.g.,. `predict` and `transform`) and accessor
-> functions (e.g., `feature_importances`). Promises of particular behavior are articulated
-> by **algorithm traits**.
+> overloading methods provided by the interface, which are divided into **training
+> methods** (e.g., `fit`), **operations** (`predict` and `transform`) and **accessor
+> functions** (e.g., `feature_importances`). Promises of particular behavior are
+> articulated by **algorithm traits**.
 
 Here we give the definitive specification of the interface provided by LearnAPI.jl. For a
 more informal guide see  [Anatomy of an Implementation](@ref) and [Common Implementation Patterns](@ref).
