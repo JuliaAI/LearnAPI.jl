@@ -1,5 +1,13 @@
 # Common Implementation Patterns
 
+```@raw html
+&#128679;
+```
+
+!!! warning
+
+    Under construction
+
 !!! warning
 
 	This section is only an implementation guide. The definitive specification of the
@@ -12,16 +20,17 @@ Although an implementation is defined purely by the methods and traits it implem
 implementations fall into one (or more) of the following informally understood patterns or
 "tasks":
 
-- [Classifiers](@ref): Supervised learners for categorical targets
+- [Classification](@ref): Supervised learners for categorical targets 
 
-- [Regressors](@ref): Supervised learners for continuous targets
+- [Regression](@ref): Supervised learners for continuous targets
 
 - [Iterative Algorithms](@ref)
 
 - [Incremental Algorithms](@ref)
 
-- [Static Transformers](@ref): Transformations that do not learn but which have
-  hyperparameters and/or deliver ancillary information about the transformation
+- [Static Algorithms](@ref): Algorithms that do not learn, in the sense they must be
+  re-executed for each new data set (do not generalize), but which have hyperparameters
+  and/or deliver ancillary information about the computation.
 
 - [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 

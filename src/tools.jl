@@ -20,17 +20,17 @@ macro trait(algorithm_ex, exs...)
     return esc(program)
 end
 
-"""
-    typename(x)
+# """
+#     typename(x)
 
-Return a symbolic representation of the name of `type(x)`, stripped of any type-parameters
-and module qualifications. For example, if
+# Return a symbolic representation of the name of `type(x)`, stripped of any type-parameters
+# and module qualifications. For example, if
 
-    typeof(x) = MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true}
+#     typeof(x) = MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true}
 
-Then `typename(x)` returns `:Machine`.
+# Then `typename(x)` returns `:Machine`.
 
-"""
+# """
 function typename(x)
     M = typeof(x)
     if isdefined(M, :name)
@@ -47,14 +47,14 @@ function is_uppercase(char::Char)
     i > 64 && i < 91
 end
 
-"""
-    snakecase(str, del='_')
+# """
+#     snakecase(str, del='_')
 
-Return the snake case version of the abstract string or symbol, `str`, as in
+# Return the snake case version of the abstract string or symbol, `str`, as in
 
-    snakecase("TheLASERBeam") == "the_laser_beam"
+#     snakecase("TheLASERBeam") == "the_laser_beam"
 
-"""
+# """
 function snakecase(str::AbstractString; delim='_')
     snake = Char[]
     n = length(str)

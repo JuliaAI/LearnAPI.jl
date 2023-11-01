@@ -1,25 +1,14 @@
 # Anatomy of an Implementation
 
-> **Summary.** Formally, an **algorithm** is a container for the hyperparameters of some
-> ML/statistics algorithm.  A basic implementation of the ridge regressor requires
-> implementing `fit` and `predict` methods dispatched on the algorithm type; `predict` is
-> an example of an **operation**, the others are `transform` and `inverse_transform`. In
-> this example we also implement an **accessor function**, called `feature_importance`,
-> returning the absolute values of the linear coefficients. The ridge regressor has a
-> target variable and outputs literal predictions of the target (rather than, say,
-> probabilistic predictions); accordingly the overloaded `predict` method is dispatched on
-> the `LiteralTarget` subtype of `KindOfProxy`. An **algorithm trait** declares this type
-> as the preferred kind of target proxy. Other traits articulate the algorithm's training
-> data type requirements and the input/output type of `predict`.
-
-We begin by describing an implementation of LearnAPI.jl for basic ridge regression
-(without intercept) to introduce the main actors in any implementation.
-
+This section explains a detailed implementation of the LearnAPI for naive [ridge
+regression](https://en.wikipedia.org/wiki/Ridge_regression).  Most readers will want to
+scan the [demonstration](@ref workflow) of the implementation before studying the
+implementation itself.
 
 ## Defining an algorithm type
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
-extending, the second, libraries needed for the core algorithm.
+extending. The second imports libraries needed for the core algorithm.
 
 ```@example anatomy
 using LearnAPI
@@ -27,293 +16,324 @@ using LinearAlgebra, Tables
 nothing # hide
 ```
 
-Next, we define a struct to store the single hyperparameter `lambda` of this algorithm:
+A struct stores the regularization hyperparameter `lambda` of our ridge regressor:
 
 ```@example anatomy
-struct MyRidge <: LearnAPI.Algorithm
-        lambda::Float64
+struct Ridge
+    lambda::Float64
 end
 nothing # hide
 ```
 
-The subtyping `MyRidge <: LearnAPI.Algorithm` is optional but recommended where it is not
-otherwise disruptive.
+Instances of `Ridge` are [algorithms](@ref algorithms), in LearnAPI.jl parlance.
 
-Instances of `MyRidge` are called **algorithms** and `MyRidge` is an **algorithm type**.
-
-A keyword argument constructor providing defaults for all hyperparameters should be
-provided:
+A keyword argument constructor provides defaults for all hyperparameters:
 
 ```@example anatomy
-nothing # hide
-MyRidge(; lambda=0.1) = MyRidge(lambda)
+Ridge(; lambda=0.1) = Ridge(lambda)
 nothing # hide
 ```
 
-## Implementing training (fit)
+## Implementing `fit`
 
-A ridge regressor requires two types of data for training: **input features** `X` and a
-[**target**](@ref scope) `y`. Training is implemented by overloading `fit`. Here `verbosity` is an integer
-(`0` should train silently, unless warnings are needed):
+A ridge regressor requires two types of data for training: *input features* `X`, which
+here we suppose are tabular, and a [target](@ref proxy) `y`, which we suppose is a
+vector. Users will accordingly call [`fit`](@ref) like this:
+
+```julia
+algorithm = Ridge(lambda=0.05)
+fit(algorithm, X, y; verbosity=1)
+```
+
+However, a new implementation does not overload `fit`. Rather it
+implements
+
+```julia
+obsfit(algorithm::Ridge, obsdata; verbosity=1)
+```
+
+for each `obsdata` returned by a data-preprocessing call `obs(fit, algorithm, X, y)`. You
+can read "obs" as "observation-accessible", for reasons explained shortly. The
+LearnAPI.jl definition
+
+```julia
+fit(algorithm, data...; verbosity=1) =
+    obsfit(algorithm, obs(fit, algorithm, data...), verbosity)
+```
+then takes care of `fit`.
+
+The `obs` and `obsfit`  method are public, and the user can call them like this:
+
+```julia
+obsdata = obs(fit, algorithm, X, y)
+model = obsfit(algorithm, obsdata)
+```
+
+We begin by defining a struct¹ for the output of our data-preprocessing operation, `obs`,
+which will store `y` and the matrix representation of `X`, together with it's column names
+(needed for recording named coefficients for user inspection):
 
 ```@example anatomy
-function LearnAPI.fit(algorithm::MyRidge, verbosity, X, y)
-
-        # process input:
-        x = Tables.matrix(X)  # convert table to matrix
-        s = Tables.schema(X)
-        features = s.names
-
-        # core solver:
-        coefficients = (x'x + algorithm.lambda*I)\(x'y)
-
-        # prepare output - learned parameters:
-        fitted_params = (; coefficients)
-
-        # prepare output - algorithm state:
-        state = nothing  # not relevant here
-
-        # prepare output - byproducts of training:
-        feature_importances =
-                [features[j] => abs(coefficients[j]) for j in eachindex(features)]
-        sort!(feature_importances, by=last) |> reverse!
-        verbosity > 0 && @info "Features in order of importance: $(first.(feature_importances))"
-        report = (; feature_importances)
-
-        return fitted_params, state, report
+struct RidgeFitData{T}
+    A::Matrix{T}    # p x n
+    names::Vector{Symbol}
+    y::Vector{T}
 end
 nothing # hide
 ```
 
-Regarding the return value of `fit`:
-
-- The `fitted_params` variable is for the algorithm's learned parameters, for passing to
-  `predict` (see below).
-
-- The `state` variable is only relevant when additionally implementing a [`LearnAPI.update!`](@ref)
-  or [`LearnAPI.ingest!`](@ref) method (see [Fit, update! and ingest!](@ref)).
-
-- The `report` is for other byproducts of training, apart from the learned parameters (the
-  ones we'll need to provide `predict` below).
-
-Our `fit` method assumes that `X` is a table (satisfies the [Tables.jl
-spec](https://github.com/JuliaData/Tables.jl)) whose rows are the observations; and it
-will need need `y` to be an `AbstractFloat` vector. An algorithm implementation is free to
-dictate the representation of data that `fit` accepts but articulates its requirements
-using appropriate traits; see [Training data types](@ref) below. We recommend against data
-type checks internal to `fit`; this would ordinarily be the responsibility of a higher
-level API, using those traits. 
-
-
-## Operations
-
-Now we need a method for predicting the target on new input features:
+And we overload [`obs`](@ref) like this
 
 ```@example anatomy
-function LearnAPI.predict(::MyRidge, ::LearnAPI.LiteralTarget, fitted_params, Xnew)
-    Xmatrix = Tables.matrix(Xnew)
-    report = nothing
-    return Xmatrix*fitted_params.coefficients, report
+function LearnAPI.obs(::typeof(fit), ::Ridge, X, y)
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    return RidgeFitData(Tables.matrix(table, transpose=true), names, y)
 end
 nothing # hide
 ```
 
-The second argument of `predict` is always an instance of `KindOfProxy`, and will always
-be `LiteralTarget()` in this case, as only literal values of the target (rather than, say
-probabilistic predictions) are being supported.
+so that `obs(fit, Ridge(), X, y)` returns a combined `RidgeFitData` object with everything
+the core algorithm will need.
 
-In some algorithms `predict` computes something of interest in addition to the target
-prediction, and this `report` item is returned as the second component of the return
-value. When there's nothing to report, we must return `nothing`, as here.
+Since `obs` is public, the user will have access to this object, but to make it useful to
+her (and to fulfill the [`obs`](@ref) contract) this object must implement the
+[MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) `getobs`/`numobs` interface, to enable
+observation-resampling (which will be efficient, because observations are now columns). It
+usually suffices to overload `Base.getindex` and `Base.length` (which are the
+`getobs`/`numobs` fallbacks) so we won't actually need to depend on MLUtils.jl:
 
-Our `predict` method is an example of an **operation**. Other operations include
-`transform` and `inverse_transform` and an algorithm can implement more than one. For
-example, a K-means clustering algorithm might implement `transform` for dimension
-reduction, and `predict` to return cluster labels. 
+```@example anatomy
+Base.getindex(data::RidgeFitData, I) =
+    RidgeFitData(data.A[:,I], data.names, y[I])
+Base.length(data::RidgeFitData, I) = length(data.y)
+nothing # hide
+```
 
-The `predict` method is reserved for predictions of a [target variable](@ref proxy), and
-only `predict` has the extra `::KindOfProxy` argument.
+Next, we define a second struct for storing the outcomes of training, including named
+versions of the learned coefficients:
+
+```@example anatomy
+struct RidgeFitted{T,F}
+    algorithm::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
+end
+nothing # hide
+```
+
+We include `algorithm`, which must be recoverable from the output of `fit`/`obsfit` (see
+[Accessor functions](@ref) below).
+
+We are now ready to implement a suitable `obsfit` method to execute the core training:
+
+```@example anatomy
+function LearnAPI.obsfit(algorithm::Ridge, obsdata::RidgeFitData, verbosity)
+
+    lambda = algorithm.lambda
+    A = obsdata.A
+    names = obsdata.names
+    y = obsdata.y
+
+    # apply core algorithm:
+    coefficients = (A*A' + algorithm.lambda*I)\(A*y) # 1 x p matrix
+
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
+
+    return RidgeFitted(algorithm, coefficients, named_coefficients)
+
+end
+nothing # hide
+```
+Users set `verbosity=0` for warnings only, and `verbosity=-1` for silence.
+
+
+## Implementing `predict`
+
+The primary `predict` call will look like this:
+
+```julia
+predict(model, LiteralTarget(), Xnew)
+```
+
+where `Xnew` is a table (of the same form as `X` above). The argument `LiteralTarget()`
+signals that we want literal predictions of the target variable, as opposed to a proxy for
+the target, such as probability density functions.  `LiteralTarget` is an example of a
+[`LearnAPI.KindOfProxy`](@ref proxy_types) type. Targets and target proxies are defined
+[here](@ref proxy).
+
+Rather than overload the primary signature above, however, we overload for
+"observation-accessible" input, as we did for `fit`,
+
+```@example anatomy
+LearnAPI.obspredict(model::RidgeFitted, ::LiteralTarget, Anew::Matrix) =
+    ((model.coefficients)'*Anew)'
+nothing # hide
+```
+
+and overload `obs` to make the table-to-matrix conversion:
+
+```@example anatomy
+LearnAPI.obs(::typeof(predict), ::Ridge, Xnew) = Tables.matrix(Xnew, transpose=true)
+```
+
+As matrices (with observations as columns) already implement the MLUtils.jl
+`getobs`/`numobs` interface, we already satisfy the [`obs`](@ref) contract, and there was
+no need to create a wrapper for `obs` output.
+
+The primary `predict` method, handling tabular input, is provided by a
+LearnAPI.jl fallback similar to the `fit` fallback.
 
 
 ## Accessor functions
 
-The arguments of an operation are always `(algorithm, fitted_params, data...)`. The
-interface also provides **accessor functions** for extracting information, from the
-`fitted_params` and/or fit `report`, that is shared by several algorithm types.  There is
-one for feature importances that we can implement for `MyRidge`:
+An [accessor function](@ref accessor_functions) has the output of [`fit`](@ref) (a
+"model") as it's sole argument.  Every new implementation must implement the accessor
+function [`LearnAPI.algorithm`](@ref) for recovering an algorithm from a fitted object:
 
 ```@example anatomy
-LearnAPI.feature_importances(::MyRidge, fitted_params, report) =
-    report.feature_importances
-nothing # hide
+LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
 ```
 
-Another example of an accessor function is [`LearnAPI.training_losses`](@ref).
-
-
-## [Algorithm traits](@id traits)
-
-We have implemented `predict`, and it is possible to implement `predict` methods for
-multiple `KindOfProxy` types (see See [Target proxies](@ref) for a complete
-list). Accordingly, we are required to declare a preferred target proxy, which we do using
-[`LearnAPI.preferred_kind_of_proxy`](@ref):
+Other accessor functions extract learned parameters or some standard byproducts of
+training, such as feature importances or training losses.² Implementing the
+[`LearnAPI.coefficients`](@ref) accessor function is straightforward:
 
 ```@example anatomy
-LearnAPI.preferred_kind_of_proxy(::MyRidge) = LearnAPI.LiteralTarget()
-nothing # hide
+LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
+nothing #hide
+```
+
+## Tearing a model down for serialization
+
+The `minimize` method falls back to the identity. Here, for the sake of illustration, we
+overload it to dump the named version of the coefficients:
+
+```@example anatomy
+LearnAPI.minimize(model::RidgeFitted) =
+    RidgeFitted(model.algorithm, model.coefficients, nothing)
+```
+
+## Algorithm traits
+
+Algorithm [traits](@ref traits) record extra generic information about an algorithm, or
+make specific promises of behavior. They usually have an algorithm as the single argument.
+
+In LearnAPI.jl `predict` always outputs a [target or target proxy](@ref proxy), where
+"target" is understood very broadly. We overload a trait to record the fact that the
+target variable explicitly appears in training (i.e, the algorithm is supervised) and
+where exactly it appears:
+
+```julia
+LearnAPI.position_of_target(::Ridge) = 2
 ```
 Or, you can use the shorthand
 
-```@example anatomy
-@trait MyRidge preferred_kind_of_proxy=LearnAPI.LiteralTarget()
-nothing # hide
+```julia
+@trait Ridge position_of_target = 2
 ```
 
-[`LearnAPI.preferred_kind_of_proxy`](@ref) is an example of a **algorithm trait**. A
-complete list of traits and the contracts they imply is given in [Algorithm Traits](@ref).
-
-We also need to indicate that a target variable appears in training (this is a supervised
-algorithm). We do this by declaring *where* in the list of training data arguments (in this
-case `(X, y)`) the target variable (in this case `y`) appears:
+The macro can also be used to specify multiple traits simultaneously:
 
 ```@example anatomy
-@trait MyRidge position_of_target=2
-nothing # hide
-```
-
-As explained in the introduction, LearnAPI.jl does not attempt to define strict algorithm
-categories, such as "regression" or "clustering". However, we can optionally specify suggestive
-descriptors, as in
-
-```@example anatomy
-@trait MyRidge descriptors=(:regression,)
-nothing # hide
-```
-
-This declaration actually promises nothing, but can help in generating documentation. Do
-`LearnAPI.descriptors()` to get a list of available descriptors.
-
-Finally, we are required to declare what methods (excluding traits) we have explicitly
-overloaded for our type:
-
-```@example anatomy
-@trait MyRidge methods=(
-        :fit,
-        :predict,
-        :feature_importances,
+@trait(
+    Ridge,
+    position_of_target = 2,
+    kinds_of_proxy=(LiteralTarget(),),
+    descriptors = (:regression,),
+    functions = (
+        fit,
+        obsfit,
+        minimize,
+        predict,
+        obspredict,
+        obs,
+        LearnAPI.algorithm,
+        LearnAPI.coefficients,
+    )
 )
 nothing # hide
 ```
 
-## Training data types
+Implementing the last trait, [`LearnAPI.functions`](@ref), which must include all
+non-trait functions overloaded for `Ridge`, is compulsory. This is the only universally
+compulsory trait. It is worthwhile studying the [list of all traits](@ref traits_list) to
+see which might apply to a new implementation, to enable maximum buy into functionality
+provided by third party packages, and to assist third party algorithms that match machine
+learning algorithms to user defined tasks.
 
-Since LearnAPI.jl is a basement level API, one is discouraged from including explicit type
-checks in an implementation of `fit`. Instead one uses traits to make promises about the
-acceptable type of `data` consumed by `fit`. In general, this can be a promise regarding
-the ordinary type of `data` or the [scientific
-type](https://github.com/JuliaAI/ScientificTypes.jl) of `data` (but not
-both). Alternatively, one may only promise a bound on the type/scitype of *observations*
-in the data . See [Algorithm Traits](@ref) for further details. In this case we'll be
-happy to restrict the scitype of the data:
+## [Demonstration](@id workflow)
 
-```@example anatomy
-import ScientificTypesBase: scitype, Table, Continuous
-@trait MyRidge fit_scitype = Tuple{Table(Continuous), AbstractVector{Continuous}}
-nothing # hide
-```
-
-This is a contract that `data` is acceptable in the call `fit(algorithm, verbosity, data...)`
-whenever
-
-```julia
-scitype(data) <: Tuple{Table(Continuous), AbstractVector{Continuous}}
-```
-
-Or, in other words:
-
-- `X` in `fit(algorithm, verbosity, X, y)` is acceptable, provided `scitype(X) <:
-  Table(Continuous)` - meaning that `X` `Tables.istable(X) == true` (see
-  [Tables.jl](https://github.com/JuliaData/Tables.jl)) and each column has some
-  `<:AbstractFloat` element type.
-
-- `y` in `fit(algorithm, verbosity, X, y)` is acceptable if `scitype(y) <:
-  AbstractVector{Continuous}` - meaning that it is an abstract vector with `<:AbstractFloat`
-  elements.
-
-## Input types for operations
-
-An optional promise about what `data` is guaranteed to work in a call like
-`predict(algorithm, fitted_params, data...)` is articulated this way:
+We now illustrate how to interact directly with `Ridge` instances using the methods
+just implemented.
 
 ```@example anatomy
-@trait MyRidge predict_input_scitype = Tuple{AbstractVector{<:Continuous}}
+# synthesize some data:
+n = 10 # number of observations
+train = 1:6
+test = 7:10
+a, b, c = rand(n), rand(n), rand(n)
+X = (; a, b, c)
+y = 2a - b + 3c + 0.05*rand(n)
+
+algorithm = Ridge(lambda=0.5)
+LearnAPI.functions(algorithm)
 ```
 
-Note that `data` is always a `Tuple`, even if it has only one component (the typical
-case), which explains the `Tuple` on the right-hand side.
+### Naive user workflow
 
-Optionally, we may express our promise using regular types, using the
-[`LearnAPI.predict_input_type`](@ref) trait.
-
-One can optionally make promises about the outut of an operation. See [Algorithm
-Traits](@ref) for details.
-
-
-## [Illustrative fit/predict workflow](@id workflow)
-
-We now illustrate how to interact directly with `MyRidge` instances using the methods we
-have implemented:
-
-Here's some toy data for supervised learning:
+Training and predicting with external resampling:
 
 ```@example anatomy
 using Tables
+model = fit(algorithm, Tables.subset(X, train), y[train])
+ŷ = predict(model, LiteralTarget(), Tables.subset(X, test))
+```
 
-n = 10          # number of training observations
-train = 1:6
-test = 7:10
+### Advanced workflow
 
-a, b, c = rand(n), rand(n), rand(n)
-X = (; a, b, c) |> Tables.rowtable
-y = 2a - b + 3c + 0.05*rand(n)
+We now train and predict using internal data representations, resampled using the generic
+MLUtils.jl interface.
+
+```@example anatomy
+import MLUtils
+fit_data = obs(fit, algorithm, X, y)
+predict_data = obs(predict, algorithm, X)
+model = obsfit(algorithm, MLUtils.getobs(fit_data, train))
+ẑ = obspredict(model, LiteralTarget(), MLUtils.getobs(predict_data, test))
+@assert ẑ == ŷ
 nothing # hide
 ```
-Instantiate an algorithm with relevant hyperparameters (which is all the object stores):
+
+### Applying an accessor function and serialization
+
+Extracting coefficients:
 
 ```@example anatomy
-algorithm = MyRidge(lambda=0.5)
+LearnAPI.coefficients(model)
 ```
 
-Train the algorithm (the `0` means do so silently):
+Serialization/deserialization:
 
-```@example anatomy
-import LearnAPI: fit, predict, feature_importances
+```julia
+using Serialization
+small_model = minimize(model)
+serialize("my_ridge.jls", small_model)
 
-fitted_params, state, fit_report = fit(algorithm, 0, X[train], y[train])
+recovered_model = deserialize("my_ridge.jls")
+@assert LearnAPI.algorithm(recovered_model) == algorithm
+predict(recovered_model, LiteralTarget(), X) == predict(model, LiteralTarget(), X)
 ```
 
-Inspect the learned parameters and report:
+---
 
-```@example anatomy
-@info "training outcomes" fitted_params fit_report
-```
+¹ The definition of this and other structs above is not an explicit requirement of
+LearnAPI.jl, whose constracts are purely functional. 
 
-Inspect feature importances:
-
-```@example anatomy
-feature_importances(algorithm, fitted_params, fit_report)
-```
-
-Make a prediction using new data:
-
-```@example anatomy
-yhat, predict_report = predict(algorithm, LearnAPI.LiteralTarget(), fitted_params, X[test])
-```
-
-Compare predictions with ground truth
-
-```@example anatomy
-deviations = yhat - y[test]
-loss = deviations .^2 |> sum
-@info "Sum of squares loss" loss
-```
+² An implementation can provide further accessor functions, if necessary, but
+like the native ones, they must be included in the [`LearnAPI.functions`](@ref)
+declaration.

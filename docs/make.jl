@@ -2,30 +2,32 @@ using Documenter
 using LearnAPI
 using ScientificTypesBase
 
-const REPO="github.com/JuliaAI/LearnAPI.jl"
+const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
-makedocs(;
+makedocs(
     modules=[LearnAPI,],
     format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     pages=[
-        "Overview" => "index.md",
-        "Goals and Approach" => "goals_and_approach.md",
+        "Home" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
         "Reference" => "reference.md",
-        "Fit, update and ingest" => "fit_update_and_ingest.md",
-        "Predict and other operations" => "operations.md",
+        "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
+        "fit" => "fit.md",
+        "predict, transform, and relatives" => "predict_transform.md",
+        "mimimize" => "minimize.md",
+        "obs" => "obs.md",
         "Accessor Functions" => "accessor_functions.md",
-        "Optional Data Interface" => "optional_data_interface.md",
-        "Algorithm Traits" => "algorithm_traits.md",
+        "Algorithm Traits" => "traits.md",
         "Common Implementation Patterns" => "common_implementation_patterns.md",
         "Testing an Implementation" => "testing_an_implementation.md",
     ],
-    repo="https://$REPO/blob/{commit}{path}#L{line}",
-    sitename="LearnAPI.jl"
+    sitename="LearnAPI.jl",
+    warnonly = [:cross_references, :missing_docs],
+    repo =REPO,
 )
 
 deploydocs(
-    ; repo=REPO,
     devbranch="dev",
     push_preview=false,
+    repo=REPO,
 )
