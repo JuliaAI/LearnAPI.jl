@@ -152,7 +152,7 @@ See also [`LearnAPI.fit`](@ref), [`LearnAPI.ingest!`](@ref).
 # # INGEST
 
 """
-    LernAPI.ingest!(algorithm, verbosity, fitted_params, state, data...)
+    LearnAPI.ingest!(algorithm, verbosity, fitted_params, state, data...)
 
 For an algorithm that supports incremental learning, update the fitted parameters using
 `data`, which has typically not been seen before.  The arguments `state` and
