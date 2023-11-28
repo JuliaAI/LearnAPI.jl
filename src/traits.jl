@@ -68,18 +68,18 @@ non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| function             | needs explicit  implementation? | include in returned tuple?     |
-|----------------------|-------------------------|--------------------------------|
-| `fit`                | no                      | yes                            |
-| `obsfit`             | yes                     | yes                            |
-| `minimize`           | optional                | yes                            |
-| `predict`            | no                      | if `obspredict` is implemented |
-| `obspredict`         | optional                | if implemented                 |
-| `transform`          | no                      | if `transform` is implemented  |
-| `obstransform`       | optional                | if implemented                 |
-| `obs`                | optional                | yes                            |
-| `inverse_transform`  | optional                | if implemented                 |
-| `LearnAPI.algorithm` | yes                     | yes                            |
+| function             | needs explicit  implementation? | include in returned tuple?       |
+|----------------------|---------------------------------|----------------------------------|
+| `fit`                | no                              | yes                              |
+| `obsfit`             | yes                             | yes                              |
+| `minimize`           | optional                        | yes                              |
+| `predict`            | no                              | if `obspredict` is implemented   |
+| `obspredict`         | optional                        | if implemented                   |
+| `transform`          | no                              | if `obstransform` is implemented |
+| `obstransform`       | optional                        | if implemented                   |
+| `obs`                | optional                        | yes                              |
+| `inverse_transform`  | optional                        | if implemented                   |
+| `LearnAPI.algorithm` | yes                             | yes                              |
 
 Also include any implemented accessor functions. The LearnAPI.jl accessor functions are:
 $ACCESSOR_FUNCTIONS_LIST.
