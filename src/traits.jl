@@ -68,18 +68,18 @@ non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| function             | needs explicit  implementation? | include in returned tuple?     |
-|----------------------|-------------------------|--------------------------------|
-| `fit`                | no                      | yes                            |
-| `obsfit`             | yes                     | yes                            |
-| `minimize`           | optional                | yes                            |
-| `predict`            | no                      | if `obspredict` is implemented |
-| `obspredict`         | optional                | if implemented                 |
-| `transform`          | no                      | if `transform` is implemented  |
-| `obstransform`       | optional                | if implemented                 |
-| `obs`                | optional                | yes                            |
-| `inverse_transform`  | optional                | if implemented                 |
-| `LearnAPI.algorithm` | yes                     | yes                            |
+| function             | needs explicit  implementation? | include in returned tuple?       |
+|----------------------|---------------------------------|----------------------------------|
+| `fit`                | no                              | yes                              |
+| `obsfit`             | yes                             | yes                              |
+| `minimize`           | optional                        | yes                              |
+| `predict`            | no                              | if `obspredict` is implemented   |
+| `obspredict`         | optional                        | if implemented                   |
+| `transform`          | no                              | if `obstransform` is implemented |
+| `obstransform`       | optional                        | if implemented                   |
+| `obs`                | optional                        | yes                              |
+| `inverse_transform`  | optional                        | if implemented                   |
+| `LearnAPI.algorithm` | yes                             | yes                              |
 
 Also include any implemented accessor functions. The LearnAPI.jl accessor functions are:
 $ACCESSOR_FUNCTIONS_LIST.
@@ -699,7 +699,7 @@ preferred_kind_of_proxy(algorithm) = first(kinds_of_proxy(algorithm))
 
 const DOC_PREDICT_OUTPUT2(s) =
     """
-        LearnAPI.predict_output_$(s)s(algorithm)
+        LearnAPI.predict_output_$(s)(algorithm)
 
     Return a dictionary of upper bounds on the $(s) of predictions, keyed on concrete
     subtypes of [`LearnAPI.KindOfProxy`](@ref). Each of these subtypes represents a
@@ -727,11 +727,11 @@ const DOC_PREDICT_OUTPUT2(s) =
     """
 
 "$(DOC_PREDICT_OUTPUT2(:scitype))"
-predict_output_scitypes(algorithm) =
+predict_output_scitype(algorithm) =
     Dict(T => predict_output_scitype(algorithm, T())
          for T in CONCRETE_TARGET_PROXY_TYPES)
 
 "$(DOC_PREDICT_OUTPUT2(:type))"
-predict_output_types(algorithm) =
+predict_output_type(algorithm) =
     Dict(T => predict_output_type(algorithm, T())
          for T in CONCRETE_TARGET_PROXY_TYPES)
