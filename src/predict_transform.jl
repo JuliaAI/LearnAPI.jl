@@ -101,7 +101,7 @@ predict(model, data...) = predict(model, LiteralTarget(), data...)
     obspredict(model, kind_of_proxy::LearnAPI.KindOfProxy, obsdata)
 
 Similar to `predict` but consumes algorithm-specific representations of input data,
-`obsdata`, as returned by `obs(predict, algorithm, data...)`. Hre `data...` is the form of
+`obsdata`, as returned by `obs(predict, algorithm, data...)`. Here `data...` is the form of
 data expected in the main [`predict`](@ref) method.  Alternatively, such `obsdata` may be
 replaced by a resampled version, where resampling is performed using `MLUtils.getobs`
 (always supported).
