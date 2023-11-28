@@ -620,12 +620,6 @@ predict_input_type(::Any) = Union{}
 "$(DOC_INPUT_OBSERVATION_TYPE(:predict))"
 predict_input_observation_type(::Any) = Union{}
 
-"$(DOC_OUTPUT_SCITYPE(:predict))"
-predict_output_scitype(::Any) = Any
-
-"$(DOC_OUTPUT_TYPE(:predict))"
-predict_output_type(::Any) = Any
-
 "$(DOC_INPUT_SCITYPE(:transform))"
 transform_input_scitype(::Any) = Union{}
 
