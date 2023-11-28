@@ -84,7 +84,7 @@ there is no concept of an algorithm-specific representation of *outputs*, only i
 | [`obs`](@ref) | depends     | slurps `data` argument |
 |               |             |                        |
 
-If the `data` consumed by `fit`, `predict` or `tranform` consists only of tables and
+If the `data` consumed by `fit`, `predict` or `transform` consists only of tables and
 arrays (with last dimension the observation dimension) then overloading `obs` is
 optional. However, if an implementation overloads `obs` to return a (thinly wrapped)
 representation of user data that is closer to what the core algorithm actually uses, and

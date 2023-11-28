@@ -14,7 +14,7 @@ makedocs(
         "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
         "fit" => "fit.md",
         "predict, transform, and relatives" => "predict_transform.md",
-        "mimimize" => "minimize.md",
+        "minimize" => "minimize.md",
         "obs" => "obs.md",
         "Accessor Functions" => "accessor_functions.md",
         "Algorithm Traits" => "traits.md",

@@ -24,7 +24,7 @@ A `DataFrame` instance, from [DataFrames.jl](https://dataframes.juliadata.org/st
 an example of data, the observations being the rows. LearnAPI.jl makes no assumptions
 about how observations can be accessed, except in the case of the output of [`obs`](@ref
 data_interface), which must implement the MLUtils.jl `getobs`/`numobs` interface. For
-example, it is generally ambiguous whether the rows or columms of a matrix are considered
+example, it is generally ambiguous whether the rows or columns of a matrix are considered
 observations, but if a matrix is returned by [`obs`](@ref data_interface) the observations
 must be the columns.
 
@@ -125,7 +125,7 @@ implementations must implement [`obsfit`](@ref), the accessor function
 
 - [`fit`](@ref fit)/[`obsfit`](@ref): for training algorithms that generalize to new data
 
-- [`predict`](@ref operations)/[`obspredict`](@ref): for outputing [targets](@ref proxy)
+- [`predict`](@ref operations)/[`obspredict`](@ref): for outputting [targets](@ref proxy)
   or [target proxies](@ref proxy) (such as probability density functions)
 
 - [`transform`](@ref operations)/[`obstransform`](@ref): similar to `predict`, but for

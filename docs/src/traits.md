@@ -70,7 +70,7 @@ The following convenience methods are provided but not overloadable by new imple
 | `LearnAPI.name(algorithm)`                           | algorithm type name as string                                                                                 | "PCA"   |
 | `LearnAPI.is_algorithm(algorithm)`                   | `true` if `LearnAPI.functions(algorithm)` is not empty                                                                 | `true`  |
 | [`LearnAPI.predict_output_scitypes(algorithm)`](@ref) | dictionary of upper bounds on the scitype of predictions, keyed on subtypes of [`LearnAPI.KindOfProxy`](@ref) |         |
-| [`LearnAPI.predict_output_types(alogorithm)`](@ref)   | dictionary of upper bounds on the type of predictions, keyed on subtypes of [`LearnAPI.KindOfProxy`](@ref)    |         |
+| [`LearnAPI.predict_output_types(algorithm)`](@ref)   | dictionary of upper bounds on the type of predictions, keyed on subtypes of [`LearnAPI.KindOfProxy`](@ref)    |         |
 
 ## Implementation guide
 

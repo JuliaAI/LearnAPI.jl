@@ -29,7 +29,7 @@ See also [`obsfit`](@ref), [`predict`](@ref), [`transform`](@ref),
 
 # New implementations
 
-LearnAPI.jl provides the following defintion of `fit`, which is never directly overloaded:
+LearnAPI.jl provides the following definition of `fit`, which is never directly overloaded:
 
 ```julia
 fit(algorithm, data...; verbosity=1) =
@@ -58,9 +58,9 @@ obsdata = obs(fit, algorithm, data...)
 model = obsfit(algorithm, obsdata)
 ```
 
-Here `obsdata` is algorithm-specific, "observaton-accessible" data, meaning it implements
+Here `obsdata` is algorithm-specific, "observation-accessible" data, meaning it implements
 the MLUtils.jl `getobs`/`numobs` interface for observation resampling (even if `data` does
-not). Morevoer, resampled versions of `obsdata` may be passed to `obsfit` in its place.
+not). Moreover, resampled versions of `obsdata` may be passed to `obsfit` in its place.
 
 The use of `obsfit` may offer performance advantages.  See more at [`obs`](@ref).
 
@@ -82,7 +82,7 @@ overloaded, then a fallback gives `obsdata = data` (always a tuple!). Note that
 
 New implementations must also implement [`LearnAPI.algorithm`](@ref).
 
-If overloaded, then the functions `LearnAPI.obsfit` and `LeranAPI.fit` must be included in
+If overloaded, then the functions `LearnAPI.obsfit` and `LearnAPI.fit` must be included in
 the tuple returned by the [`LearnAPI.functions(algorithm)`](@ref) trait.
 
 ## Non-generalizing algorithms

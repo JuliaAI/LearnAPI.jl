@@ -332,7 +332,7 @@ predict(recovered_model, LiteralTarget(), X) == predict(model, LiteralTarget(), 
 ---
 
 ¹ The definition of this and other structs above is not an explicit requirement of
-LearnAPI.jl, whose constracts are purely functional. 
+LearnAPI.jl, whose constructs are purely functional. 
 
 ² An implementation can provide further accessor functions, if necessary, but
 like the native ones, they must be included in the [`LearnAPI.functions`](@ref)
