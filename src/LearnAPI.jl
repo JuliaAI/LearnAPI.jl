@@ -1,16 +1,22 @@
 module LearnAPI
 
-using Statistics
 import InteractiveUtils.subtypes
 
 include("tools.jl")
-include("algorithms.jl")
-include("operations.jl")
-include("fit_update_ingest.jl")
+include("types.jl")
+include("predict_transform.jl")
+include("fit.jl")
+include("minimize.jl")
+include("obs.jl")
 include("accessor_functions.jl")
-include("data_interface.jl")
-include("algorithm_traits.jl")
+include("traits.jl")
 
 export @trait
+export fit, predict, transform, inverse_transform, fit_transform, minimize
+export obs, obsfit, obspredict, obstransform
 
+for name in Symbol.(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS)
+    @eval export $name
 end
+
+end # module

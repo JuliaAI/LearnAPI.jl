@@ -1,3 +1,7 @@
+using LearnAPI
+using Test
+using SparseArrays
+
 module Fruit
 using LearnAPI
 
