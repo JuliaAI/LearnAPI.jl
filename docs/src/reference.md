@@ -75,7 +75,8 @@ will encapsulate a particular set of user-specified [hyperparameters](@ref).
 
 Additionally, for `alg::Alg` to be a LearnAPI algorithm, we require:
 
-- `Base.propertynames(alg)` returns the hyperparameters of `alg`.
+- `Base.propertynames(alg)` returns the hyperparameter names; values can be accessed using
+  `Base.getproperty`
 
 - If `alg` is an algorithm, then so are all instances of the same type.
 
