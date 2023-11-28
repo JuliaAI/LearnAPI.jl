@@ -147,6 +147,4 @@ LearnAPI.transform_input_observation_type
 LearnAPI.predict_or_transform_mutates
 LearnAPI.transform_output_scitype
 LearnAPI.transform_output_type
-LearnAPI.predict_output_scitypes
-LearnAPI.predict_output_types
 ```
