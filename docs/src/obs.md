@@ -47,7 +47,6 @@ import MLUtils
 
 X = <some data frame with 30 rows>
 y = <some categorical vector with 30 rows>
-w = <some class weight dictionary>
 algorithm = <some LearnAPI-compliant algorithm>
 
 test_train_folds = map([1:10, 11:20, 21:30]) do test
