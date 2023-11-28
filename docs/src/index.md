@@ -38,7 +38,6 @@ etc.). Then, a LearnAPI.jl interface can be implemented, for objects with the ty
 ```julia
 X = <some training features>
 y = <some training target>
-w = <some class weights dictionary>
 Xnew = <some test or production features>
 
 # Train:
