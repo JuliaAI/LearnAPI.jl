@@ -699,7 +699,7 @@ preferred_kind_of_proxy(algorithm) = first(kinds_of_proxy(algorithm))
 
 const DOC_PREDICT_OUTPUT2(s) =
     """
-        LearnAPI.predict_output_$(s)s(algorithm)
+        LearnAPI.predict_output_$(s)(algorithm)
 
     Return a dictionary of upper bounds on the $(s) of predictions, keyed on concrete
     subtypes of [`LearnAPI.KindOfProxy`](@ref). Each of these subtypes represents a
@@ -727,11 +727,11 @@ const DOC_PREDICT_OUTPUT2(s) =
     """
 
 "$(DOC_PREDICT_OUTPUT2(:scitype))"
-predict_output_scitypes(algorithm) =
+predict_output_scitype(algorithm) =
     Dict(T => predict_output_scitype(algorithm, T())
          for T in CONCRETE_TARGET_PROXY_TYPES)
 
 "$(DOC_PREDICT_OUTPUT2(:type))"
-predict_output_types(algorithm) =
+predict_output_type(algorithm) =
     Dict(T => predict_output_type(algorithm, T())
          for T in CONCRETE_TARGET_PROXY_TYPES)
