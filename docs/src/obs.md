@@ -93,6 +93,8 @@ the user concerning herself with the details of the representation.
 
 A sample implementation is given in the [`obs`](@ref) document-string below.
 
+## Reference
+
 ```@docs
 obs
 ```
