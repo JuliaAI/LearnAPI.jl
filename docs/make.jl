@@ -23,11 +23,11 @@ makedocs(
     ],
     sitename="LearnAPI.jl",
     warnonly = [:cross_references, :missing_docs],
-    repo =REPO,
+    repo = Remotes.GitHub("JuliaAI", "LearnAPI.jl"),
 )
 
 deploydocs(
     devbranch="dev",
     push_preview=false,
-    repo=REPO,
+    repo="github.com/JuliaAI/LearnAPI.jl.git",
 )
