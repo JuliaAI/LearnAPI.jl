@@ -28,7 +28,7 @@ combines `X` and `y` in a single object guaranteed to implement the MLUtils.jl
 after resampling using `MLUtils.getobs`:
 
 ```julia
-# equivalent to `fit(algorithm, X, y)`:
+# equivalent to `mode = fit(algorithm, X, y)`:
 model = obsfit(algorithm, obsdata)
 
 # with resampling:
