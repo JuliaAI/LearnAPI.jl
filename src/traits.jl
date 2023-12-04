@@ -278,7 +278,7 @@ See also `[LearnAPI.components]`(@ref).
 This trait should be overloaded if one or more properties (fields) of `algorithm` may take
 algorithm values. Fallback return value is `false`. The keyword constructor for such an
 algorithm need not prescribe defaults for algorithm-valued properties. Implementation of
-the accessor function `[LearnAPI.components]`(@ref) is recommended.
+the accessor function [`LearnAPI.components`](@ref) is recommended.
 
 $DOC_ON_TYPE
 
