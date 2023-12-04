@@ -18,7 +18,9 @@ The sole argument of an accessor function is the output, `model`, of [`fit`](@re
 ## Implementation guide
 
 All new implementations must implement [`LearnAPI.algorithm`](@ref). All others are
-optional.
+optional. All implemented accessor functions must be added to the list returned by
+[`LearnAPI.functions`](@ref).
+
 
 ## Reference
 
