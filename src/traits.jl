@@ -189,7 +189,7 @@ Lists one or more suggestive algorithm descriptors from this list: $DOC_DESCRIPT
 
 # New implementations
 
-This trait should return a tuple of symbols, as in `(:classifier, :probabilistic)`.
+This trait should return a tuple of symbols, as in `(:classifier, :text_analysis)`.
 
 """
 descriptors(::Any) = ()
