@@ -56,7 +56,7 @@ having the same type as `algorithm`, or to associated models (objects returned b
 `fit(algorithm, ...)`. Algorithm traits are excluded.
 
 In addition to functions, the returned tuple may include expressions, like
-`:(DecisionTree.print_tree)`, which reference functions not owned by LearnAPI.jl packages.
+`:(DecisionTree.print_tree)`, which reference functions not owned by LearnAPI.jl.
 
 The understanding is that `algorithm` is a LearnAPI-compliant object whenever this is
 non-empty.
