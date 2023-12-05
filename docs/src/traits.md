@@ -5,7 +5,7 @@ per-observation weights, which must appear as the third argument of `fit`*, or *
 algorithm's `transform` method predicts `Real` vectors*. They also record more mundane
 information, such as a package license.
 
-Algorithm traits are functions whose  (and usually only) argument is an algorithm.
+Algorithm traits are functions whose first (and usually only) argument is an algorithm.
 
 ### Special two-argument traits
 
