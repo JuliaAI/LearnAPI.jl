@@ -49,7 +49,8 @@ ŷ = obspredict(model, LiteralTarget(), predictdata)
 
 ## Implementation guide
 
-The methods `predict` and `transform` are not directly overloaded.
+The methods `predict` and `transform` are not directly overloaded. Implement `obspredict`
+and `obstransform` instead:
 
 | method                      | compulsory? | fallback | requires                              |
 |:----------------------------|:-----------:|:--------:|:-------------------------------------:|
