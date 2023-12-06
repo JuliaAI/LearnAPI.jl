@@ -1,9 +1,18 @@
 # [`predict`, `transform`, and relatives](@id operations)
 
+Standard methods:
+
 ```julia
-predict(model, kind_of_proxy, data...) -> prediction 
+predict(model, kind_of_proxy, data...) -> prediction
 transform(model, data...) -> transformed_data
 inverse_transform(model, data...) -> inverted_data
+```
+
+Methods consuming output `obsdata` of data-preprocessor [`obs`](@ref):
+
+```julia
+obspredict(model, kind_of_proxy, obsdata) -> prediction
+obstransform(model, obsdata) -> transformed_data
 ```
 
 ## Typical worklows
@@ -40,7 +49,7 @@ ŷ = obspredict(model, LiteralTarget(), predictdata)
 
 ## Implementation guide
 
-The methods `predict` and `transform` are not directly overloaded. 
+The methods `predict` and `transform` are not directly overloaded.
 
 | method                      | compulsory? | fallback | requires                              |
 |:----------------------------|:-----------:|:--------:|:-------------------------------------:|
