@@ -91,7 +91,7 @@ functions(::Any) = ()
 """
     LearnAPI.kinds_of_proxy(algorithm)
 
-Returns an tuple of instances, `kind`, for which for which `predict(algorithm, kind,
+Returns an tuple of all instances, `kind`, for which for which `predict(algorithm, kind,
 data...)` has a guaranteed implementation. Each such `kind` subtypes
 [`LearnAPI.KindOfProxy`](@ref). Examples are `LiteralTarget()` (for predicting actual
 target values) and `Distributions()` (for predicting probability mass/density functions).

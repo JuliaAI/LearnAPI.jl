@@ -1,4 +1,4 @@
-function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
+ function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     word = overloaded ? "overloaded" : "implemented"
     "If $word, you must include `$name` in the tuple returned by the "*
     "[`LearnAPI.functions`](@ref) trait. "
@@ -49,8 +49,9 @@ DOC_MINIMIZE(func) =
 The first signature returns target or target proxy predictions for input features `data`,
 according to some `model` returned by [`fit`](@ref) or [`obsfit`](@ref). Where supported,
 these are literally target predictions if `kind_of_proxy = LiteralTarget()`, and
-probability density/mass functions if `kind_of_proxy =
-Distribution()`. $DOC_HOW_TO_LIST_PROXIES
+probability density/mass functions if `kind_of_proxy = Distribution()`. List all options
+with [`LearnAPI.kinds_of_proxy(algorithm)`](@ref), where `algorithm =
+LearnAPI.algorithm(model)`.
 
 The shortcut `predict(model, data...) = predict(model, LiteralTarget(), data...)` is also
 provided.
@@ -135,13 +136,15 @@ where `data...` is what the standard [`predict`](@ref) call expects, as in the c
 `predict(model, kind_of_proxy, data...)`. Note `data` is always a tuple, even if `predict`
 has only one data argument. See more at [`obs`](@ref).
 
+
 $(DOC_MUTATION(:obspredict))
 
 If overloaded, you must include both `LearnAPI.obspredict` and `LearnAPI.predict` in the
 list of methods returned by the [`LearnAPI.functions`](@ref) trait.
 
-Each supported `kind_of_proxy` should be listed in the return value of the
-[`LearnAPI.kinds_of_proxy(algorithm)`](@ref) trait.
+An implementation is provided for each kind of target proxy you wish to support. See the
+LearnAPI.jl documentation for options. Each supported `kind_of_proxy` instance should be
+listed in the return value of the [`LearnAPI.kinds_of_proxy(algorithm)`](@ref) trait.
 
 $(DOC_MINIMIZE(:obspredict))
 

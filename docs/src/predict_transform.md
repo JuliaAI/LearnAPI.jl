@@ -8,7 +8,7 @@ transform(model, data...) -> transformed_data
 inverse_transform(model, data...) -> inverted_data
 ```
 
-Methods consuming output `obsdata` of data-preprocessor [`obs`](@ref):
+Methods consuming output, `obsdata`, of data-preprocessor [`obs`](@ref):
 
 ```julia
 obspredict(model, kind_of_proxy, obsdata) -> prediction
