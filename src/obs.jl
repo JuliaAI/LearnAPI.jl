@@ -69,7 +69,7 @@ that case.
 
 ## Sample implementation
 
-Refer to the "Anatomy of an Implemetation" section of the LearnAPI
+Refer to the "Anatomy of an Implementation" section of the LearnAPI
 [manual](https://juliaai.github.io/LearnAPI.jl/dev/).
 
 

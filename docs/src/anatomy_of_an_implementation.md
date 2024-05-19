@@ -401,7 +401,7 @@ LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 ### The `obs` contract
 
 Providing `fit` signatures matching the output of `obs`, is the first part of the `obs`
-contract. The second part is this: *The outupt of `obs` must implement the*
+contract. The second part is this: *The output of `obs` must implement the*
 [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs/numobs` *interface for
 accessing individual observations*. It usually suffices to overload `Base.getindex` and
 `Base.length` (which are the `getobs/numobs` fallbacks):

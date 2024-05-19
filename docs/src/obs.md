@@ -8,7 +8,7 @@ performance advantages over naive workflows in some cases (e.g., cross-validatio
 
 ```julia
 obs(algorithm, data) # can be passed to `fit` instead of `data`
-obs(model, data)     # can be passed to `predict` or `tranform` instead of `data`
+obs(model, data)     # can be passed to `predict` or `transform` instead of `data`
 ```
 
 ## Typical workflows
