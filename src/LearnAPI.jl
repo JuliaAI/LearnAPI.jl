@@ -12,8 +12,7 @@ include("accessor_functions.jl")
 include("traits.jl")
 
 export @trait
-export fit, predict, transform, inverse_transform, fit_transform, minimize
-export obs, obsfit, obspredict, obstransform
+export fit, predict, transform, inverse_transform, minimize, obs
 
 for name in Symbol.(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS)
     @eval export $name

@@ -5,7 +5,7 @@ Return a version of `model` that will generally have a smaller memory allocation
 `model`, suitable for serialization. Here `model` is any object returned by
 [`fit`](@ref). Accessor functions that can be called on `model` may not work on
 `minimize(model)`, but [`predict`](@ref), [`transform`](@ref) and
-[`inverse_transform`](@ref) will work, if implemented for `model`. Check
+[`inverse_transform`](@ref) will work, if implemented. Check
 `LearnAPI.functions(LearnAPI.algorithm(model))` to view see what the original `model`
 implements.
 

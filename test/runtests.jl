@@ -4,6 +4,10 @@ using Test
     include("tools.jl")
 end
 
+@testset "traits.jl" begin
+    include("traits.jl")
+end 
+
 # # INTEGRATION TESTS
 
 @testset "regression" begin

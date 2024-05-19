@@ -1,17 +1,20 @@
 """
-    obs(func, algorithm, data...)
+    obs(algorithm, data)
+    obs(model, data)
 
-Where `func` is `fit`, `predict` or `transform`, return a combined, algorithm-specific,
-representation of `data...`, which can be passed directly to `obsfit`, `obspredict` or
-`obstransform`, as shown in the example below.
+Return an algorithm-specific representation of `data`, suitable for passing to `fit`
+(first signature) or to `predict` and `transform` (second signature), in place of
+`data`. Here `model` is the return value of `fit(algorithm, ...)` for some LearnAPI.jl
+algorithm, `algorithm`.
 
-The returned object implements the `getobs`/`numobs` observation-resampling interface
-provided by MLUtils.jl, even if `data` does not.
+The returned object is guaranteed to implement observation access as indicated
+by [`LearnAPI.data_interface(algorithm)`](@ref) (typically the
+[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs`/`numobs` interface).
 
-Calling `func` on the returned object may be cheaper than calling `func` directly on
-`data...`. And resampling the returned object using `MLUtils.getobs` may be cheaper than
-directly resampling the components of `data` (an operation not provided by the LearnAPI.jl
-interface).
+Calling `fit`/`predict`/`transform` on the returned objects may have performance
+advantages over calling directly on `data` in some contexts. And resampling the returned
+object using `MLUtils.getobs` may be cheaper than directly resampling the components of
+`data`.
 
 # Example
 
@@ -23,100 +26,52 @@ y = <some `Vector`>
 
 Xtrain = Tables.select(X, 1:100)
 ytrain = y[1:100]
-model = fit(algorithm, Xtrain, ytrain)
+model = fit(algorithm, (Xtrain, ytrain))
 ŷ = predict(model, LiteralTarget(), y[101:150])
 ```
 
-Alternative workflow using `obs`:
+Alternative workflow using `obs` and the MLUtils.jl API:
 
 ```julia
 import MLUtils
 
-fitdata = obs(fit, algorithm, X, y)
-predictdata = obs(predict, algorithm, X)
+fit_obsevations = obs(algorithm, (X, y))
+model = fit(algorithm, MLUtils.getobs(fit_observations, 1:100))
 
-model = obsfit(algorithm, MLUtils.getobs(fitdata, 1:100))
-ẑ = obspredict(model, LiteralTarget(), MLUtils.getobs(predictdata, 101:150))
+predict_observations = obs(model, X)
+ẑ = predict(model, LiteralTarget(), MLUtils.getobs(predict_observations, 101:150))
 @assert ẑ == ŷ
 ```
 
-See also [`obsfit`](@ref), [`obspredict`](@ref), [`obstransform`](@ref).
+See also [`LearnAPI.data_interface`](@ref).
 
 
 # Extended help
 
 # New implementations
 
-If the `data` to be consumed in standard user calls to `fit`, `predict` or `transform`
-consists only of tables and arrays (with last dimension the observation dimension) then
-overloading `obs` is optional, but the user will get no performance benefits by using
-it. The implementation of `obs` is optional under more general circumstances stated at the
-end.
+Implementation is typically optional.
 
-The fallback for `obs` just slurps the provided data:
+For each supported form of `data` in `fit(algorithm, data)`, `predict(model, data)`, and
+`transform(model, data)`, it must be true that `model = fit(algorithm, observations)` is
+supported, whenever `observations = obs(algorithm, data)`, and that `predict(model,
+observations)` and `transform(model, observations)` are supported, whenever `observations
+= obs(model, data)`.
 
-```julia
-obs(func, alg, data...) = data
-```
+The fallback for `obs` is `obs(model_or_algorithm, data) = data`, and the fallback for
+`LearnAPI.data_interface(algorithm)` indicates MLUtils.jl as the adopted interface. For
+details refer to the [`LearnAPI.data_interface`](@ref) document string.
 
-The only contractual obligation of `obs` is to return an object implementing the
-`getobs`/`numobs` interface. Generally it suffices to overload `Base.getindex` and
-`Base.length`. However, note that implementations of [`obsfit`](@ref),
-[`obspredict`](@ref), and [`obstransform`](@ref) depend on the form of output of `obs`.
-
-$(DOC_IMPLEMENTED_METHODS(:(obs), overloaded=true))
+In particular, if the `data` to be consumed by `fit`, `predict` or `transform` consists
+only of suitable tables and arrays, then `obs` and `LearnAPI.data_interface` do not need
+to be overloaded. However, the user will get no performance benefits by using `obs` in
+that case.
 
 ## Sample implementation
 
-Suppose that `fit`, for an algorithm of type `Alg`, is to have the primary signature
+Refer to the "Anatomy of an Implemetation" section of the LearnAPI
+[manual](https://juliaai.github.io/LearnAPI.jl/dev/).
 
-```julia
-fit(algorithm::Alg, X, y)
-```
-
-where `X` is a table, `y` a vector. Internally, the algorithm is to call a lower level
-function
-
-`train(A, names, y)`
-
-where `A = Tables.matrix(X)'` and `names` are the column names of `X`. Then relevant parts
-of an implementation might look like this:
-
-```julia
-# thin wrapper for algorithm-specific representation of data:
-struct ObsData{T}
-    A::Matrix{T}
-    names::Vector{Symbol}
-    y::Vector{T}
-end
-
-# (indirect) implementation of `getobs/numobs`:
-Base.getindex(data::ObsData, I) =
-    ObsData(data.A[:,I], data.names, y[I])
-Base.length(data::ObsData, I) = length(data.y)
-
-# implementation of `obs`:
-function LearnAPI.obs(::typeof(fit), ::Alg, X, y)
-    table = Tables.columntable(X)
-    names = Tables.columnnames(table) |> collect
-    return ObsData(Tables.matrix(table)', names, y)
-end
-
-# implementation of `obsfit`:
-function LearnAPI.obsfit(algorithm::Alg, data::ObsData; verbosity=1)
-    coremodel = train(data.A, data.names, data.y)
-    data.verbosity > 0 && @info "Training using these features: $names."
-    <construct final `model` using `coremodel`>
-    return model
-end
-```
-
-## When is overloading `obs` optional?
-
-Overloading `obs` is optional, for a given `typeof(algorithm)` and `typeof(fun)`, if the
-components of `data` in the standard call `func(algorithm_or_model, data...)` are already
-expected to separately implement the `getobs`/`numbobs` interface. This is true for arrays
-whose last dimension is the observation dimension, and for suitable tables.
 
 """
-obs(func, alg, data...) = data
+obs(algorithm_or_model, data) = data

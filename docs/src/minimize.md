@@ -23,9 +23,9 @@ LearnAPI.feature_importances(recovered_model)
 
 # Implementation guide
 
-| method                       | compulsory? | fallback | requires      |
-|:-----------------------------|:-----------:|:--------:|:-------------:|
-| [`minimize`](@ref)           | no          | identity | [`fit`](@ref) |
+| method                       | compulsory? | fallback |
+|:-----------------------------|:-----------:|:--------:|
+| [`minimize`](@ref)           | no          | identity |
 
 # Reference
 

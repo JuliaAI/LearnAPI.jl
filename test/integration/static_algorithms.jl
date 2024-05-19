@@ -13,13 +13,15 @@ import DataFrames
 struct Selector
     names::Vector{Symbol}
 end
-Selector(; names=Symbol[]) =  Selector(names)
+Selector(; names=Symbol[]) =  Selector(names) # LearnAPI.constructor defined later
 
-LearnAPI.obsfit(algorithm::Selector, obsdata, verbosity) = algorithm
-LearnAPI.algorithm(model) = model # i.e., the algorithm
+# `fit` has no input data, does no "learning", and just returns thinly wrapped `algorithm`
+# (to distinguish it from the algorithm in dispatch):
+LearnAPI.fit(algorithm::Selector; verbosity=1) = Ref(algorithm)
+LearnAPI.algorithm(model) = model[]
 
-function LearnAPI.obstransform(algorithm::Selector, obsdata)
-    X = only(obsdata)
+function LearnAPI.transform(model::Base.RefValue{Selector}, X)
+    algorithm = LearnAPI.algorithm(model)
     table = Tables.columntable(X)
     names = Tables.columnnames(table)
     filtered_names = filter(in(algorithm.names), names)
@@ -28,23 +30,31 @@ function LearnAPI.obstransform(algorithm::Selector, obsdata)
     return Tables.materializer(X)(filtered_table)
 end
 
-@trait Selector functions = (
-    fit,
-    obsfit,
-    minimize,
-    transform,
-    obstransform,
-    obs,
-    Learn.algorithm,
+# fit and transform in one go:
+function LearnAPI.transform(algorithm::Selector, X)
+    model = fit(algorithm)
+    transform(model, X)
+end
+
+@trait(
+    Selector,
+    constructor = Selector,
+    functions = (
+        fit,
+        minimize,
+        transform,
+        Learn.algorithm,
+    ),
 )
 
 @testset "test a static transformer" begin
     algorithm = Selector(names=[:x, :w])
     X = DataFrames.DataFrame(rand(3, 4), [:x, :y, :z, :w])
     model = fit(algorithm) # no data arguments!
-    @test model == algorithm
-    @test transform(model, X) ==
-        DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
+    @test LearnAPI.algorithm(model) == algorithm
+    W = transform(model, X)
+    @test W == DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
+    @test W == transform(algorithm, X)
 end
 
 
@@ -56,7 +66,7 @@ end
 struct Selector2
     names::Vector{Symbol}
 end
-Selector2(; names=Symbol[]) =  Selector2(names)
+Selector2(; names=Symbol[]) =  Selector2(names) # LearnAPI.constructor defined later
 
 mutable struct Selector2Fit
     algorithm::Selector2
@@ -66,13 +76,11 @@ end
 LearnAPI.algorithm(model::Selector2Fit) = model.algorithm
 rejected(model::Selector2Fit) = model.rejected
 
-# Here `obsdata=()` and we are just wrapping `algorithm` with a place-holder for
-# the `rejected` feature names.
-LearnAPI.obsfit(algorithm::Selector2, obsdata, verbosity) = Selector2Fit(algorithm)
+# Here we are wrapping `algorithm` with a place-holder for the `rejected` feature names.
+LearnAPI.fit(algorithm::Selector2; verbosity=1) = Selector2Fit(algorithm)
 
-# output the filtered table and add `rejected` field to model (mutatated)
-function LearnAPI.obstransform(model::Selector2Fit, obsdata)
-    X = only(obsdata)
+# output the filtered table and add `rejected` field to model (mutatated!)
+function LearnAPI.transform(model::Selector2Fit, X)
     table = Tables.columntable(X)
     names = Tables.columnnames(table)
     keep = LearnAPI.algorithm(model).names
@@ -83,16 +91,21 @@ function LearnAPI.obstransform(model::Selector2Fit, obsdata)
     return Tables.materializer(X)(filtered_table)
 end
 
+# fit and transform in one step:
+function LearnAPI.transform(algorithm::Selector2, X)
+    model = fit(algorithm)
+    transform(model, X)
+end
+
 @trait(
     Selector2,
+    constructor = Selector,
     predict_or_transform_mutates = true,
     functions = (
         fit,
         obsfit,
         minimize,
         transform,
-        obstransform,
-        obs,
         Learn.algorithm,
         :(MyPkg.rejected), # accessor function not owned by LearnAPI.jl
     )
@@ -106,6 +119,7 @@ end
     @test LearnAPI.algorithm(model) == algorithm
     filtered =  DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
     @test transform(model, X) == filtered
+    @test transform(algorithm, X) == filtered
     @test rejected(model) == [:y, :z]
 end
 

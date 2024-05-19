@@ -161,6 +161,24 @@ $(DOC_IMPLEMENTED_METHODS(:training_losses)).
 function training_losses end
 
 """
+    LearnAPI.training_predictions(model)
+
+Return internally computed training predictions when running `model = fit(algorithm, ...)`
+for some `algorithm`.
+
+See also [`fit`](@ref).
+
+# New implementations
+
+Implement for iterative algorithms that compute and record training losses as part of
+training (e.g. neural networks).
+
+$(DOC_IMPLEMENTED_METHODS(:training_predictions)).
+
+"""
+function training_predictions end
+
+"""
     LearnAPI.training_scores(model)
 
 Return the training scores obtained when running `model = fit(algorithm, ...)` for some
@@ -227,6 +245,7 @@ const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     feature_importances,
     training_labels,
     training_losses,
+    training_predictions,
     training_scores,
     components,
 )

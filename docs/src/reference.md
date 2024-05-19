@@ -21,12 +21,13 @@ undertood that individual objects share the same number of observations, and tha
 resampling of one component implies synchronized resampling of the others.
 
 A `DataFrame` instance, from [DataFrames.jl](https://dataframes.juliadata.org/stable/), is
-an example of data, the observations being the rows. LearnAPI.jl makes no assumptions
-about how observations can be accessed, except in the case of the output of [`obs`](@ref
-data_interface), which must implement the MLUtils.jl `getobs`/`numobs` interface. For
-example, it is generally ambiguous whether the rows or columns of a matrix are considered
-observations, but if a matrix is returned by [`obs`](@ref data_interface) the observations
-must be the columns.
+an example of data, the observations being the rows. Typically, data provided to
+LearnAPI.jl algorithms, will implement the
+[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/stable) `getobs/numobs` interface for
+accessing individual observations, but implementations can opt out of this requirement;
+see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details. In the MLUtils.jl
+convention, observations in tables are the rows but observations in a matrix are the
+columns.
 
 ### [Hyperparameters](@id hyperparameters)
 
@@ -69,38 +70,31 @@ by the package
 ### [Algorithms](@id algorithms)
 
 An object implementing the LearnAPI.jl interface is called an *algorithm*, although it is
-more accurately "the configuration of some algorithm".¹ It will have a type name
-reflecting the name of some ML/statistics algorithm (e.g., `RandomForestRegressor`) and it
-will encapsulate a particular set of user-specified [hyperparameters](@ref).
+more accurately "the configuration of some algorithm".¹ An algorithm encapsulates a
+particular set of user-specified [hyperparameters](@ref) as the object's properties. It
+does not store learned parameters.
 
-Additionally, for `alg::Alg` to be a LearnAPI algorithm, we require:
+For `algorithm` to be a valid LearnAPI.jl algorithm,
+[`LearnAPI.constructor(algorithm)`](@ref) must be defined and return a keyword constructor
+enabling recovery of `algorithm` from its properties:
 
-- `Base.propertynames(alg)` returns the hyperparameter names; values can be accessed using
-  `Base.getproperty`
+```julia
+properties = propertynames(algorithm)
+named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), properties))
+@assert algorithm == LearnAPI.constructor(algorithm)(; named_properties...)
+```
 
-- If `alg` is an algorithm, then so are all instances of the same type.
+Note that if if `algorithm` is an instance of a *mutable* struct, this requirement
+generally requires overloading `Base.==` for the struct.
 
-- If `_alg` is another algorithm, then `alg == _alg` if and only if `typeof(alg) ==
-  typeof(_alg)` and corresponding properties are `==`. This includes properties that are
-  random number generators (which should be copied in training to avoid mutation).
-
-- If an algorithm has other algorithms as hyperparameters, then
-  [`LearnAPI.is_composite`](@ref)`(alg)` must be `true` (fallback is `false`).
-
-- A keyword constructor for `Alg` exists, providing default values for *all* non-algorithm
-  hyperparameters.
-  
-- At least one non-trait LearnAPI.jl function must be overloaded for instances of `Alg`,
-  and accordingly `LearnAPI.functions(algorithm)` must be non-empty.
-
-Any object `alg` for which [`LearnAPI.functions`](@ref)`(alg)` is non-empty is understood
-have a valid implementation of the LearnAPI.jl interface.
-
+A *composite algorithm* is one with a property that can take other algorithms as values;
+for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true` (fallback
+is `false`). Generally, the keyword constructor provided by [`LearnAPI.constructor`](@ref)
+must provide default values for all non-algorithm properties.
 
 ### Example
 
-Any instance of `GradientRidgeRegressor` defined below meets all but the last criterion
-above:
+Any instance of `GradientRidgeRegressor` defined below is a valid algorithm.
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}
@@ -110,27 +104,33 @@ struct GradientRidgeRegressor{T<:Real}
 end
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
     GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
-The same is not true if we make this a `mutable struct`. In that case we will need to
-appropriately overload `Base.==` for `GradientRidgeRegressor`.
+Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
+understood have a valid implementation of the LearnAPI.jl interface.
 
 
 ## Methods
 
-Only these method names are exported: `fit`, `obsfit`, `predict`, `obspredict`,
-`transform`, `obstransform`, `inverse_transform`, `minimize`, and `obs`. All new
-implementations must implement [`obsfit`](@ref), the accessor function
-[`LearnAPI.algorithm`](@ref algorithm_minimize) and the trait
-[`LearnAPI.functions`](@ref).
+Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_transform`,
+`minimize`, and `obs`. All new implementations must implement [`fit`](@ref),
+[`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
+[`LearnAPI.functions`](@ref). The last two are algorithm traits, which can be set with the
+[`@trait`](@ref) macro.
 
-- [`fit`](@ref fit)/[`obsfit`](@ref): for training algorithms that generalize to new data
+### List of methods
 
-- [`predict`](@ref operations)/[`obspredict`](@ref): for outputting [targets](@ref proxy)
-  or [target proxies](@ref proxy) (such as probability density functions)
+- [`fit`](@ref fit): for training or updating algorithms that generalize to new data. For
+  non-generalizing ("static") algorithms, `fit(algorithm)` generally wraps algorithm in a
+  mutable struct that can be mutated by `predict`/`transform` to record byproducts of
+  those operations.
 
-- [`transform`](@ref operations)/[`obstransform`](@ref): similar to `predict`, but for
-  arbitrary kinds of output, and which can be paired with an `inverse_transform` method
+- [`predict`](@ref operations): for outputting [targets](@ref proxy) or [target
+  proxies](@ref proxy) (such as probability density functions)
+
+- [`transform`](@ref operations): similar to `predict`, but for arbitrary kinds of output,
+  and which can be paired with an `inverse_transform` method
 
 - [`inverse_transform`](@ref operations): for inverting the output of
   `transform` ("inverting" broadly understood)
@@ -138,21 +138,22 @@ implementations must implement [`obsfit`](@ref), the accessor function
 - [`minimize`](@ref algorithm_minimize): for stripping the `model` output by `fit` of
   inessential content, for purposes of serialization.
 
-- [`obs`](@ref data_interface): a method for exposing to the user "optimized",
-  algorithm-specific representations of data, which can be passed to `obsfit`,
-  `obspredict` or `obstransform`, but which can also be efficiently resampled using the
-  `getobs`/`numobs` interface provided by
-  [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
-
+- [`obs`](@ref data_interface): a method for exposing to the user algorithm-specific
+  representations of data guaranteed to implement observation access according to the
+  value of the [`LearnAPI.data_interface`](@ref) trait
+  
 - [Accessor functions](@ref accessor_functions): include things like `feature_importances`
   and `training_losses`, for extracting, from training outcomes, information common to
   many algorithms. 
 
-- [Algorithm traits](@ref traits): special methods that promise specific algorithm
-  behavior or for recording general information about the algorithm. The only universally
-  compulsory trait is `LearnAPI.functions(algorithm)`, which returns a list of the
-  explicitly overloaded non-trait methods.
-  
+- [Algorithm traits](@ref traits): special methods, that promise specific algorithm
+  behavior or for recording general information about the algorithm. Only
+  [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref) are universally
+  compulsory.
+
+- [`LearnAPI.target`](@ref) and [`LearnAPI.weights`](@ref) are both traits and methods to
+  extract, from `fit` input data, the target and per-observation weights, when available.
+
 ---
 
 ¹ We acknowledge users may not like this terminology, and may know "algorithm" by some

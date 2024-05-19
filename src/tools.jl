@@ -8,6 +8,27 @@ function name_value_pair(ex)
     return (ex.args[1], ex.args[2])
 end
 
+"""
+    @trait(TypeEx, trait1=value1, trait2=value2, ...)
+
+Overload a number of traits for algorithms of type `TypeEx`. For example, the code
+
+```julia
+@trait(
+    RidgeRegressor,
+    descriptors = ("regression", ),
+    doc_url = "https://some.cool.documentation",
+)
+```
+
+is equivalent to
+
+```julia
+LearnAPI.descriptors(::RidgeRegressor) = ("regression", ),
+LearnAPI.doc_url(::RidgeRegressor) = "https://some.cool.documentation",
+```
+
+"""
 macro trait(algorithm_ex, exs...)
     program = quote end
     for ex in exs
@@ -18,28 +39,6 @@ macro trait(algorithm_ex, exs...)
         )
     end
     return esc(program)
-end
-
-# """
-#     typename(x)
-
-# Return a symbolic representation of the name of `type(x)`, stripped of any type-parameters
-# and module qualifications. For example, if
-
-#     typeof(x) = MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true}
-
-# Then `typename(x)` returns `:Machine`.
-
-# """
-function typename(x)
-    M = typeof(x)
-    if isdefined(M, :name)
-        return M.name.name
-    elseif isdefined(M, :body)
-        return typename(M.body)
-    else
-        return Symbol(string(M))
-    end
 end
 
 function is_uppercase(char::Char)

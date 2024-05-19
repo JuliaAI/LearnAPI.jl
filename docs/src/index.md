@@ -22,11 +22,11 @@ promising specific behavior.
 
 !!! warning
 
-    The API described here is under active development and not ready for adoption. 
-	Join an ongoing design discussion at 
-	[this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048) 
+	The API described here is under active development and not ready for adoption.
+	Join an ongoing design discussion at
+	[this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048)
 	Julia Discourse thread.
-	
+
 
 ## Sample workflow
 
@@ -69,12 +69,17 @@ on the usual supervised/unsupervised learning dichotomy. From this point of view
 supervised algorithm is simply one in which a target variable exists, and happens to
 appear as an input to training but not to prediction.
 
-In LearnAPI.jl, a method called [`obs`](@ref data_interface) gives users access to an
-"internal", algorithm-specific, representation of input data, which is always
-"observation-accessible", in the sense that it can be resampled using
-[MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) `getobs/numobs` interface. The
-implementation can arrange for this resampling to be efficient, and workflows based on
-`obs` can have performance benefits.
+Algorithms are free to consume data in any format. However, a method called [`obs`](@ref
+data_interface) (read as "observations") gives users and meta-algorithms access to an
+algorithm-specific representation of input data, which is also guaranteed to implement a
+standard interface for accessing individual observations, unless an algorithm explicitly
+opts out. The `fit` and `predict` methods consume these alternative representations of data. 
+
+The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
+`getobs/numobs` interface, and if the input consumed by the algorithm already implements
+that interface (tables, arrays, etc.) then overloading `obs` is completely optional. A
+plain iteration interface (to support, e.g., data loaders reading images from disk files)
+can also be specified.
 
 ## Learning more
 

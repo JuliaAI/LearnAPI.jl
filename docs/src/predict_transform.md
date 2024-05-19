@@ -1,72 +1,74 @@
-# [`predict`, `transform`, and relatives](@id operations)
-
-Standard methods:
+# [`predict`, `transform` and `inverse_transform`](@id operations)
 
 ```julia
-predict(model, kind_of_proxy, data...) -> prediction
-transform(model, data...) -> transformed_data
-inverse_transform(model, data...) -> inverted_data
+predict(model, kind_of_proxy, data)
+transform(model, data)
+inverse_transform(model, data)
 ```
 
-Methods consuming output, `obsdata`, of data-preprocessor [`obs`](@ref):
-
-```julia
-obspredict(model, kind_of_proxy, obsdata) -> prediction
-obstransform(model, obsdata) -> transformed_data
-```
+When a method expects a tuple form of argument, `data = (X1, ..., Xn)`, then a slurping
+signature is also provided, as in `transform(model, X1, ..., Xn)`.
 
 ## Typical worklows
 
+Train some supervised `algorithm`:
+
 ```julia
-# Train some supervised `algorithm`:
 model = fit(algorithm, X, y)
+```
 
-# Predict probability distributions:
+Predict probability distributions:
+
+```julia
 ŷ = predict(model, Distribution(), Xnew)
+```
 
-# Generate point predictions:
+Generate point predictions:
+
+```julia
 ŷ = predict(model, LiteralTarget(), Xnew)
 ```
 
+Train a dimension-reducing `algorithm`:
+
 ```julia
-# Training a dimension-reducing `algorithm`:
 model = fit(algorithm, X)
 Xnew_reduced = transform(model, Xnew)
+```
 
-# Apply an approximate right inverse:
+Apply an approximate right inverse:
+
+```julia
 inverse_transform(model, Xnew_reduced)
 ```
 
 ### An advanced workflow
 
 ```julia
-fitdata = obs(fit, algorithm, X, y)
-predictdata = obs(predict, algorithm, Xnew)
-model = obsfit(algorithm, obsdata)
-ŷ = obspredict(model, LiteralTarget(), predictdata)
+fitobs = obs(algorithm, (X, y)) # algorithm-specific repr. of data
+model = fit(algorithm, MLUtils.getobs(fitobs, 1:100))
+predictobs = obs(model, MLUtils.getobs(X, 101:150))
+ŷ = predict(model, LiteralTarget(), predictobs)
 ```
 
 
 ## Implementation guide
 
-The methods `predict` and `transform` are not directly overloaded. Implement `obspredict`
-and `obstransform` instead:
-
-| method                      | compulsory? | fallback | requires                              |
-|:----------------------------|:-----------:|:--------:|:-------------------------------------:|
-| [`obspredict`](@ref)        | no          | none     | [`fit`](@ref)                         |
-| [`obstransform`](@ref)      | no          | none     | [`fit`](@ref)                         |
-| [`inverse_transform`](@ref) | no          | none     | [`fit`](@ref), [`obstransform`](@ref) |
+| method                      | compulsory? | fallback |
+|:----------------------------|:-----------:|:--------:|
+| [`predict`](@ref)           | no          | none     |
+| [`transform`](@ref)         | no          | none     |
+| [`inverse_transform`](@ref) | no          | none     |
 
 ### Predict or transform?
 
-If the algorithm has a notion of [target variable](@ref proxy), then arrange for
-[`obspredict`](@ref) to output each supported [kind of target proxy](@ref
+If the algorithm has a notion of [target variable](@ref proxy), then use 
+[`predict`](@ref) to output each supported [kind of target proxy](@ref
 proxy_types) (`LiteralTarget()`, `Distribution()`, etc).
 
-For output not associated with a target variable, implement [`obstransform`](@ref)
+For output not associated with a target variable, implement [`transform`](@ref)
 instead, which does not dispatch on [`LearnAPI.KindOfProxy`](@ref), but can be optionally
-paired with an implementation of [`inverse_transform`](@ref) for returning (approximate)
+paired with an implementation of [`inverse_transform`](@ref), for returning (approximate)
 right inverses to `transform`.
 
 
@@ -74,8 +76,6 @@ right inverses to `transform`.
 
 ```@docs
 predict
-obspredict
 transform
-obstransform
 inverse_transform
 ```

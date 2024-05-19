@@ -1,9 +1,12 @@
 # [`fit`](@ref fit)
 
 ```julia
-fit(algorithm, data...; verbosity=1) -> model
-fit(model, data...; verbosity=1) -> updated_model
+fit(algorithm, data; verbosity=1) -> model
+fit(model, data; verbosity=1) -> updated_model
 ```
+
+When `fit` expects an tuple form of argument, `data = (X1, ..., Xn)`, then the signature
+`fit(algorithm, X1, ..., Xn)` is also provided.
 
 ## Typical workflow
 
@@ -20,17 +23,14 @@ LearnAPI.feature_importances(model)
 
 ## Implementation guide
 
-The `fit` method is not implemented directly. Instead, implement [`obsfit`](@ref).
+| method                    | fallback | compulsory? |
+|:--------------------------|:---------|-------------|
+| [`fit`](@ref)`(alg, ...)` | none     | yes         |
 
-| method                       | fallback | compulsory? | requires                    |
-|:-----------------------------|:---------|-------------|-----------------------------|
-| [`obsfit`](@ref)`(alg, ...)` | none     | yes         | [`obs`](@ref) in some cases |
-|                              |          |             |                             |
 
 
 ## Reference
 
 ```@docs
 LearnAPI.fit
-LearnAPI.obsfit
 ```
