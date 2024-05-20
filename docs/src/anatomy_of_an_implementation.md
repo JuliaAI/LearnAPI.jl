@@ -166,8 +166,8 @@ predictions.
 ## Algorithm traits
 
 Algorithm [traits](@ref traits) record extra generic information about an algorithm, or
-make specific promises of behavior. They usually have an algorithm as the single
-argument. We regard [`LearnAPI.constructor`](@ref) defined above as a trait.
+make specific promises of behavior. They usually have an algorithm as the single argument,
+and so we also regard [`LearnAPI.constructor`](@ref) defined above as a trait.
 
 In LearnAPI.jl `predict` always outputs a [target or target proxy](@ref proxy), where
 "target" is understood very broadly. We overload a trait to record the fact here that the
@@ -214,9 +214,10 @@ traits_list) to see which might apply to a new implementation, to enable maximum
 functionality provided by third party packages, and to assist third party algorithms that
 match machine learning algorithms to user-defined tasks.
 
-Having set `LearnAPI.target(::Ridge) == true` we are obliged to overload a multi-argument
-version of `LearnAPI.target` to extract the target from the `data` that gets supplied to
-`fit`:
+According to the contract articulated in its document string, having set
+[`LearnAPI.target(::Ridge)`](@ref) equal to `true`, we are obliged to overload a
+multi-argument version of `LearnAPI.target` to extract the target from the `data` that
+gets supplied to `fit`:
 
 ```@example anatomy
 LearnAPI.target(::Ridge, data) = last(data)

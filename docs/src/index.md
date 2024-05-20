@@ -12,9 +12,9 @@ A base Julia interface for machine learning and statistics </span>
 LearnAPI.jl is a lightweight, functional-style interface, providing a collection of
 [methods](@ref Methods), such as `fit` and `predict`, to be implemented by algorithms from
 machine learning and statistics. Through such implementations, these algorithms buy into
-functionality, such as hyperparameter optimization, as provided by ML/statistics toolboxes
-and other packages. LearnAPI.jl also provides a number of Julia [traits](@ref traits) for
-promising specific behavior.
+functionality, such as hyperparameter optimization and model composition, as provided by
+ML/statistics toolboxes and other packages. LearnAPI.jl also provides a number of Julia
+[traits](@ref traits) for promising specific behavior.
 
 ```@raw html
 &#128679;
@@ -78,7 +78,7 @@ opts out. The `fit` and `predict` methods consume these alternative representati
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
 `getobs/numobs` interface, and if the input consumed by the algorithm already implements
 that interface (tables, arrays, etc.) then overloading `obs` is completely optional. A
-plain iteration interface (to support, e.g., data loaders reading images from disk files)
+plain iteration interface (to support, e.g., data loaders reading images from disk)
 can also be specified.
 
 ## Learning more

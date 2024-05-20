@@ -54,16 +54,15 @@ compared with censored ground truth survival times.
 
 #### Definitions
 
-More generally, whenever we have a variable (e.g., a class label) that can (in principle)
-can be paired with a predicted value, or some predicted "proxy" for that variable (such as
-a class probability), then we call the variable a *target* variable, and the predicted
-output a *target proxy*. In this definition, it is immaterial whether or not the target
-appears in training (is supervised) or whether or not the model generalizes to new
+More generally, whenever we have a variable (e.g., a class label) that can, at least in
+principle, be paired with a predicted value, or some predicted "proxy" for that variable
+(such as a class probability), then we call the variable a *target* variable, and the
+predicted output a *target proxy*. In this definition, it is immaterial whether or not the
+target appears in training (is supervised) or whether or not the model generalizes to new
 observations ("learns").
 
 LearnAPI.jl provides singleton [target proxy types](@ref proxy_types) for prediction
-dispatch in LearnAPI.jl. These are also used to distinguish performance metrics provided
-by the package
+dispatch. These are also used to distinguish performance metrics provided by the package
 [StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
@@ -151,8 +150,9 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
   [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref) are universally
   compulsory.
 
-- [`LearnAPI.target`](@ref) and [`LearnAPI.weights`](@ref) are both traits and methods to
-  extract, from `fit` input data, the target and per-observation weights, when available.
+- [`LearnAPI.target`](@ref) and [`LearnAPI.weights`](@ref) are traits which also include
+  extended signatures for extracting, from `fit` input data, the target and
+  per-observation weights, when available.
 
 ---
 
