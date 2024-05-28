@@ -73,7 +73,8 @@ Algorithms are free to consume data in any format. However, a method called [`ob
 data_interface) (read as "observations") gives users and meta-algorithms access to an
 algorithm-specific representation of input data, which is also guaranteed to implement a
 standard interface for accessing individual observations, unless an algorithm explicitly
-opts out. The `fit` and `predict` methods consume these alternative representations of data. 
+opts out. The `fit` and `predict` methods also consume these alternative representations
+of data.
 
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
 `getobs/numobs` interface, and if the input consumed by the algorithm already implements
