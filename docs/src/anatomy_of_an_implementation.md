@@ -10,19 +10,19 @@ For a transformer, implementations ordinarily implement `transform` instead of
 
 !!! important
 
-	The core implementations of `fit`, `predict`, etc,
-	always have a *single* `data` argument, as in `fit(algorithm, data; verbosity=1)`.
-	Calls like `fit(algorithm, X, y)` are provided as additional convenience methods.
+        The core implementations of `fit`, `predict`, etc,
+        always have a *single* `data` argument, as in `fit(algorithm, data; verbosity=1)`.
+        Calls like `fit(algorithm, X, y)` are provided as additional convenience methods.
 
 !!! note
 
-	If the `data` object consumed by `fit`, `predict`, or `transform` is not
-	not a suitable table¹, array³, tuple of tables and arrays, or some
-	other object implementing
-	the MLUtils.jl `getobs`/`numobs` interface,
-	then an implementation must: (i) suitably overload the trait
-	[`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
-	illustrated below under [Providing an advanced data interface](@ref).
+        If the `data` object consumed by `fit`, `predict`, or `transform` is not
+        not a suitable table¹, array³, tuple of tables and arrays, or some
+        other object implementing
+        the MLUtils.jl `getobs`/`numobs` interface,
+        then an implementation must: (i) suitably overload the trait
+        [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
+        illustrated below under [Providing an advanced data interface](@ref).
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -39,7 +39,7 @@ Here's a new type whose instances specify ridge regression parameters:
 
 ```@example anatomy
 struct Ridge{T<:Real}
-		lambda::T
+    lambda::T
 end
 nothing # hide
 ```
@@ -63,7 +63,7 @@ changed to `0.05`.
 
 ## Implementing `fit`
 
-A ridge regressor requires two types of data for training: *input features* `X`, which
+A ridge regressor requires two types of data for training: input features `X`, which
 here we suppose are tabular¹, and a [target](@ref proxy) `y`, which we suppose is a
 vector.
 
@@ -72,9 +72,9 @@ coefficients labelled by feature name for inspection after training:
 
 ```@example anatomy
 struct RidgeFitted{T,F}
-		algorithm::Ridge
-		coefficients::Vector{T}
-		named_coefficients::F
+    algorithm::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 nothing # hide
 ```
@@ -87,25 +87,25 @@ The core implementation of `fit` looks like this:
 ```@example anatomy
 function LearnAPI.fit(algorithm::Ridge, data; verbosity=1)
 
-		X, y = data
+    X, y = data
 
-		# data preprocessing:
-		table = Tables.columntable(X)
-		names = Tables.columnnames(table) |> collect
-		A = Tables.matrix(table, transpose=true)
+    # data preprocessing:
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    A = Tables.matrix(table, transpose=true)
 
-		lambda = algorithm.lambda
+    lambda = algorithm.lambda
 
-		# apply core algorithm:
-		coefficients = (A*A' + algorithm.lambda*I)\(A*y) # vector
+    # apply core algorithm:
+    coefficients = (A*A' + algorithm.lambda*I)\(A*y) # vector
 
-		# determine named coefficients:
-		named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-		# make some noise, if allowed:
-		verbosity > 0 && @info "Coefficients: $named_coefficients"
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-		return RidgeFitted(algorithm, coefficients, named_coefficients)
+    return RidgeFitted(algorithm, coefficients, named_coefficients)
 end
 ```
 
@@ -127,7 +127,7 @@ Here's the implementation for our ridge regressor:
 
 ```@example anatomy
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
-		Tables.matrix(Xnew)*model.coefficients
+                Tables.matrix(Xnew)*model.coefficients
 ```
 
 ## Accessor functions
@@ -156,7 +156,7 @@ overload it to dump the named version of the coefficients:
 
 ```@example anatomy
 LearnAPI.minimize(model::RidgeFitted) =
-		RidgeFitted(model.algorithm, model.coefficients, nothing)
+    RidgeFitted(model.algorithm, model.coefficients, nothing)
 ```
 
 Crucially, we can still use `LearnAPI.minimize(model)` in place of `model` to make new
@@ -187,19 +187,19 @@ The macro can be used to specify multiple traits simultaneously:
 
 ```@example anatomy
 @trait(
-	Ridge,
-	constructor = Ridge,
-	target = true,
-	kinds_of_proxy=(LiteralTarget(),),
-	descriptors = (:regression,),
-	functions = (
-		fit,
-		minimize,
-		predict,
-		obs,
-		LearnAPI.algorithm,
-		LearnAPI.coefficients,
-	)
+        Ridge,
+        constructor = Ridge,
+        target = true,
+        kinds_of_proxy=(LiteralTarget(),),
+        descriptors = (:regression,),
+        functions = (
+                fit,
+                minimize,
+                predict,
+                obs,
+                LearnAPI.algorithm,
+                LearnAPI.coefficients,
+        )
 )
 nothing # hide
 ```
@@ -230,10 +230,10 @@ enabling the kind of workflow previewed in [Sample workflow](@ref):
 
 ```@example anatomy
 LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
-	fit(algorithm, (X, y); kwargs...)
+    fit(algorithm, (X, y); kwargs...)
 
 LearnAPI.predict(model::RidgeFitted, Xnew) =
-	predict(model, LiteralTarget(), Xnew)
+    predict(model, LiteralTarget(), Xnew)
 ```
 
 ## [Demonstration](@id workflow)
@@ -292,40 +292,40 @@ using LearnAPI
 using LinearAlgebra, Tables
 
 struct Ridge{T<:Real}
-		lambda::T
+                lambda::T
 end
 
 Ridge(; lambda=0.1) = Ridge(lambda)
 
 struct RidgeFitted{T,F}
-		algorithm::Ridge
-		coefficients::Vector{T}
-		named_coefficients::F
+    algorithm::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 
 LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
 LearnAPI.minimize(model::RidgeFitted) =
-		RidgeFitted(model.algorithm, model.coefficients, nothing)
+    RidgeFitted(model.algorithm, model.coefficients, nothing)
 
 LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
-	fit(algorithm, (X, y); kwargs...)
+    fit(algorithm, (X, y); kwargs...)
 LearnAPI.predict(model::RidgeFitted, Xnew) = predict(model, LiteralTarget(), Xnew)
 
 @trait(
-	Ridge,
-	constructor = Ridge,
-	target = true,
-	kinds_of_proxy=(LiteralTarget(),),
-	descriptors = (:regression,),
-	functions = (
-		fit,
-		minimize,
-		predict,
-		obs,
-		LearnAPI.algorithm,
-		LearnAPI.coefficients,
-	)
+        Ridge,
+        constructor = Ridge,
+        target = true,
+        kinds_of_proxy=(LiteralTarget(),),
+        descriptors = (:regression,),
+        functions = (
+                fit,
+                minimize,
+                predict,
+                obs,
+                LearnAPI.algorithm,
+                LearnAPI.coefficients,
+        )
 )
 
 n = 10 # number of observations
@@ -344,9 +344,9 @@ new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
-		A::M                  # p x n
-		names::Vector{Symbol} # features
-		y::Vector{T}          # target
+    A::M                  # p x n
+    names::Vector{Symbol} # features
+    y::Vector{T}          # target
 end
 ```
 
@@ -354,10 +354,10 @@ Now we overload `obs` to carry out the data pre-processing previously in `fit`, 
 
 ```@example anatomy2
 function LearnAPI.obs(::Ridge, data)
-		X, y = data
-		table = Tables.columntable(X)
-		names = Tables.columnnames(table) |> collect
-		return RidgeFitObs(Tables.matrix(table)', names, y)
+    X, y = data
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    return RidgeFitObs(Tables.matrix(table)', names, y)
 end
 ```
 
@@ -369,27 +369,27 @@ methods - one to handle "regular" input, and one to handle the pre-processed dat
 ```@example anatomy2
 function LearnAPI.fit(algorithm::Ridge, observations::RidgeFitObs; verbosity=1)
 
-		lambda = algorithm.lambda
+    lambda = algorithm.lambda
 
-		A = observations.A
-		names = observations.names
-		y = observations.y
+    A = observations.A
+    names = observations.names
+    y = observations.y
 
-		# apply core algorithm:
-		coefficients = (A*A' + algorithm.lambda*I)\(A*y) # 1 x p matrix
+    # apply core algorithm:
+    coefficients = (A*A' + algorithm.lambda*I)\(A*y) # 1 x p matrix
 
-		# determine named coefficients:
-		named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-		# make some noise, if allowed:
-		verbosity > 0 && @info "Coefficients: $named_coefficients"
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-		return RidgeFitted(algorithm, coefficients, named_coefficients)
+    return RidgeFitted(algorithm, coefficients, named_coefficients)
 
 end
 
 LearnAPI.fit(algorithm::Ridge, data; kwargs...) =
-		fit(algorithm, obs(algorithm, data); kwargs...)
+    fit(algorithm, obs(algorithm, data); kwargs...)
 ```
 
 We provide an overloading of `LearnAPI.target` to handle the additional supported data
@@ -409,7 +409,7 @@ accessing individual observations*. It usually suffices to overload `Base.getind
 
 ```@example anatomy2
 Base.getindex(data::RidgeFitObs, I) =
-		RidgeFitObs(data.A[:,I], data.names, y[I])
+    RidgeFitObs(data.A[:,I], data.names, y[I])
 Base.length(data::RidgeFitObs, I) = length(data.y)
 ```
 
@@ -420,10 +420,10 @@ case:
 LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)'
 
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, observations::AbstractMatrix) =
-		observations'*model.coefficients
+    observations'*model.coefficients
 
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
-		predict(model, LiteralTarget(), obs(model, Xnew))
+    predict(model, LiteralTarget(), obs(model, Xnew))
 ```
 
 ### Important notes:

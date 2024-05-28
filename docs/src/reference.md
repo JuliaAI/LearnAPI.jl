@@ -25,9 +25,13 @@ an example of data, the observations being the rows. Typically, data provided to
 LearnAPI.jl algorithms, will implement the
 [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/stable) `getobs/numobs` interface for
 accessing individual observations, but implementations can opt out of this requirement;
-see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details. In the MLUtils.jl
-convention, observations in tables are the rows but observations in a matrix are the
-columns.
+see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details. 
+
+!!! note 
+
+    In the MLUtils.jl
+    convention, observations in tables are the rows but observations in a matrix are the
+    columns.
 
 ### [Hyperparameters](@id hyperparameters)
 
