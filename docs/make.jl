@@ -11,7 +11,7 @@ makedocs(
         "Home" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
         "Reference" => [
-            "Summary" => "reference.md",
+            "Overview" => "reference.md",
             "fit" => "fit.md",
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
