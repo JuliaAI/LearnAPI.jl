@@ -10,19 +10,19 @@ For a transformer, implementations ordinarily implement `transform` instead of
 
 !!! important
 
-        The core implementations of `fit`, `predict`, etc,
-        always have a *single* `data` argument, as in `fit(algorithm, data; verbosity=1)`.
-        Calls like `fit(algorithm, X, y)` are provided as additional convenience methods.
+    The core implementations of `fit`, `predict`, etc,
+    always have a *single* `data` argument, as in `fit(algorithm, data; verbosity=1)`.
+    Calls like `fit(algorithm, X, y)` are provided as additional convenience methods.
 
 !!! note
 
-        If the `data` object consumed by `fit`, `predict`, or `transform` is not
-        not a suitable table¹, array³, tuple of tables and arrays, or some
-        other object implementing
-        the MLUtils.jl `getobs`/`numobs` interface,
-        then an implementation must: (i) suitably overload the trait
-        [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
-        illustrated below under [Providing an advanced data interface](@ref).
+    If the `data` object consumed by `fit`, `predict`, or `transform` is not
+    not a suitable table¹, array³, tuple of tables and arrays, or some
+    other object implementing
+    the MLUtils.jl `getobs`/`numobs` interface,
+    then an implementation must: (i) suitably overload the trait
+    [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
+    illustrated below under [Providing an advanced data interface](@ref).
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
