@@ -120,10 +120,9 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
 
 ### List of methods
 
-- [`fit`](@ref fit): for training or updating algorithms that generalize to new data. For
-  non-generalizing ("static") algorithms, `fit(algorithm)` generally wraps algorithm in a
-  mutable struct that can be mutated by `predict`/`transform` to record byproducts of
-  those operations.
+- [`fit`](@ref fit): for training or updating algorithms that generalize to new data. Or,
+  for non-generalizing ("static") algorithms, wrap `algorithm` in a mutable struct that
+  can be mutated by `predict`/`transform` to record byproducts of those operations.
 
 - [`predict`](@ref operations): for outputting [targets](@ref proxy) or [target
   proxies](@ref proxy) (such as probability density functions)
