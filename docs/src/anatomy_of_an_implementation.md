@@ -215,7 +215,7 @@ functionality provided by third party packages, and to assist third party algori
 match machine learning algorithms to user-defined tasks.
 
 According to the contract articulated in its document string, having set
-[`LearnAPI.target(::Ridge)`](@ref) equal to `true`, we are obliged to overload a
+[`LearnAPI.target`](@ref)`(::Ridge)`](@ref) equal to `true`, we are obliged to overload a
 multi-argument version of `LearnAPI.target` to extract the target from the `data` that
 gets supplied to `fit`:
 
