@@ -10,9 +10,17 @@ import DataFrames
 # We overload `obs` to expose internal representation of input data. See later for a
 # simpler variation using the `obs` fallback.
 
+# no docstring here - that goes with the constructor
 struct Ridge
     lambda::Float64
 end
+
+"""
+    Ridge(; lambda=0.1)
+
+Instantiate a ridge regression algorithm, with regularization of `lambda`.
+
+"""
 Ridge(; lambda=0.1) = Ridge(lambda) # LearnAPI.constructor defined later
 
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
@@ -176,9 +184,17 @@ end
 
 # # VARIATION OF RIDGE REGRESSION THAT USES FALLBACK OF LearnAPI.obs
 
+# no docstring here - that goes with the constructor
 struct BabyRidge
     lambda::Float64
 end
+
+"""
+    BabyRidge(; lambda=0.1)
+
+Instantiate a ridge regression algorithm, with regularization of `lambda`.
+
+"""
 BabyRidge(; lambda=0.1) = BabyRidge(lambda) # LearnAPI.constructor defined later
 
 struct BabyRidgeFitted{T,F}

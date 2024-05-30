@@ -83,7 +83,7 @@ end
 
 const CONCRETE_TARGET_PROXY_TYPES_LIST = join(
     map(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS) do s
-        "`$s`"
+        "`$s()`"
     end,
     ", ",
     " and ",

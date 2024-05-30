@@ -95,6 +95,9 @@ for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true` 
 is `false`). Generally, the keyword constructor provided by [`LearnAPI.constructor`](@ref)
 must provide default values for all non-algorithm properties.
 
+Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
+understood have a valid implementation of the LearnAPI.jl interface.
+
 ### Example
 
 Any instance of `GradientRidgeRegressor` defined below is a valid algorithm.
@@ -110,8 +113,11 @@ GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) 
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
-Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
-understood have a valid implementation of the LearnAPI.jl interface.
+### Documentation
+
+Attach public LearnAPI.jl-related documentation for an algorithm to it's *constructor*,
+rather than to the struct defining its type. In this way, an algorithm can implement
+non-LearnAPI interfaces (such as a native interface) with separate document strings.
 
 
 ## Methods
@@ -125,8 +131,9 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
 ### List of methods
 
 - [`fit`](@ref fit): for training or updating algorithms that generalize to new data. Or,
-  for non-generalizing ("static") algorithms, wrap `algorithm` in a mutable struct that
-  can be mutated by `predict`/`transform` to record byproducts of those operations.
+  for non-generalizing algorithms (see [Static Algorithms](@ref)), wrap `algorithm` in a
+  mutable struct that can be mutated by `predict`/`transform` to record byproducts of
+  those operations.
 
 - [`predict`](@ref operations): for outputting [targets](@ref proxy) or [target
   proxies](@ref proxy) (such as probability density functions)

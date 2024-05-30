@@ -95,12 +95,13 @@ Multiple traits can be declared like this:
 To ensure that trait metadata can be stored in an external algorithm registry, LearnAPI.jl
 requires:
 
-1. *Finiteness:* The value of a trait is the same for all algorithms with same
-   underlying `UnionAll` type. That is, even if the type parameters are different, the
-   trait should be the same.  There is an exception if `is_composite(algorithm) = true`.
+1. *Finiteness:* The value of a trait is the same for all `algorithm`s with same value of
+   [`LearnAPI.constructor(algorithm)`](@ref). This typically means trait values do not
+   depend on type parameters! There is an exception if `is_composite(algorithm) = true`.
 
-2. *Serializability:* The value of any trait can be evaluated without installing any
-   third party package; `using LearnAPI` should suffice.
+2. *Immediate serializability:* It should be possible to call a trait without first
+   installing any third party package. Importing the package that defines the algorithm,
+   together with `import LearnAPI` should suffice.
 
 Because of 1, combining a lot of functionality into one algorithm (e.g. the algorithm can
 perform both classification or regression) can mean traits are necessarily less

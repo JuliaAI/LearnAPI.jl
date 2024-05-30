@@ -51,6 +51,11 @@ mechanism for creating new versions of itself, with modified property (field) va
 this end, we implement `LearnAPI.constructor`, which must return a keyword constructor:
 
 ```@example anatomy
+"""
+    Ridge(; lambda=0.1)
+
+Instantiate a ridge regression algorithm, with regularization of `lambda`.
+"""
 Ridge(; lambda=0.1) = Ridge(lambda)
 LearnAPI.constructor(::Ridge) = Ridge
 nothing # hide
@@ -59,6 +64,8 @@ nothing # hide
 So, if `algorithm = Ridge(lambda=0.1)` then `LearnAPI.constructor(algorithm)(lambda=0.05)`
 is another algorithm with the same properties, except that the value of `lambda` has been
 changed to `0.05`.
+
+Note that we attach the docstring to the constructor, not the struct. 
 
 
 ## Implementing `fit`

@@ -76,8 +76,12 @@ julia> algorithm2.lambda
 
 # New implementations
 
-All new implementations must overload this trait. It must be possible to recover an
-algorithm from the constructor returned as follows:
+All new implementations must overload this trait.
+
+Attach public LearnAPI.jl-related documentation for an algorithm to the constructor, not
+the algorithm struct.
+
+It must be possible to recover an algorithm from the constructor returned as follows:
 
 ```julia
 properties = propertynames(algorithm)
