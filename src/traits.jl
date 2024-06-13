@@ -304,14 +304,19 @@ doc_url(::Any) = "unknown"
 """
     LearnAPI.load_path(algorithm)
 
-Return a string indicating where the `struct` for `typeof(algorithm)` can be found, beginning
-with the name of the package module defining it. For example, a return value of
-`"FastTrees.LearnAPI.DecisionTreeClassifier"` means the following julia code will return the
-algorithm type:
+Return a string indicating where in code the definition of the algorithm's constructor can
+be found, beginning with the name of the package module defining it. By "constructor" we
+mean the return value of [`LearnAPI.constructor(algorithm)`](@ref).
+
+# Implementation
+
+For example, a return value of `"FastTrees.LearnAPI.DecisionTreeClassifier"` means the
+following julia code will not error:
 
 ```julia
 import FastTrees
-FastTrees.LearnAPI.DecisionTreeClassifier
+import LearnAPI
+@assert FastTrees.LearnAPI.DecisionTreeClassifier == LearnAPI.constructor(algorithm)
 ```
 
 $DOC_UNKNOWN

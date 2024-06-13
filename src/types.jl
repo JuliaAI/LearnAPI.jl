@@ -40,6 +40,9 @@ struct SurvivalDistribution <: IID end
 struct HazardFunction <: IID end
 struct OutlierScore <: IID end
 struct Continuous <: IID end
+struct Quantile <: IID end
+struct Expectile <: IID end
+
 
 """
     Joint <: KindOfProxy
