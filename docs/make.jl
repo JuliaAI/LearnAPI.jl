@@ -6,7 +6,10 @@ const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
 makedocs(
     modules=[LearnAPI,],
-    format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
+    format=Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        collapselevel = 1,
+    ),
     pages=[
         "Home" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
