@@ -116,3 +116,79 @@ $DOC_HOW_TO_LIST_PROXIES
 
 """
 KindOfProxy
+
+
+# # DATA INTERFACES
+
+abstract type DataInterface end
+abstract type Finite <: DataInterface end
+
+"""
+    LearnAPI.RandomAccess
+
+A data interface type. We say that `data` implements the `RandomAccess` interface if
+`data` implements the methods `getobs` and `numobs` from MLUtils.jl. The first method
+allows one to grab observations specified by an arbitrary index set, as in
+`MLUtils.getobs(data, [2, 3, 5])`, while the second method returns the total number of
+available observations, which is assumed to be known and finite.
+
+All arrays implement `RandomAccess`, with the last index being the observation index
+(observations-as-columns in matrices).
+
+A Tables.jl compatible table `data` implements `RandomAccess` if `Tables.istable(data)` is
+true and if `data` implements `DataAPI.nrows`. This includes many tables, and in
+particular, `DataFrame`s. Tables that are also tuples are excluded.
+
+Any tuple of objects implementing `RandomAccess` also implements `RandomAccess`.
+
+If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `RandomAccess()`, then
+[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+`RandomAccess` interface, and the same holds for `obs(model, ...)`, whenever
+`LearnAPI.algorithm(model) == algorithm`.
+
+# Implementing `RandomAccess` for new data types
+
+Typically, to implement `RandomAccess` for a new data type requires only implementing
+`Base.getindex` and `Base.length`, which are the fallbacks for `MLUtils.getobs` and
+`MLUtils.numobs`, and this avoids making MLUtils.jl a package dependency.
+
+See also [`LearnAPI.FiniteIterable`](@ref), [`LearnAPI.Iterable`](@ref).
+"""
+struct RandomAccess <: Finite end
+
+"""
+    LearnAPI.FiniteIterable
+
+A data interface type.  We say that `data` implements the `FiniteIterable` interface if
+it implements Julia's `iterate` interface, including `Base.length`, and if
+`Base.IteratorSize(typeof(data)) == Base.HasLength()`. For example, this is true if:
+
+- `data` implements the [`LearnAPI.RandomAccess`](@ref) interface (arrays and most tables)
+
+- `data isa MLUtils.DataLoader`, which includes output from `MLUtils.eachobs`.
+
+If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `FiniteIterable()`, then
+[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+`FiniteIterable` interface, and the same holds for `obs(model, ...)`, whenever
+`LearnAPI.algorithm(model) == algorithm`.
+
+See also [`LearnAPI.RandomAccess`](@ref), [`LearnAPI.Iterable`](@ref).
+"""
+struct FiniteIterable <: Finite end
+
+"""
+    LearnAPI.Iterable
+
+A data interface type. We say that `data` implements the `Iterable` interface if it
+implements Julia's basic `iterate` interface. (Such objects may not implement
+`MLUtils.numobs` or `Base.length`.)
+
+If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `Iterable()`, then
+[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing `Iterable`,
+and the same holds for `obs(model, ...)`, whenever `LearnAPI.algorithm(model) ==
+algorithm`.
+
+See also [`LearnAPI.FiniteIterable`](@ref), [`LearnAPI.RandomAccess`](@ref).
+
+"""
+struct Iterable <: DataInterface end

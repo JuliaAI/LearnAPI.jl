@@ -14,15 +14,19 @@ returning an object, `model`, on which other methods, such as [`predict`](@ref) 
 [`transform`](@ref), can be dispatched.  [`LearnAPI.functions(algorithm)`](@ref) returns a
 list of methods that can be applied to either `algorithm` or `model`.
 
-The second signature applies to algorithms which do not generalize to new observations. In
-that case `predict` or `transform` actually execute the algorithm, but may also write to
-the (mutable) object returned by `fit`.
+The second signature is provided by algorithms that do not generalize to new observations
+("static" algorithms). In that case, `transform(model, data)` or `predict(model, ...,
+data)` carries out the actual algorithm execution, writing any byproducts of that
+operation to the mutable object `model` returned by `fit`.
 
-When `data` is a tuple, a data slurping form of `fit` is typically provided.
+Whenever `fit` expects a tuple form of argument, `data = (X1, ..., Xn)`, then the
+signature `fit(algorithm, X1, ..., Xn)` is also provided.
+
+For example, a supervised classifier will typically admit this workflow:
 
 ```julia
-model = fit(algorithm, (X, y))  # or `fit(algorithm, X, y)`
-ŷ = predict(model, X)
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+ŷ = predict(model, Xnew)
 ```
 
 Use `verbosity=0` for warnings only, and `-1` for silent training.
@@ -34,7 +38,14 @@ See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
 
 # New implementations
 
-Implementation is compulsory. The signature must include `verbosity`.
+Implementation is compulsory. The signature must include `verbosity`. Note the requirement
+on providing slurping signatures. A fallback for the first signature calls the second,
+ignoring `data`:
+
+```julia
+fit(algorithm, data...; kwargs...) = fit(algorithm; kwargs...)
+```
+$(DOC_DATA_INTERFACE(:fit))
 
 """
-fit(algorithm, data...; kwargs...) = nothing
+fit(algorithm, data...; kwargs...) = fit(algorithm; kwargs...)

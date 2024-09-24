@@ -100,11 +100,11 @@ function constructor end
 """
     LearnAPI.functions(algorithm)
 
-Return a tuple of functions that can be meaningfully applied with `algorithm`, or an
-associate model (object returned by `fit(algorithm, ...)`, as the first
+Return a tuple of symbols respresenting functions that can be meaningfully applied with
+`algorithm`, or an associate model (object returned by `fit(algorithm, ...)`, as the first
 argument. Algorithm traits (`algorithm` is the *only* argument) are excluded.
 
-In addition to functions, the returned tuple may include expressions, like
+In addition to symbols, the returned tuple may include expressions, like
 `:(DecisionTree.print_tree)`, which reference functions not owned by LearnAPI.jl.
 
 The understanding is that `algorithm` is a LearnAPI-compliant object whenever the return
@@ -117,15 +117,15 @@ value is non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| function             | implementation/overloading compulsory? | include in returned tuple? |
-|----------------------|----------------------------------------|----------------------------|
-| `fit`                | yes                                    | yes                        |
-| `minimize`           | no                                     | yes                        |
-| `obs`                | no                                     | yes                        |
-| `LearnAPI.algorithm` | yes                                    | yes                        |
-| `inverse_transform`  | no                                     | only if implemented        |
-| `predict`            | no                                     | only if implemented        |
-| `transform`          | no                                     | only if implemented        |
+| symbol                | implementation/overloading compulsory? | include in returned tuple? |
+|-----------------------|----------------------------------------|----------------------------|
+| `:fit`                | yes                                    | yes                        |
+| `:minimize`           | no                                     | yes                        |
+| `:obs`                | no                                     | yes                        |
+| `:LearnAPI.algorithm` | yes                                    | yes                        |
+| `:inverse_transform`  | no                                     | only if implemented        |
+| `:predict`            | no                                     | only if implemented        |
+| `:transform`          | no                                     | only if implemented        |
 
 Also include any implemented accessor functions. The LearnAPI.jl accessor functions are:
 $ACCESSOR_FUNCTIONS_LIST.
@@ -137,10 +137,14 @@ functions(::Any) = ()
 """
     LearnAPI.kinds_of_proxy(algorithm)
 
-Returns an tuple of all instances, `kind`, for which for which `predict(algorithm, kind,
+Returns a tuple of all instances, `kind`, for which for which `predict(algorithm, kind,
 data...)` has a guaranteed implementation. Each such `kind` subtypes
 [`LearnAPI.KindOfProxy`](@ref). Examples are `LiteralTarget()` (for predicting actual
 target values) and `Distributions()` (for predicting probability mass/density functions).
+
+If a `predict(model, data)` is overloaded to return predictions for a specific kind of
+proxy (e.g., `predict(model::MyModel, data) = predict(model, Distribution(), data)`) then
+that kind appears first in the returned tuple.
 
 See also [`LearnAPI.predict`](@ref), [`LearnAPI.KindOfProxy`](@ref).
 
@@ -188,7 +192,7 @@ target(::Any, data) = nothing
 
 """
     LearnAPI.weights(algorithm)::Bool
-    LearnAPI.target(algorithm, data) -> weights
+    LearnAPI.weights(algorithm, data) -> weights
 
 First method (an algorithm trait) returns `true` if the second method returns
 per-observation weights, for some value(s) of `data`, where `data` is a supported argument
@@ -333,7 +337,7 @@ load_path(::Any) = "unknown"
 Returns `true` if one or more properties (fields) of `algorithm` may themselves be
 algorithms, and `false` otherwise.
 
-See also `[LearnAPI.components]`(@ref).
+See also [`LearnAPI.components`](@ref).
 
 # New implementations
 
@@ -367,28 +371,23 @@ human_name(M) = snakecase(name(M), delim=' ') # `name` defined below
 """
     LearnAPI.data_interface(algorithm)
 
-Return the data interface supported by `algorithm` for accessing individual observations in
-representations of input data returned by [`obs(algorithm, data)`](@ref) or [`obs(model,
-data)`](@ref). Here `data` is `fit`, `predict`, or `transform`-consumable data.
+Return the data interface supported by `algorithm` for accessing individual observations
+in representations of input data returned by [`obs(algorithm, data)`](@ref) or
+[`obs(model, data)`](@ref), whenever `algorithm == LearnAPI.algorithm(model)`. Here `data`
+is `fit`, `predict`, or `transform`-consumable data.
 
-Options for the return value:
-
-- `Base.HasLength()`: Data returned by `obs` implements the
-  [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs/numobs` interface; it
-  usually suffices to overload `Base.getindex` and `Base.length` (which are the
-  `getobs/numobs` fallbacks).
-
-- `Base.SizeUnknown()`: Data returned by `obs` implements Julia's `iterate`
-  interface.
+Possible return values are [`LearnAPI.RandomAccess`](@ref),
+[`LearnAPI.FiniteIterable`](@ref), and [`LearnAPI.Iterable`](@ref).
 
 See also [`obs`](@ref).
 
 # New implementations
 
-The fallback returns `Base.HasLength`.
+The fallback returns [`LearnAPI.RandomAccess`](@ref), which applies to arrays, most
+tables, and tuples of these. See the doc-string for details.
 
 """
-data_interface(::Any) = Base.HasLength()
+data_interface(::Any) = LearnAPI.RandomAccess()
 
 """
     LearnAPI.predict_or_transform_mutates(algorithm)

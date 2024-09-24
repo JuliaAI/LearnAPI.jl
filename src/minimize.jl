@@ -17,7 +17,7 @@ functionality is preserved by `minimize`.
 # New implementations
 
 Overloading `minimize` for new algorithms is optional. The fallback is the
-identity. $(DOC_IMPLEMENTED_METHODS(:minimize, overloaded=true))
+identity. $(DOC_IMPLEMENTED_METHODS(":minimize", overloaded=true))
 
 New implementations must enforce the following identities, whenever the right-hand side is
 defined:

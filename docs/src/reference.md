@@ -25,21 +25,21 @@ an example of data, the observations being the rows. Typically, data provided to
 LearnAPI.jl algorithms, will implement the
 [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/stable) `getobs/numobs` interface for
 accessing individual observations, but implementations can opt out of this requirement;
-see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details. 
+see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
-!!! note 
+!!! note
 
-    In the MLUtils.jl
-    convention, observations in tables are the rows but observations in a matrix are the
-    columns.
+	In the MLUtils.jl
+	convention, observations in tables are the rows but observations in a matrix are the
+	columns.
 
 ### [Hyperparameters](@id hyperparameters)
 
 Besides the data it consumes, a machine learning algorithm's behavior is governed by a
 number of user-specified *hyperparameters*, such as the number of trees in a random
-forest. In LearnAPI.jl, one is allowed to have hyperparematers that are not data-generic.
-For example, a class weight dictionary will only make sense for a target taking values in
-the set of dictionary keys. 
+forest. In LearnAPI.jl, one is allowed to have hyperparameters that are not data-generic.
+For example, a class weight dictionary, which will only make sense for a target taking
+values in the set of dictionary keys, can be specified as a hyperparameter.
 
 
 ### [Targets and target proxies](@id proxy)
@@ -54,7 +54,7 @@ detection, "outlier"/"inlier" predictions, or probability-like scores, are simil
 compared with ground truth labels. In clustering, integer labels assigned to observations
 by the clustering algorithm can can be paired with human labels using, say, the Rand
 index. In survival analysis, predicted survival functions or probability distributions are
-compared with censored ground truth survival times.
+compared with censored ground truth survival times. And so on ...
 
 #### Definitions
 
@@ -74,8 +74,12 @@ dispatch. These are also used to distinguish performance metrics provided by the
 
 An object implementing the LearnAPI.jl interface is called an *algorithm*, although it is
 more accurately "the configuration of some algorithm".¹ An algorithm encapsulates a
-particular set of user-specified [hyperparameters](@ref) as the object's properties. It
-does not store learned parameters.
+particular set of user-specified [hyperparameters](@ref) as the object's *properties*
+(which conceivably differ from its fields). It does not store learned parameters.
+
+Informally, we will sometimes use the word "model" to refer to the output of
+`fit(algorithm, ...)` (see below), something which typically does store learned
+parameters.
 
 For `algorithm` to be a valid LearnAPI.jl algorithm,
 [`LearnAPI.constructor(algorithm)`](@ref) must be defined and return a keyword constructor
@@ -90,13 +94,16 @@ named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), propertie
 Note that if if `algorithm` is an instance of a *mutable* struct, this requirement
 generally requires overloading `Base.==` for the struct.
 
-A *composite algorithm* is one with a property that can take other algorithms as values;
-for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true` (fallback
-is `false`). Generally, the keyword constructor provided by [`LearnAPI.constructor`](@ref)
-must provide default values for all non-algorithm properties.
+#### Composite algorithms (wrappers)
+
+A *composite algorithm* is one with at least one property that can take other algorithms
+as values; for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true`
+(fallback is `false`). Generally, the keyword constructor provided by
+[`LearnAPI.constructor`](@ref) must provide default values for all fields that are not
+algorithm-valued.
 
 Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
-understood have a valid implementation of the LearnAPI.jl interface.
+understood to have a valid implementation of the LearnAPI.jl interface.
 
 ### Example
 
@@ -109,7 +116,7 @@ struct GradientRidgeRegressor{T<:Real}
 	l2_regularization::T
 end
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
-    GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
@@ -117,16 +124,22 @@ LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 
 Attach public LearnAPI.jl-related documentation for an algorithm to it's *constructor*,
 rather than to the struct defining its type. In this way, an algorithm can implement
-non-LearnAPI interfaces (such as a native interface) with separate document strings.
+multiple interfaces, in addition to the LearnAPI interface, with separate document strings
+for each.
 
 
 ## Methods
 
 Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_transform`,
-`minimize`, and `obs`. All new implementations must implement [`fit`](@ref),
-[`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
-[`LearnAPI.functions`](@ref). The last two are algorithm traits, which can be set with the
-[`@trait`](@ref) macro.
+`minimize`, and `obs`.
+
+!!! note
+
+	All new implementations must implement [`fit`](@ref),
+	[`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
+	[`LearnAPI.functions`](@ref). The last two are algorithm traits, which can be set
+	with the [`@trait`](@ref) macro.
+
 
 ### List of methods
 
@@ -147,22 +160,20 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
 - [`minimize`](@ref algorithm_minimize): for stripping the `model` output by `fit` of
   inessential content, for purposes of serialization.
 
+- [`LearnAPI.input`](@ref input): for extracting inputs from training data.
+
 - [`obs`](@ref data_interface): a method for exposing to the user algorithm-specific
-  representations of data guaranteed to implement observation access according to the
-  value of the [`LearnAPI.data_interface`](@ref) trait
-  
-- [Accessor functions](@ref accessor_functions): include things like `feature_importances`
-  and `training_losses`, for extracting, from training outcomes, information common to
-  many algorithms. 
+  representations of data that are guaranteed to implement observation access, as
+  specified by [`LearnAPI.data_interface(algorithm)`](@ref).
+
+- [Accessor functions](@ref accessor_functions): these include functions like
+  `feature_importances` and `training_losses`, for extracting, from training outcomes,
+  information common to many algorithms.
 
 - [Algorithm traits](@ref traits): special methods, that promise specific algorithm
   behavior or for recording general information about the algorithm. Only
   [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref) are universally
   compulsory.
-
-- [`LearnAPI.target`](@ref) and [`LearnAPI.weights`](@ref) are traits which also include
-  extended signatures for extracting, from `fit` input data, the target and
-  per-observation weights, when available.
 
 ---
 

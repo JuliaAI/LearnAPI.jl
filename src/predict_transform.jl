@@ -32,6 +32,21 @@ DOC_MINIMIZE(func) =
 
     """
 
+DOC_DATA_INTERFACE(method) =
+    """
+
+    ## Assumptions about data
+
+    By default, it is assumed that `data` supports the [`LearnAPI.RandomAccess`](@ref)
+    interface (all matrices, with observations-as-columns, most tables, and tuples
+    thereof). See  [`LearnAPI.RandomAccess`](@ref) for details. If this is not the case
+    then an implementation must suitably: (i) overload the trait
+    [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref). Refer to these
+    methods' document strings for details.
+
+    """
+
+
 # # METHOD STUBS/FALLBACKS
 
 """
@@ -56,16 +71,19 @@ In the following, `algorithm` is some supervised learning algorithm with
 training features `X`, training target `y`, and test features `Xnew`:
 
 ```julia
-model = fit(algorithm, X, y; verbosity=0)
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
 predict(model, LiteralTarget(), Xnew)
 ```
-
-Note `predict ` does not mutate any argument, except in the special case
-`LearnAPI.predict_or_transform_mutates(algorithm) = true`.
 
 See also [`fit`](@ref), [`transform`](@ref), [`inverse_transform`](@ref).
 
 # Extended help
+
+If `predict` supports data in the form of a tuple `data = (X1, ..., Xn)`, then a slurping
+signature is also provided, as in `predict(model, X1, ..., Xn)`.
+
+Note `predict ` does not mutate any argument, except in the special case
+`LearnAPI.predict_or_transform_mutates(algorithm) = true`.
 
 # New implementations
 
@@ -78,11 +96,13 @@ convenience form, but it is free to choose the fallback `kind_of_proxy`. Each
 `kind_of_proxy` that gets an implementation must be added to the list returned by
 [`LearnAPI.kinds_of_proxy`](@ref).
 
-$(DOC_IMPLEMENTED_METHODS(:predict))
+$(DOC_IMPLEMENTED_METHODS(":predict"))
 
 $(DOC_MINIMIZE(:predict))
 
 $(DOC_MUTATION(:predict))
+
+$(DOC_DATA_INTERFACE(:predict))
 
 """
 function predict end
@@ -94,7 +114,7 @@ function predict end
 Return a transformation of some `data`, using some `model`, as returned by
 [`fit`](@ref).
 
-For `data` that consists of a tuple, a slurping version is typically provided, i.e.,
+For `data` that consists of a tuple, a slurping version is also provided, i.e., you can do
 `transform(model, X1, X2, X3)` in place of `transform(model, (X1, X2, X3))`.
 
 # Example
@@ -115,7 +135,7 @@ model = fit(algorithm)
 W = transform(model, X)
 ```
 
-or, in one step:
+or, in one step (where supported):
 
 ```julia
 W = transform(algorithm, X)
@@ -132,11 +152,13 @@ See also [`fit`](@ref), [`predict`](@ref),
 # New implementations
 
 Implementation for new LearnAPI.jl algorithms is optional.
-$(DOC_IMPLEMENTED_METHODS(:transform))
+$(DOC_IMPLEMENTED_METHODS(":transform"))
 
 $(DOC_MINIMIZE(:transform))
 
 $(DOC_MUTATION(:transform))
+
+$(DOC_DATA_INTERFACE(:transform))
 
 """
 function transform end
@@ -166,7 +188,7 @@ See also [`fit`](@ref), [`transform`](@ref), [`predict`](@ref).
 
 # New implementations
 
-Implementation is optional. $(DOC_IMPLEMENTED_METHODS(:inverse_transform))
+Implementation is optional. $(DOC_IMPLEMENTED_METHODS(":inverse_transform"))
 
 $(DOC_MINIMIZE(:inverse_transform))
 

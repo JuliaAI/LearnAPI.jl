@@ -69,18 +69,20 @@ on the usual supervised/unsupervised learning dichotomy. From this point of view
 supervised algorithm is simply one in which a target variable exists, and happens to
 appear as an input to training but not to prediction.
 
+## Data interfaces
+
 Algorithms are free to consume data in any format. However, a method called [`obs`](@ref
 data_interface) (read as "observations") gives users and meta-algorithms access to an
 algorithm-specific representation of input data, which is also guaranteed to implement a
-standard interface for accessing individual observations, unless an algorithm explicitly
-opts out. The `fit` and `predict` methods also consume these alternative representations
-of data.
+standard interface for accessing individual observations, unless the algorithm explicitly
+opts out. Moreover, the `fit` and `predict` methods will also be able to consume these
+alternative data representations.
 
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
 `getobs/numobs` interface, and if the input consumed by the algorithm already implements
-that interface (tables, arrays, etc.) then overloading `obs` is completely optional. A
-plain iteration interface (to support, e.g., data loaders reading images from disk)
-can also be specified.
+that interface (tables, arrays, etc.) then overloading `obs` is completely optional. Plain
+iteration interfaces, with or without knowledge of the number of observations, can also be
+specified (to support, e.g., data loaders reading images from disk).
 
 ## Learning more
 

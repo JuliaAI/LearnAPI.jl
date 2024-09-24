@@ -9,12 +9,13 @@ inverse_transform(model, data)
 When a method expects a tuple form of argument, `data = (X1, ..., Xn)`, then a slurping
 signature is also provided, as in `transform(model, X1, ..., Xn)`.
 
-## Typical worklows
+
+## [Typical worklows](@id predict_workflow)
 
 Train some supervised `algorithm`:
 
 ```julia
-model = fit(algorithm, X, y)
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
 ```
 
 Predict probability distributions:
@@ -52,7 +53,7 @@ ŷ = predict(model, LiteralTarget(), predictobs)
 ```
 
 
-## Implementation guide
+## [Implementation guide](@id predict_guide)
 
 | method                      | compulsory? | fallback |
 |:----------------------------|:-----------:|:--------:|
@@ -72,7 +73,27 @@ paired with an implementation of [`inverse_transform`](@ref), for returning (app
 right inverses to `transform`.
 
 
-## Reference
+### [One-liners combining fit and transform/predict](@id one_liners)
+
+Algorithms may optionally overload `transform` to apply `fit` first, using the supplied
+data if required, and then immediately `transform` the same data. The same applies to
+`predict`. In that case the first argument of `transform`/`predict` is an *algorithm*
+instead of the output of `fit`:
+
+```julia
+predict(algorithm, kind_of_proxy, data) # `fit` implied
+transform(algorithm, data) # `fit` implied
+```
+
+For example, if `fit(algorithm, X)` is defined, then `predict(algorithm, X)` will be
+shorthand for
+
+```julia
+model = fit(algorithm, X)
+predict(model, X)
+```
+
+## [Reference](@id predict_ref)
 
 ```@docs
 predict

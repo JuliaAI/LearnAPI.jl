@@ -7,9 +7,9 @@ Return an algorithm-specific representation of `data`, suitable for passing to `
 `data`. Here `model` is the return value of `fit(algorithm, ...)` for some LearnAPI.jl
 algorithm, `algorithm`.
 
-The returned object is guaranteed to implement observation access as indicated
-by [`LearnAPI.data_interface(algorithm)`](@ref) (typically the
-[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs`/`numobs` interface).
+The returned object is guaranteed to implement observation access as indicated by
+[`LearnAPI.data_interface(algorithm)`](@ref) (typically
+[`LearnAPI.RandomAccess()`](@ref)).
 
 Calling `fit`/`predict`/`transform` on the returned objects may have performance
 advantages over calling directly on `data` in some contexts. And resampling the returned
@@ -21,21 +21,19 @@ object using `MLUtils.getobs` may be cheaper than directly resampling the compon
 Usual workflow, using data-specific resampling methods:
 
 ```julia
-X = <some `DataFrame`>
-y = <some `Vector`>
-
-Xtrain = Tables.select(X, 1:100)
-ytrain = y[1:100]
-model = fit(algorithm, (Xtrain, ytrain))
-ŷ = predict(model, LiteralTarget(), y[101:150])
+data = (X, y) # a DataFrame and a vector
+data_train = (Tables.select(X, 1:100), y[1:100])
+model = fit(algorithm, data_train)
+ŷ = predict(model, LiteralTarget(), X[101:150])
 ```
 
-Alternative workflow using `obs` and the MLUtils.jl API:
+Alternative workflow using `obs` and the MLUtils.jl method `getobs` (assumes
+`LearnAPI.data_interface(algorithm) == RandomAccess()`):
 
 ```julia
 import MLUtils
 
-fit_obsevations = obs(algorithm, (X, y))
+fit_observations = obs(algorithm, data)
 model = fit(algorithm, MLUtils.getobs(fit_observations, 1:100))
 
 predict_observations = obs(model, X)
@@ -52,15 +50,16 @@ See also [`LearnAPI.data_interface`](@ref).
 
 Implementation is typically optional.
 
-For each supported form of `data` in `fit(algorithm, data)`, `predict(model, data)`, and
-`transform(model, data)`, it must be true that `model = fit(algorithm, observations)` is
-supported, whenever `observations = obs(algorithm, data)`, and that `predict(model,
-observations)` and `transform(model, observations)` are supported, whenever `observations
-= obs(model, data)`.
+For each supported form of `data` in `fit(algorithm, data)`, it must be true that `model =
+fit(algorithm, observations)` is equivalent to `model = fit(algorithm, data)`, whenever
+`observations = obs(algorithm, data)`. For each supported form of `data` in calls
+`predict(model, ..., data)` and `transform(model, data)`, where implemented, the calls
+`predict(model, ..., observations)` and `transform(model, observations)` are supported
+alternatives, whenever `observations = obs(model, data)`.
 
 The fallback for `obs` is `obs(model_or_algorithm, data) = data`, and the fallback for
-`LearnAPI.data_interface(algorithm)` indicates MLUtils.jl as the adopted interface. For
-details refer to the [`LearnAPI.data_interface`](@ref) document string.
+`LearnAPI.data_interface(algorithm)` is `LearnAPI.RandomAccess()`. For details refer to
+the [`LearnAPI.data_interface`](@ref) document string.
 
 In particular, if the `data` to be consumed by `fit`, `predict` or `transform` consists
 only of suitable tables and arrays, then `obs` and `LearnAPI.data_interface` do not need

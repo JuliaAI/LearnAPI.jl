@@ -7,7 +7,7 @@ minimize(model) -> <smaller version of model suitable for serialization>
 # Typical workflow
 
 ```julia
-model = fit(algorithm, X, y)
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
 ŷ = predict(model, LiteralTarget(), Xnew)
 LearnAPI.feature_importances(model)
 
