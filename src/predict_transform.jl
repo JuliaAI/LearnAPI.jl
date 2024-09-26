@@ -1,4 +1,4 @@
- function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
+function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     word = overloaded ? "overloaded" : "implemented"
     "If $word, you must include `$name` in the tuple returned by the "*
     "[`LearnAPI.functions`](@ref) trait. "
@@ -105,6 +105,8 @@ $(DOC_DATA_INTERFACE(:predict))
 
 """
 predict(model, data) = predict(model, kinds_of_proxy(algorithm(model)) |> first, data)
+
+# automatic slurping of multiple data arguments:
 predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
     predict(model, k, (data1, data2, datas...); kwargs...)
 predict(model, data1, data2, datas...; kwargs...) =
@@ -166,9 +168,7 @@ $(DOC_DATA_INTERFACE(:transform))
 
 """
 transform(model, data1, data2...; kwargs...) =
-    transform(model, (data1, datas...); kwargs...)
-
-
+    transform(model, (data1, datas...); kwargs...) # automatic slurping
 
 """
     inverse_transform(model, data)

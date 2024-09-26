@@ -27,8 +27,6 @@ const TRAITS = [
     :constructor,
     :functions,
     :kinds_of_proxy,
-    :target,
-    :weights,
     :descriptors,
     :is_pure_julia,
     :pkg_name,
@@ -63,8 +61,7 @@ const TRAITS = [
 """
     Learn.API.constructor(algorithm)
 
-Return a keyword constructor that can be used to clone `algorithm` or make copies with
-selectively altered property values:
+Return a keyword constructor that can be used to clone `algorithm`:
 
 ```julia-repl
 julia> algorithm.lambda
@@ -178,42 +175,6 @@ For more on target variables and target proxies, refer to the LearnAPI documenta
 
 """
 kinds_of_proxy(::Any) = ()
-
-"""
-    LearnAPI.target(algorithm)::Bool
-    LearnAPI.target(algorithm, data) -> target
-
-First method (an algorithm trait) returns `true` if the second method returns a target
-variable for some value(s) of `data`, where `data` is a supported argument in
-[`fit(algorithm, data)`](@ref).
-
-# New implementations
-
-The trait fallback returns `false`. A fallback for the second method returns `nothing`.
-
-"""
-target(::Any) = false
-target(::Any, data) = nothing
-
-"""
-    LearnAPI.weights(algorithm)::Bool
-    LearnAPI.weights(algorithm, data) -> weights
-
-First method (an algorithm trait) returns `true` if the second method returns
-per-observation weights, for some value(s) of `data`, where `data` is a supported argument
-in [`fit(algorithm, data)`](@ref).
-
-Otherwise, weights, if they apply, are assumed uniform.
-
-# New implementations
-
-The trait fallback returns `false`. A fallback for the second method returns `nothing`,
-which is interpreted as uniform weights.
-
-"""
-weights(::Any) = false
-weights(::Any, data) = nothing
-
 
 descriptors() = [
     :regression,

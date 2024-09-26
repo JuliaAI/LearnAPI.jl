@@ -1,8 +1,14 @@
-# [`input`](@id input)
+# [`target`, `weights`, and `input`](@id input)
+
+Methods for extracting parts of training data:
 
 ```julia
-LearnAPI.input(algorithm, data) -> <suitable input for `predict`>
+LearnAPI.target(algorithm, data) -> <target variable>
+LearnAPI.weights(algorithm, data) -> <per-observation weights>
+LearnAPI.input(algorithm, data) -> <training "features", suitable input for `predict` or `transform`>
 ```
+
+Here `data` is something supported in a call of the form `fit(algorithm, data)`. 
 
 # Typical workflow
 
@@ -24,12 +30,17 @@ training_loss = sum(ŷ .!= y)
 
 The fallback returns `first(data)`, assuming `data` is a tuple, and `data` otherwise.
 
-| method                   | compulsory? |
-|:-------------------------|:-----------:|
-| [`LearnAPI.input`](@ref) | no          |
+| method                     | fallback          | compulsory?            |   |
+|:---------------------------|:-----------------:|------------------------|---|
+| [`LearnAPI.target`](@ref)  | returns `nothing` | no                     |   |
+| [`LearnAPI.weights`](@ref) | returns `nothing` | no                     |   |
+| [`LearnAPI.input`](@ref)   | see docstring     | only if fallback fails |   |
+
 
 # Reference
 
 ```@docs
+LearnAPI.target
+LearnAPI.weights
 LearnAPI.input
 ```

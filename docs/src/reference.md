@@ -160,11 +160,12 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
 - [`minimize`](@ref algorithm_minimize): for stripping the `model` output by `fit` of
   inessential content, for purposes of serialization.
 
-- [`LearnAPI.input`](@ref input): for extracting inputs from training data.
+- [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
+  [`LearnAPI.input`](@ref): for extracting relevant parts of training data, where defined.
 
-- [`obs`](@ref data_interface): a method for exposing to the user algorithm-specific
-  representations of data that are guaranteed to implement observation access, as
-  specified by [`LearnAPI.data_interface(algorithm)`](@ref).
+- [`obs`](@ref data_interface): optional method for exposing to the user
+  algorithm-specific representations of data that are guaranteed to implement observation
+  access, as specified by [`LearnAPI.data_interface(algorithm)`](@ref).
 
 - [Accessor functions](@ref accessor_functions): these include functions like
   `feature_importances` and `training_losses`, for extracting, from training outcomes,

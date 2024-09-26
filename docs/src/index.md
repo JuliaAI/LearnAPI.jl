@@ -31,9 +31,10 @@ ML/statistics toolboxes and other packages. LearnAPI.jl also provides a number o
 ## Sample workflow
 
 Suppose `forest` is some object encapsulating the hyperparameters of the [random forest
-algorithm](https://en.wikipedia.org/wiki/Random_forest) (the number of trees,
-etc.). Then, a LearnAPI.jl interface can be implemented, for objects with the type of
-`forest`, to enable the following basic workflow:
+algorithm](https://en.wikipedia.org/wiki/Random_forest) (the number of trees, etc.). Then,
+a LearnAPI.jl interface can be implemented, for objects with the type of `forest`, to
+enable the basic workflow below. In this case data is presented following the
+"scikit-learn" `X, y` pattern, although LearnAPI.jl supports other patterns as well.
 
 ```julia
 X = <some training features>

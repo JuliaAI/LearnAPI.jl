@@ -1,8 +1,9 @@
 # [Algorithm Traits](@id traits)
 
-Traits generally promise specific algorithm behavior, such as: *This algorithm supports
-per-observation weights, or *This algorithm's `transform` method predicts `Real`
-vectors*. They also record more mundane information, such as a package license.
+Traits generally promise specific algorithm behavior, such as: *This algorithm can make
+point or probabilistic predictions*, *This algorithm sees a target variable in training*,
+or *This algorithm's `transform` method predicts `Real` vectors*. They also record more
+mundane information, such as a package license.
 
 Algorithm traits are functions whose first (and usually only) argument is an algorithm.
 
@@ -24,8 +25,6 @@ package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.
 | [`LearnAPI.constructor`](@ref)`(algorithm)`                           | constructor for generating new or modified versions of `algorithm`                                                               | (no fallback)                                         | `RidgeRegressor`                                         |
 | [`LearnAPI.functions`](@ref)`(algorithm)`                             | functions you can apply to `algorithm` or associated model (traits excluded)                                                     | `()`                                                  | `(:fit, :predict, :minimize, :(LearnAPI.algorithm), :obs)`      |
 | [`LearnAPI.kinds_of_proxy`](@ref)`(algorithm)`                        | instances `kind` of `KindOfProxy` for which an implementation of `LearnAPI.predict(algorithm, kind, ...)` is guaranteed.         | `()`                                                  | `(Distribution(), Interval())`                           |
-| [`LearnAPI.target`](@ref)`(algorithm)`                                | `true` if target can appear in `fit` data                                                                                        | `false`                                               | `true`                                                   |
-| [`LearnAPI.weights`](@ref)`(algorithm)`                               | `true` if per-observation weights can appear in `fit` data                                                                       | `false`                                               | `true`                                                   |
 | [`LearnAPI.descriptors`](@ref)`(algorithm)`                           | lists one or more suggestive algorithm descriptors from `LearnAPI.descriptors()`                                                 | `()`                                                  | (:regression, :probabilistic)                            |
 | [`LearnAPI.is_pure_julia`](@ref)`(algorithm)`                         | `true` if implementation is 100% Julia code                                                                                      | `false`                                               | `true`                                                   |
 | [`LearnAPI.pkg_name`](@ref)`(algorithm)`                              | name of package providing core code (may be different from package providing LearnAPI.jl implementation)                         | `"unknown"`                                           | `"DecisionTree"`                                         |
@@ -91,7 +90,7 @@ Multiple traits can be declared like this:
 )
 ```
 
-### The global trait contracts
+### [The global trait contract](@id trait_contract)
 
 To ensure that trait metadata can be stored in an external algorithm registry, LearnAPI.jl
 requires:
@@ -115,8 +114,6 @@ informative (as in `LearnAPI.predict_type(algorithm) = Any`).
 LearnAPI.constructor
 LearnAPI.functions
 LearnAPI.kinds_of_proxy
-LearnAPI.target
-LearnAPI.weights
 LearnAPI.descriptors
 LearnAPI.is_pure_julia
 LearnAPI.pkg_name

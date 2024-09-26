@@ -8,21 +8,23 @@ refer to the [demonstration](@ref workflow) of the implementation given later.
 For a transformer, implementations ordinarily implement `transform` instead of
 `predict`. For more on `predict` versus `transform`, see [Predict or transform?](@ref)
 
-!!! important
+!!! note
 
-        Implementations of `fit`, `predict`, etc,
-        always have a *single* `data` argument, as in `fit(algorithm, data; verbosity=1)`.
-        For user convenience, calls like `fit(algorithm, X, y)` automatically fallback to `fit(algorithm, (X, y))`.
+    New implementations of `fit`, `predict`, etc,
+    always have a *single* `data` argument, as in
+        `LearnAPI.fit(algorithm, data; verbosity=1) = ...`.
+    For convenience, user calls like `fit(algorithm, X, y)` automatically fallback
+        to `fit(algorithm, (X, y))`.
 
 !!! note
 
-        If the `data` object consumed by `fit`, `predict`, or `transform` is not
-        not a suitable table¹, array³, tuple of tables and arrays, or some
-        other object implementing
-        the MLUtils.jl `getobs`/`numobs` interface,
-        then an implementation must: (i) suitably overload the trait
-        [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
-        illustrated below under [Providing an advanced data interface](@ref).
+    If the `data` object consumed by `fit`, `predict`, or `transform` is not
+    not a suitable table¹, array³, tuple of tables and arrays, or some
+    other object implementing
+    the MLUtils.jl `getobs`/`numobs` interface,
+    then an implementation must: (i) suitably overload the trait
+    [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
+     illustrated below under [Providing an advanced data interface](@ref).
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -48,7 +50,7 @@ Instances of `Ridge` will be [algorithms](@ref algorithms), in LearnAPI.jl parla
 
 Associated with each new type of LearnAPI [algorithm](@ref algorithms) will be a keyword
 argument constructor, providing default values for all properties (struct fields) that are
-not other algorithms, and we must implement `LearnAPI.constructor(algorithm)`, for
+not other algorithms, and we must implement [`LearnAPI.constructor(algorithm)`](@ref), for
 recovering the constructor from an instance:
 
 ```@example anatomy
@@ -62,7 +64,7 @@ LearnAPI.constructor(::Ridge) = Ridge
 nothing # hide
 ```
 
-So, in this case, if `algorithm = Ridge(0.2)`, then
+For example, in this case, if `algorithm = Ridge(0.2)`, then
 `LearnAPI.constructor(algorithm)(lambda=0.2) == algorithm` is true. Note that we attach
 the docstring to the *constructor*, not the struct.
 
@@ -123,12 +125,12 @@ predict(model, LiteralTarget(), Xnew)
 ```
 
 where `Xnew` is a table (of the same form as `X` above). The argument `LiteralTarget()`
-signals that we want literal predictions of the target variable, as opposed to a proxy for
-the target, such as probability density functions.  `LiteralTarget` is an example of a
-[`LearnAPI.KindOfProxy`](@ref proxy_types) type. Targets and target proxies are discussed
-[here](@ref proxy).
+signals that literal predictions of the target variable are sought, as opposed to some
+proxy for the target, such as probability density functions.  `LiteralTarget` is an
+example of a [`LearnAPI.KindOfProxy`](@ref proxy_types) type. Targets and target proxies
+are discussed [here](@ref proxy).
 
-So, we provide this implementation for our ridge regressor:
+We provide this implementation for our ridge regressor:
 
 ```@example anatomy
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
@@ -197,7 +199,7 @@ and so we regard [`LearnAPI.constructor`](@ref) defined above as a trait.
 
 Because we have implemented `predict`, we are required to overload the
 [`LearnAPI.kinds_of_proxy`](@ref) trait. Because we can only make point predictions of the
-target, we do this like this:
+target, we make this definition:
 
 ```julia
 LearnAPI.kinds_of_proxy(::Ridge) = (LiteralTarget(),)
@@ -232,6 +234,11 @@ only universally compulsory traits. However, it is worthwhile studying the [list
 traits](@ref traits_list) to see which might apply to a new implementation, to enable
 maximum buy into functionality provided by third party packages, and to assist third party
 algorithms that match machine learning algorithms to user-defined tasks.
+
+Note that we know `Ridge` instances are supervised algorithms because `:(LearnAPI.target)
+in LearnAPI.functions(algorithm)`, for every instance `algorithm`. With [some
+exceptions](@ref trait_contract), the value of a trait should depend only on the *type* of
+the argument.
 
 
 ## [Demonstration](@id workflow)
@@ -307,9 +314,6 @@ LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
 LearnAPI.minimize(model::RidgeFitted) =
     RidgeFitted(model.algorithm, model.coefficients, nothing)
-
-LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
 
 @trait(
     Ridge,
