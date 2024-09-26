@@ -43,9 +43,12 @@ on providing slurping signatures. A fallback for the first signature calls the s
 ignoring `data`:
 
 ```julia
-fit(algorithm, data...; kwargs...) = fit(algorithm; kwargs...)
+fit(algorithm, data; kwargs...) = fit(algorithm; kwargs...)
 ```
 $(DOC_DATA_INTERFACE(:fit))
 
 """
-fit(algorithm, data...; kwargs...) = fit(algorithm; kwargs...)
+fit(algorithm, data; kwargs...) =
+    fit(algorithm; kwargs...)
+fit(algorithm, data1, datas...; kwargs...) =
+    fit(algorithm, (data1, datas...); kwargs...)

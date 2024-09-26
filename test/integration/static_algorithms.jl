@@ -15,8 +15,8 @@ struct Selector
 end
 Selector(; names=Symbol[]) =  Selector(names) # LearnAPI.constructor defined later
 
-# `fit` has no input data, does no "learning", and just returns thinly wrapped `algorithm`
-# (to distinguish it from the algorithm in dispatch):
+# `fit` consumes no observational data, does no "learning", and just returns a thinly
+# wrapped `algorithm` (to distinguish it from the algorithm in dispatch):
 LearnAPI.fit(algorithm::Selector; verbosity=1) = Ref(algorithm)
 LearnAPI.algorithm(model) = model[]
 
@@ -40,10 +40,11 @@ end
     Selector,
     constructor = Selector,
     functions = (
-        fit,
-        minimize,
-        transform,
-        Learn.algorithm,
+        :(LearnAPI.fit),
+        :(LearnAPI.algorithm),
+        :(LearnAPI.minimize),
+        :(LearnAPI.obs),
+        :(LearnAPI.transform),
     ),
 )
 
@@ -61,7 +62,9 @@ end
 # # FEATURE SELECTOR THAT REPORTS BYPRODUCTS OF SELECTION PROCESS
 
 # This a variation of `Selector` above that stores the names of rejected features in the
-# model object, for inspection by an accessor function called `rejected`.
+# model object, for inspection by an accessor function called `rejected`. Since
+# `transform(model, X)` mutates `model` in this case, we must overload the
+# `predict_or_transform_mutates` trait.
 
 struct Selector2
     names::Vector{Symbol}
@@ -99,15 +102,15 @@ end
 
 @trait(
     Selector2,
-    constructor = Selector,
+    constructor = Selector2,
     predict_or_transform_mutates = true,
     functions = (
-        fit,
-        obsfit,
-        minimize,
-        transform,
-        Learn.algorithm,
-        :(MyPkg.rejected), # accessor function not owned by LearnAPI.jl
+        :(LearnAPI.fit),
+        :(LearnAPI.algorithm),
+        :(LearnAPI.minimize),
+        :(LearnAPI.obs),
+        :(LearnAPI.transform),
+        :(MyPkg.rejected), # accessor function not owned by LearnAPI.jl,
     )
 )
 

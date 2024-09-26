@@ -105,7 +105,10 @@ $(DOC_MUTATION(:predict))
 $(DOC_DATA_INTERFACE(:predict))
 
 """
-function predict end
+predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
+    predict(model, k, (data1, data2, datas...); kwargs...)
+predict(model, data1, data2, datas...; kwargs...) =
+    predict(model, (data1, data2, datas...); kwargs...)
 
 
 """
@@ -161,7 +164,9 @@ $(DOC_MUTATION(:transform))
 $(DOC_DATA_INTERFACE(:transform))
 
 """
-function transform end
+transform(model, data1, data2...; kwargs...) =
+    transform(model, (data1, datas...); kwargs...)
+
 
 
 """

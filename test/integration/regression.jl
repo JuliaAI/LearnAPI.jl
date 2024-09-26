@@ -7,8 +7,8 @@ import DataFrames
 
 # # NAIVE RIDGE REGRESSION WITH NO INTERCEPTS
 
-# We overload `obs` to expose internal representation of input data. See later for a
-# simpler variation using the `obs` fallback.
+# We overload `obs` to expose internal representation of data. See later for a simpler
+# variation using the `obs` fallback.
 
 # no docstring here - that goes with the constructor
 struct Ridge
@@ -78,13 +78,10 @@ end
 LearnAPI.fit(algorithm::Ridge, data; kwargs...) =
     fit(algorithm, obs(algorithm, data); kwargs...)
 
-# for convenience:
-LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
-
-# to extract the target:
+# extracting stuff from training data:
 LearnAPI.target(::Ridge, data) = last(data)
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
+LearnAPI.input(::Ridge, observations::RidgeFitObs) = observations.A
 
 # observations for consumption by `predict`:
 LearnAPI.obs(::RidgeFitted, X) = Tables.matrix(X)'
@@ -100,6 +97,7 @@ LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
 # convenience method:
 LearnAPI.predict(model::RidgeFitted, data) = predict(model, LiteralTarget(), data)
 
+# accessor function:
 LearnAPI.feature_importances(model::RidgeFitted) = model.feature_importances
 
 LearnAPI.minimize(model::RidgeFitted) =
@@ -108,18 +106,20 @@ LearnAPI.minimize(model::RidgeFitted) =
 @trait(
     Ridge,
     constructor = Ridge,
-    target=true,
     kinds_of_proxy = (LiteralTarget(),),
     functions = (
-        fit,
-        minimize,
-        predict,
-        obs,
-        LearnAPI.algorithm,
-        LearnAPI.feature_importances,
-    )
+        :(LearnAPI.fit),
+        :(LearnAPI.algorithm),
+        :(LearnAPI.minimize),
+        :(LearnAPI.obs),
+        :(LearnAPI.input),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.feature_importances),
+   )
 )
 
+# synthetic test data:
 n = 30 # number of observations
 train = 1:6
 test = 7:10
@@ -127,10 +127,14 @@ a, b, c = rand(n), rand(n), rand(n)
 X = (; a, b, c)
 X = DataFrames.DataFrame(X)
 y = 2a - b + 3c + 0.05*rand(n)
+data = (X, y)
 
 @testset "test an implementation of ridge regression" begin
     algorithm = Ridge(lambda=0.5)
-    @test LearnAPI.obs in LearnAPI.functions(algorithm)
+    @test :(LearnAPI.obs) in LearnAPI.functions(algorithm)
+
+    @test LearnAPI.target(algorithm, data) == y
+    @test LearnAPI.input(algorithm, data) == X
 
     # verbose fitting:
     @test_logs(
@@ -157,10 +161,12 @@ y = 2a - b + 3c + 0.05*rand(n)
     @test ŷ isa Vector{Float64}
     @test predict(model, Tables.subset(X, test)) == ŷ
 
-    fitobs = LearnAPI.obs(algorithm, (X, y))
+    fitobs = LearnAPI.obs(algorithm, data)
     predictobs = LearnAPI.obs(model, X)
     model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
+    @test LearnAPI.target(algorithm, fitobs) == y
     @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) ≈ ŷ
+    @test predict(model, LearnAPI.input(algorithm, fitobs)) ≈ predict(model, X)
 
     @test LearnAPI.feature_importances(model) isa Vector{<:Pair{Symbol}}
 
@@ -176,9 +182,6 @@ y = 2a - b + 3c + 0.05*rand(n)
         LiteralTarget(),
         MLUtils.getobs(predictobs, test)
     ) ≈ ŷ
-
-    @test LearnAPI.target(algorithm, (X, y)) == y
-    @test LearnAPI.target(algorithm, fitobs) == y
 
 end
 
@@ -221,32 +224,34 @@ function LearnAPI.fit(algorithm::BabyRidge, data; verbosity=1)
 
 end
 
+# extracting stuff from training data:
 LearnAPI.target(::BabyRidge, data) = last(data)
-
-# convenience form:
-LearnAPI.fit(algorithm::BabyRidge, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
 
 LearnAPI.algorithm(model::BabyRidgeFitted) = model.algorithm
 
 LearnAPI.predict(model::BabyRidgeFitted, ::LiteralTarget, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 
+# convenience method:
+LearnAPI.predict(model::BabyRidgeFitted, data) = predict(model, LiteralTarget(), data)
+
 LearnAPI.minimize(model::BabyRidgeFitted) =
     BabyRidgeFitted(model.algorithm, model.coefficients, nothing)
 
 @trait(
     BabyRidge,
-    constructor = Ridge,
-    target=true,
+    constructor = BabyRidge,
     kinds_of_proxy = (LiteralTarget(),),
     functions = (
-        fit,
-        minimize,
-        predict,
-        LearnAPI.algorithm,
-        LearnAPI.feature_importances,
-    )
+        :(LearnAPI.fit),
+        :(LearnAPI.algorithm),
+        :(LearnAPI.minimize),
+        :(LearnAPI.obs),
+        :(LearnAPI.input),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.feature_importances),
+   )
 )
 
 @testset "test a variation  which does not overload LearnAPI.obs" begin
@@ -256,12 +261,14 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
     ŷ = predict(model, LiteralTarget(), Tables.subset(X, test))
     @test ŷ isa Vector{Float64}
 
-    fitobs = obs(algorithm, (X, y))
+    fitobs = obs(algorithm, data)
     predictobs = LearnAPI.obs(model, X)
     model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
-    @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) == ŷ
-
-    @test LearnAPI.target(algorithm, (X, y)) == y
+    @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) == ŷ ==
+        predict(model, MLUtils.getobs(predictobs, test))
+    @test LearnAPI.target(algorithm, data) == y
+    @test LearnAPI.predict(model, X) ≈
+        LearnAPI.predict(model, LearnAPI.input(algorithm, data))
 end
 
 true

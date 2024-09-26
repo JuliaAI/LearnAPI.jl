@@ -100,12 +100,13 @@ function constructor end
 """
     LearnAPI.functions(algorithm)
 
-Return a tuple of symbols respresenting functions that can be meaningfully applied with
-`algorithm`, or an associate model (object returned by `fit(algorithm, ...)`, as the first
-argument. Algorithm traits (`algorithm` is the *only* argument) are excluded.
+Return a tuple of expressions respresenting functions that can be meaningfully applied
+with `algorithm`, or an associated model (object returned by `fit(algorithm, ...)`, as the
+first argument. Algorithm traits (methods for which `algorithm` is the *only* argument)
+are excluded.
 
-In addition to symbols, the returned tuple may include expressions, like
-`:(DecisionTree.print_tree)`, which reference functions not owned by LearnAPI.jl.
+The returned tuple may include expressions like `:(DecisionTree.print_tree)`, which
+reference functions not owned by LearnAPI.jl.
 
 The understanding is that `algorithm` is a LearnAPI-compliant object whenever the return
 value is non-empty.
@@ -117,18 +118,22 @@ value is non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| symbol                | implementation/overloading compulsory? | include in returned tuple? |
-|-----------------------|----------------------------------------|----------------------------|
-| `:fit`                | yes                                    | yes                        |
-| `:minimize`           | no                                     | yes                        |
-| `:obs`                | no                                     | yes                        |
-| `:LearnAPI.algorithm` | yes                                    | yes                        |
-| `:inverse_transform`  | no                                     | only if implemented        |
-| `:predict`            | no                                     | only if implemented        |
-| `:transform`          | no                                     | only if implemented        |
+| symbol                          | implementation/overloading compulsory? | include in returned tuple?         |
+|---------------------------------|----------------------------------------|------------------------------------|
+| `:(LearnAPI.fit)`               | yes                                    | yes                                |
+| `:(LearnAPI.algorithm)`         | yes                                    | yes                                |
+| `:(LearnAPI.minimize)`          | no                                     | yes                                |
+| `:(LearnAPI.obs)`               | no                                     | yes                                |
+| `:(LearnAPI.input)`             | no                                     | yes, unless `fit` consumes no data |
+| `:(LearnAPI.target)`            | no                                     | only if implemented                |
+| `:(LearnAPI.weights)`           | no                                     | only if implemented                |
+| `:(LearnAPI.predict)`           | no                                     | only if implemented                |
+| `:(LearnAPI.transform)`         | no                                     | only if implemented                |
+| `:(LearnAPI.inverse_transform)` | no                                     | only if implemented                |
+| <accessor functions>            | no                                     | only if implemented                |
 
-Also include any implemented accessor functions. The LearnAPI.jl accessor functions are:
-$ACCESSOR_FUNCTIONS_LIST.
+Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
+algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST.
 
 """
 functions(::Any) = ()
