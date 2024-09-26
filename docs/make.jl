@@ -19,7 +19,7 @@ makedocs(
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
             "minimize" => "minimize.md",
-            "input" => "input.md",
+            "target/weights/input" => "target_weights_input.md",
             "obs" => "obs.md",
             "Accessor Functions" => "accessor_functions.md",
             "Algorithm Traits" => "traits.md",
