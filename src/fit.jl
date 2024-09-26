@@ -38,13 +38,15 @@ See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
 
 # New implementations
 
-Implementation is compulsory. The signature must include `verbosity`. Note the requirement
-on providing slurping signatures. A fallback for the first signature calls the second,
-ignoring `data`:
+Implementation is compulsory. The signature must include `verbosity`. A fallback for the
+first signature calls the second, ignoring `data`:
 
 ```julia
 fit(algorithm, data; kwargs...) = fit(algorithm; kwargs...)
 ```
+
+Fallbacks also provide the data slurping versions.
+
 $(DOC_DATA_INTERFACE(:fit))
 
 """

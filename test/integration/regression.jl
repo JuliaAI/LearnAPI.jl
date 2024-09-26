@@ -94,9 +94,6 @@ LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, observations::AbstractMatr
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
         predict(model, LiteralTarget(), obs(model, Xnew))
 
-# convenience method:
-LearnAPI.predict(model::RidgeFitted, data) = predict(model, LiteralTarget(), data)
-
 # accessor function:
 LearnAPI.feature_importances(model::RidgeFitted) = model.feature_importances
 
@@ -231,9 +228,6 @@ LearnAPI.algorithm(model::BabyRidgeFitted) = model.algorithm
 
 LearnAPI.predict(model::BabyRidgeFitted, ::LiteralTarget, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
-
-# convenience method:
-LearnAPI.predict(model::BabyRidgeFitted, data) = predict(model, LiteralTarget(), data)
 
 LearnAPI.minimize(model::BabyRidgeFitted) =
     BabyRidgeFitted(model.algorithm, model.coefficients, nothing)

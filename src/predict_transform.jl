@@ -61,7 +61,8 @@ options with [`LearnAPI.kinds_of_proxy(algorithm)`](@ref), where `algorithm =
 LearnAPI.algorithm(model)`.
 
 The shortcut `predict(model, data)` calls the first method with an algorithm-specific
-`kind_of_proxy`.
+`kind_of_proxy`, namely the first element of [`LearnAPI.kinds_of_proxy(algorithm)`](@ref),
+which lists all supported target proxies.
 
 The argument `model` is anything returned by a call of the form `fit(algorithm, ...)`.
 
@@ -90,9 +91,7 @@ Note `predict ` does not mutate any argument, except in the special case
 If there is no notion of a "target" variable in the LearnAPI.jl sense, or you need an
 operation with an inverse, implement [`transform`](@ref) instead.
 
-Implementation is optional. If the first signature is implemented for some
-`kind_of_proxy`, then the implementation should provide an implementation of the second
-convenience form, but it is free to choose the fallback `kind_of_proxy`. Each
+Implementation is optional. Only the first signature is implemented, but each
 `kind_of_proxy` that gets an implementation must be added to the list returned by
 [`LearnAPI.kinds_of_proxy`](@ref).
 
@@ -105,10 +104,12 @@ $(DOC_MUTATION(:predict))
 $(DOC_DATA_INTERFACE(:predict))
 
 """
+predict(model, data) = predict(model, kinds_of_proxy(algorithm(model)) |> first, data)
 predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
     predict(model, k, (data1, data2, datas...); kwargs...)
 predict(model, data1, data2, datas...; kwargs...) =
     predict(model, (data1, data2, datas...); kwargs...)
+
 
 
 """
@@ -154,8 +155,8 @@ See also [`fit`](@ref), [`predict`](@ref),
 
 # New implementations
 
-Implementation for new LearnAPI.jl algorithms is optional.
-$(DOC_IMPLEMENTED_METHODS(":transform"))
+Implementation for new LearnAPI.jl algorithms is optional. A fallback provides the
+slurping version. $(DOC_IMPLEMENTED_METHODS(":transform"))
 
 $(DOC_MINIMIZE(:transform))
 

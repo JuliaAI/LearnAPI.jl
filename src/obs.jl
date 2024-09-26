@@ -66,9 +66,14 @@ only of suitable tables and arrays, then `obs` and `LearnAPI.data_interface` do 
 to be overloaded. However, the user will get no performance benefits by using `obs` in
 that case.
 
+When overloading `obs(algorithm, data)` to output new model-specific representations of
+data, it may be necessary to also overload [`LearnAPI.input`](@ref),
+[`LearnAPI.target`](@ref) (supervised algorithms), and/or [`LearnAPI.weights`](@ref) (if
+weights are supported), for extracting relevant parts of the representation.
+
 ## Sample implementation
 
-Refer to the "Anatomy of an Implementation" section of the LearnAPI
+Refer to the "Anatomy of an Implementation" section of the LearnAPI.jl
 [manual](https://juliaai.github.io/LearnAPI.jl/dev/).
 
 

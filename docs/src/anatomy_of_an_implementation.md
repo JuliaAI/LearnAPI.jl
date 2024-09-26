@@ -116,7 +116,7 @@ end
 
 ## Implementing `predict`
 
-The primary `predict` call will look like this:
+Users will be able to call `predict` like this:
 
 ```julia
 predict(model, LiteralTarget(), Xnew)
@@ -128,19 +128,17 @@ the target, such as probability density functions.  `LiteralTarget` is an exampl
 [`LearnAPI.KindOfProxy`](@ref proxy_types) type. Targets and target proxies are discussed
 [here](@ref proxy).
 
-Here's the implementation for our ridge regressor:
+So, we provide this implementation for our ridge regressor:
 
 ```@example anatomy
 LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 ```
 
-Since we can make no other kind of prediction in this case, we may overload the following
-for user convenience:
+If the kind of proxy is omitted, as in `predict(model, Xnew)`, then a fallback grabs the
+first element of the tuple returned by [`LearnAPI.kinds_of_proxy(algorithm)`](@ref), which
+we overload appropriately below.
 
-```@example anatomy
-LearnAPI.predict(model::RidgeFitted, Xnew) = predict(model, LiteralTarget(), Xnew)
-```
 
 ## Extracting the target from training data
 
@@ -263,7 +261,7 @@ Training and predicting:
 Xtrain = Tables.subset(X, train)
 ytrain = y[train]
 model = fit(algorithm, (Xtrain, ytrain))  # `fit(algorithm, Xtrain, ytrain)` will also work
-ŷ = predict(model, LiteralTarget(), Tables.subset(X, test))
+ŷ = predict(model, Tables.subset(X, test))
 ```
 
 Extracting coefficients:
@@ -312,7 +310,6 @@ LearnAPI.minimize(model::RidgeFitted) =
 
 LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
     fit(algorithm, (X, y); kwargs...)
-LearnAPI.predict(model::RidgeFitted, Xnew) = predict(model, LiteralTarget(), Xnew)
 
 @trait(
     Ridge,
@@ -424,8 +421,8 @@ LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
 
 ### `target` and `input` methods
 
-We provide an additional overloading of [`LearnAPI.target`](@ref) to handle the additional supported data
-argument of `fit`:
+We provide an additional overloading of [`LearnAPI.target`](@ref) to handle the additional
+supported data argument of `fit`:
 
 ```@example anatomy2
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y

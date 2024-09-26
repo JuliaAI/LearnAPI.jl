@@ -82,7 +82,7 @@ end
 | [`obs(algorithm_or_model, data)`](@ref) | depends     | returns `data` |
 |                                         |             |                |
 
-A sample implementation is given in [Providing an advanced data interface](@ref).
+A sample implementation is given in [Providing an advanced data interface](@ref). 
 
 
 ## Reference
