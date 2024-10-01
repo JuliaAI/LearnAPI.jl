@@ -47,7 +47,7 @@ expectiles at 50% will provide `LiteralTarget` instead.
 > Table of concrete subtypes of `LearnAPI.IID <: LearnAPI.KindOfProxy`.
 
 
-## Proxies for distribution-fitting algorithms
+## Proxies for density estimation lgorithms
 
 ```@docs
 LearnAPI.Single

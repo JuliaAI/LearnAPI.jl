@@ -105,7 +105,7 @@ algorithm-valued.
 Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
 understood to have a valid implementation of the LearnAPI.jl interface.
 
-### Example
+#### Example
 
 Any instance of `GradientRidgeRegressor` defined below is a valid algorithm.
 
@@ -120,33 +120,35 @@ GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) 
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
-### Documentation
+## Documentation
 
 Attach public LearnAPI.jl-related documentation for an algorithm to it's *constructor*,
 rather than to the struct defining its type. In this way, an algorithm can implement
 multiple interfaces, in addition to the LearnAPI interface, with separate document strings
 for each.
 
-
 ## Methods
 
-Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_transform`,
-`minimize`, and `obs`.
+!!! note "Compulsory methods"
 
-!!! note
+    All new algorithm types must implement [`fit`](@ref),
+    [`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
+    [`LearnAPI.functions`](@ref).
 
-	All new implementations must implement [`fit`](@ref),
-	[`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
-	[`LearnAPI.functions`](@ref). The last two are algorithm traits, which can be set
-	with the [`@trait`](@ref) macro.
-
+Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref).
 
 ### List of methods
 
 - [`fit`](@ref fit): for training or updating algorithms that generalize to new data. Or,
-  for non-generalizing algorithms (see [Static Algorithms](@ref)), wrap `algorithm` in a
-  mutable struct that can be mutated by `predict`/`transform` to record byproducts of
-  those operations.
+  for non-generalizing algorithms (see [Static Algorithms](@ref)), for wrapping
+  `algorithm` in a mutable struct that can be mutated by `predict`/`transform` to record
+  byproducts of those operations.
+  
+- [`update`](@ref fit): for updating learning outcomes after hyperparameter changes, such
+  as increasing an iteration parameter.
+  
+- [`update_observations`](@ref fit), [`update_features`](@ref fit): update learning
+  outcomes by presenting additional training data.
 
 - [`predict`](@ref operations): for outputting [targets](@ref proxy) or [target
   proxies](@ref proxy) (such as probability density functions)
@@ -161,20 +163,21 @@ Only these method names are exported by LearnAPI: `fit`, `transform`, `inverse_t
   inessential content, for purposes of serialization.
 
 - [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
-  [`LearnAPI.input`](@ref): for extracting relevant parts of training data, where defined.
+  [`LearnAPI.features`](@ref): for extracting relevant parts of training data, where
+  defined.
 
-- [`obs`](@ref data_interface): optional method for exposing to the user
-  algorithm-specific representations of data that are guaranteed to implement observation
-  access, as specified by [`LearnAPI.data_interface(algorithm)`](@ref).
+- [`obs`](@ref data_interface): method for exposing to the user
+  algorithm-specific representations of data, which are additionally guaranteed to
+  implement the observation access API specified by
+  [`LearnAPI.data_interface(algorithm)`](@ref).
 
 - [Accessor functions](@ref accessor_functions): these include functions like
   `feature_importances` and `training_losses`, for extracting, from training outcomes,
   information common to many algorithms.
 
-- [Algorithm traits](@ref traits): special methods, that promise specific algorithm
-  behavior or for recording general information about the algorithm. Only
-  [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref) are universally
-  compulsory.
+- [Algorithm traits](@ref traits): methods that promise specific algorithm behavior or
+  record general information about the algorithm. Only [`LearnAPI.constructor`](@ref) and
+  [`LearnAPI.functions`](@ref) are universally compulsory.
 
 ---
 

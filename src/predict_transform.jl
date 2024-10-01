@@ -38,11 +38,13 @@ DOC_DATA_INTERFACE(method) =
     ## Assumptions about data
 
     By default, it is assumed that `data` supports the [`LearnAPI.RandomAccess`](@ref)
-    interface (all matrices, with observations-as-columns, most tables, and tuples
-    thereof). See  [`LearnAPI.RandomAccess`](@ref) for details. If this is not the case
-    then an implementation must suitably: (i) overload the trait
-    [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref). Refer to these
-    methods' document strings for details.
+    interface; this includes all matrices, with observations-as-columns, most tables, and
+    tuples thereof). See [`LearnAPI.RandomAccess`](@ref) for details. If this is not the
+    case then an implementation must either: (i) overload [`obs`](@ref) to articulate how
+    provided data can be transformed into a form that does support
+    [`LearnAPI.RandomAccess`](@ref); or (ii) overload the trait
+    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API. Refer to
+    document strings for details.
 
     """
 

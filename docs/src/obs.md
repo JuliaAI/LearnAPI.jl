@@ -11,7 +11,7 @@ obs(algorithm, data) # can be passed to `fit` instead of `data`
 obs(model, data)     # can be passed to `predict` or `transform` instead of `data`
 ```
 
-## Typical workflows
+## [Typical workflows](@id obs_workflows)
 
 LearnAPI.jl makes no universal assumptions about the form of `data` in a call
 like `fit(algorithm, data)`. However, if we define
@@ -46,7 +46,7 @@ import MLUtils
 algorithm = <some supervised learner>
 
 data = <some data that `fit` can consume, with 30 observations>
-X = LearnAPI.input(algorithm, data)
+X = LearnAPI.features(algorithm, data)
 y = LearnAPI.target(algorithm, data)
 
 train_test_folds = map([1:10, 11:20, 21:30]) do test

@@ -15,11 +15,11 @@ makedocs(
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
         "Reference" => [
             "Overview" => "reference.md",
-            "fit" => "fit.md",
+            "fit/update" => "fit.md",
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
             "minimize" => "minimize.md",
-            "target/weights/input" => "target_weights_input.md",
+            "target/weights/features" => "target_weights_features.md",
             "obs" => "obs.md",
             "Accessor Functions" => "accessor_functions.md",
             "Algorithm Traits" => "traits.md",

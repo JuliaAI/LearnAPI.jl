@@ -81,7 +81,7 @@ LearnAPI.fit(algorithm::Ridge, data; kwargs...) =
 # extracting stuff from training data:
 LearnAPI.target(::Ridge, data) = last(data)
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
-LearnAPI.input(::Ridge, observations::RidgeFitObs) = observations.A
+LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 
 # observations for consumption by `predict`:
 LearnAPI.obs(::RidgeFitted, X) = Tables.matrix(X)'
@@ -104,12 +104,13 @@ LearnAPI.minimize(model::RidgeFitted) =
     Ridge,
     constructor = Ridge,
     kinds_of_proxy = (LiteralTarget(),),
+    descriptors = ("regression",)
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
         :(LearnAPI.minimize),
         :(LearnAPI.obs),
-        :(LearnAPI.input),
+        :(LearnAPI.features),
         :(LearnAPI.target),
         :(LearnAPI.predict),
         :(LearnAPI.feature_importances),
@@ -131,7 +132,7 @@ data = (X, y)
     @test :(LearnAPI.obs) in LearnAPI.functions(algorithm)
 
     @test LearnAPI.target(algorithm, data) == y
-    @test LearnAPI.input(algorithm, data) == X
+    @test LearnAPI.features(algorithm, data) == X
 
     # verbose fitting:
     @test_logs(
@@ -163,7 +164,7 @@ data = (X, y)
     model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
     @test LearnAPI.target(algorithm, fitobs) == y
     @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) ≈ ŷ
-    @test predict(model, LearnAPI.input(algorithm, fitobs)) ≈ predict(model, X)
+    @test predict(model, LearnAPI.features(algorithm, fitobs)) ≈ predict(model, X)
 
     @test LearnAPI.feature_importances(model) isa Vector{<:Pair{Symbol}}
 
@@ -236,12 +237,13 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
     BabyRidge,
     constructor = BabyRidge,
     kinds_of_proxy = (LiteralTarget(),),
+    descriptors = ("regression",)
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
         :(LearnAPI.minimize),
         :(LearnAPI.obs),
-        :(LearnAPI.input),
+        :(LearnAPI.features),
         :(LearnAPI.target),
         :(LearnAPI.predict),
         :(LearnAPI.feature_importances),
@@ -262,7 +264,7 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
         predict(model, MLUtils.getobs(predictobs, test))
     @test LearnAPI.target(algorithm, data) == y
     @test LearnAPI.predict(model, X) ≈
-        LearnAPI.predict(model, LearnAPI.input(algorithm, data))
+        LearnAPI.predict(model, LearnAPI.features(algorithm, data))
 end
 
 true

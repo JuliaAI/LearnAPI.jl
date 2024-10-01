@@ -9,12 +9,14 @@ A base Julia interface for machine learning and statistics </span>
 <br>
 ```
 
-LearnAPI.jl is a lightweight, functional-style interface, providing a collection of
-[methods](@ref Methods), such as `fit` and `predict`, to be implemented by algorithms from
-machine learning and statistics. Through such implementations, these algorithms buy into
-functionality, such as hyperparameter optimization and model composition, as provided by
-ML/statistics toolboxes and other packages. LearnAPI.jl also provides a number of Julia
-[traits](@ref traits) for promising specific behavior.
+LearnAPI.jl is a lightweight, functional-style interface, providing a
+collection of [methods](@ref Methods), such as `fit` and `predict`, to be implemented by
+algorithms from machine learning and statistics. Through such implementations, these
+algorithms buy into functionality, such as hyperparameter optimization and model
+composition, as provided by ML/statistics toolboxes and other packages. LearnAPI.jl also
+provides a number of Julia [traits](@ref traits) for promising specific behavior.
+
+LearnAPI.jl has no package dependencies.
 
 ```@raw html
 &#128679;
@@ -41,14 +43,17 @@ X = <some training features>
 y = <some training target>
 Xnew = <some test or production features>
 
+# List LearnaAPI functions implemented for `forest`:
+LearnAPI.functions(forest)
+
 # Train:
 model = fit(forest, X, y)
 
+# Generate point predictions:
+ŷ = predict(model, Xnew) # or `predict(model, LiteralTarget(), Xnew)`
+
 # Predict probability distributions:
 predict(model, Distribution(), Xnew)
-
-# Generate point predictions:
-ŷ = predict(model, LiteralTarget(), Xnew) # or `predict(model, Xnew)`
 
 # Apply an "accessor function" to inspect byproducts of training:
 LearnAPI.feature_importances(model)
@@ -77,13 +82,14 @@ data_interface) (read as "observations") gives users and meta-algorithms access 
 algorithm-specific representation of input data, which is also guaranteed to implement a
 standard interface for accessing individual observations, unless the algorithm explicitly
 opts out. Moreover, the `fit` and `predict` methods will also be able to consume these
-alternative data representations.
+alternative data representations, for performance benefits in some situations.
 
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
-`getobs/numobs` interface, and if the input consumed by the algorithm already implements
-that interface (tables, arrays, etc.) then overloading `obs` is completely optional. Plain
-iteration interfaces, with or without knowledge of the number of observations, can also be
-specified (to support, e.g., data loaders reading images from disk).
+`getobs/numobs` interface (here tagged as [`LearnAPI.RandomAccess()`](@ref)) and if the
+input consumed by the algorithm already implements that interface (tables, arrays, etc.)
+then overloading `obs` is completely optional. Plain iteration interfaces, with or without
+knowledge of the number of observations, can also be specified (to support, e.g., data
+loaders reading images from disk).
 
 ## Learning more
 

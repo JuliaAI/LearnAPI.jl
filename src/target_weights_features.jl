@@ -34,18 +34,18 @@ $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=true))
 weights(::Any, data) = nothing
 
 """
-    LearnAPI.input(algorithm, data)
+    LearnAPI.features(algorithm, data)
 
 Return, for each form of `data` supported in a call of the form `[`fit(algorithm,
-data)`](@ref), the "input" or "features" part of `data` (as opposed to the target
-variable, for example).
+data)`](@ref), the "features" part of `data` (as opposed to the target
+variable, for example). 
 
 The returned object `X` may always be passed to `predict` or `transform`, where
 implemented, as in the following sample workflow:
 
 ```julia
 model = fit(algorithm, data)
-X = input(data)
+X = features(data)
 ŷ = predict(algorithm, kind_of_proxy, X) # eg, `kind_of_proxy = LiteralTarget()`
 ```
 
@@ -57,11 +57,13 @@ target.
 
 # New implementations
 
-The following fallbacks typically make overloading `LearnAPI.input` unnecessary:
+The only contract `features` must satisfy is the one about passability of the output to
+`predict` or `transform`, for each supported input `data`. The following fallbacks
+typically make overloading `LearnAPI.features` unnecessary:
 
 ```julia
-LearnAPI.input(algorithm, data) = data
-LearnAPI.input(algorithm, data::Tuple) = first(data)
+LearnAPI.features(algorithm, data) = data
+LearnAPI.features(algorithm, data::Tuple) = first(data)
 ```
 
 Overloading may be necessary if [`obs(algorithm, data)`](@ref) is overloaded to return
@@ -70,5 +72,5 @@ some algorithm-specific representation of training `data`. For density estimator
 return `nothing`.
 
 """
-input(algorithm, data) = data
-input(algorithm, data::Tuple) = first(data)
+features(algorithm, data) = data
+features(algorithm, data::Tuple) = first(data)

@@ -115,19 +115,22 @@ value is non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| symbol                          | implementation/overloading compulsory? | include in returned tuple?         |
-|---------------------------------|----------------------------------------|------------------------------------|
-| `:(LearnAPI.fit)`               | yes                                    | yes                                |
-| `:(LearnAPI.algorithm)`         | yes                                    | yes                                |
-| `:(LearnAPI.minimize)`          | no                                     | yes                                |
-| `:(LearnAPI.obs)`               | no                                     | yes                                |
-| `:(LearnAPI.input)`             | no                                     | yes, unless `fit` consumes no data |
-| `:(LearnAPI.target)`            | no                                     | only if implemented                |
-| `:(LearnAPI.weights)`           | no                                     | only if implemented                |
-| `:(LearnAPI.predict)`           | no                                     | only if implemented                |
-| `:(LearnAPI.transform)`         | no                                     | only if implemented                |
-| `:(LearnAPI.inverse_transform)` | no                                     | only if implemented                |
-| <accessor functions>            | no                                     | only if implemented                |
+| symbol                            | implementation/overloading compulsory? | include in returned tuple?         |
+|-----------------------------------|----------------------------------------|------------------------------------|
+| `:(LearnAPI.fit)`                 | yes                                    | yes                                |
+| `:(LearnAPI.algorithm)`           | yes                                    | yes                                |
+| `:(LearnAPI.minimize)`            | no                                     | yes                                |
+| `:(LearnAPI.obs)`                 | no                                     | yes                                |
+| `:(LearnAPI.features)`            | no                                     | yes, unless `fit` consumes no data |
+| `:(LearnAPI.update)`              | no                                     | only if implemented                |
+| `:(LearnAPI.update_observations)` | no                                     | only if implemented                |
+| `:(LearnAPI.update_features)`     | no                                     | only if implemented                |
+| `:(LearnAPI.target)`              | no                                     | only if implemented                |
+| `:(LearnAPI.weights)`             | no                                     | only if implemented                |
+| `:(LearnAPI.predict)`             | no                                     | only if implemented                |
+| `:(LearnAPI.transform)`           | no                                     | only if implemented                |
+| `:(LearnAPI.inverse_transform)`   | no                                     | only if implemented                |
+| <accessor functions>              | no                                     | only if implemented                |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
 algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST.
@@ -177,38 +180,39 @@ For more on target variables and target proxies, refer to the LearnAPI documenta
 kinds_of_proxy(::Any) = ()
 
 descriptors() = [
-    :regression,
-    :classification,
-    :clustering,
-    :gradient_descent,
-    :iterative_algorithms,
-    :incremental_algorithms,
-    :dimension_reduction,
-    :encoders,
-    :static_algorithms,
-    :missing_value_imputation,
-    :ensemble_algorithms,
-    :wrappers,
-    :time_series_forecasting,
-    :time_series_classification,
-    :survival_analysis,
-    :distribution_fitters,
-    :Bayesian_algorithms,
-    :outlier_detection,
-    :collaborative_filtering,
-    :text_analysis,
-    :audio_analysis,
-    :natural_language_processing,
-    :image_processing,
+    "regression",
+    "classification",
+    "clustering",
+    "gradient descent",
+    "iterative algorithms",
+    "incremental algorithms",
+    "dimension reduction",
+    "encoders",
+    "feature engineering",
+    "static algorithms",
+    "missing value imputation",
+    "ensemble algorithms",
+    "wrappers",
+    "time series forecasting",
+    "time series classification",
+    "survival analysis",
+    "density estimation",
+    "Bayesian algorithms",
+    "outlier detection",
+    "collaborative filtering",
+    "text analysis",
+    "audio analysis",
+    "natural language processing",
+    "image processing",
 ]
 
-const DOC_DESCRIPTORS_LIST = join(map(d -> "`:$d`", descriptors()), ", ")
+const DOC_DESCRIPTORS_LIST = join(map(d -> "`\"$d\"`", descriptors()), ", ")
 
 """
     LearnAPI.descriptors(algorithm)
 
-Lists one or more suggestive algorithm descriptors from this list: $DOC_DESCRIPTORS_LIST (do
-`LearnAPI.descriptors()` to reproduce).
+Lists one or more suggestive algorithm descriptors. Do `LearnAPI.descriptors()` to list
+all possible.
 
 !!! warning
     The value of this trait guarantees no particular behavior. The trait is
@@ -216,7 +220,7 @@ Lists one or more suggestive algorithm descriptors from this list: $DOC_DESCRIPT
 
 # New implementations
 
-This trait should return a tuple of symbols, as in `(:classifier, :text_analysis)`.
+This trait should return a tuple of strings, as in `("classifier", "text analysis")`.
 
 """
 descriptors(::Any) = ()

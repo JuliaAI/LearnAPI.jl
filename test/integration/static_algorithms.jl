@@ -39,6 +39,7 @@ end
 @trait(
     Selector,
     constructor = Selector,
+    descriptors = ("feature engineering",)
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
@@ -104,6 +105,7 @@ end
     Selector2,
     constructor = Selector2,
     predict_or_transform_mutates = true,
+    descriptors = ("feature engineering",)
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),

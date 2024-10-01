@@ -5,7 +5,7 @@ regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. T
 workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
 refer to the [demonstration](@ref workflow) of the implementation given later.
 
-For a transformer, implementations ordinarily implement `transform` instead of
+A transformer ordinarily implements `transform` instead of
 `predict`. For more on `predict` versus `transform`, see [Predict or transform?](@ref)
 
 !!! note
@@ -13,18 +13,26 @@ For a transformer, implementations ordinarily implement `transform` instead of
     New implementations of `fit`, `predict`, etc,
     always have a *single* `data` argument, as in
         `LearnAPI.fit(algorithm, data; verbosity=1) = ...`.
-    For convenience, user calls like `fit(algorithm, X, y)` automatically fallback
+    For convenience, user-calls, such as `fit(algorithm, X, y)`, automatically fallback
         to `fit(algorithm, (X, y))`.
 
 !!! note
+
+    By default, it is assumed that `data` supports the [`LearnAPI.RandomAccess`](@ref)
+    interface; this includes all matrices, with observations-as-columns, most tables, and
+    tuples thereof). See [`LearnAPI.RandomAccess`](@ref) for details. If this is not the
+    case then an implementation must either: 
 
     If the `data` object consumed by `fit`, `predict`, or `transform` is not
     not a suitable table¹, array³, tuple of tables and arrays, or some
     other object implementing
     the MLUtils.jl `getobs`/`numobs` interface,
-    then an implementation must: (i) suitably overload the trait
-    [`LearnAPI.data_interface`](@ref); and/or (ii) overload [`obs`](@ref), as
-     illustrated below under [Providing an advanced data interface](@ref).
+    then an implementation must: (i) overload [`obs`](@ref) to articulate how
+    provided data can be transformed into a form that does support
+    it, as illustrated below under 
+	[Providing an advanced data interface](@ref); or (ii) overload the trait
+    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
+    API. 
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -152,9 +160,9 @@ from training data, by implementing [`LearnAPI.target`](@ref):
 LearnAPI.target(algorithm, data) = last(data)
 ```
 
-There is a similar method, [`LearnAPI.input`](@ref) for declaring how input data can be
-extracted (for passing to `predict`, for example) but this method has a fallback which
-typically suffices: return `first(data)` if `data` is a tuple, and otherwise return
+There is a similar method, [`LearnAPI.features`](@ref) for declaring how training features
+can be extracted (for passing to `predict`, for example) but this method has a fallback
+which typically suffices: return `first(data)` if `data` is a tuple, and otherwise return
 `data`.
 
 
@@ -218,7 +226,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
         :(LearnAPI.algorithm),
         :(LearnAPI.minimize),
         :(LearnAPI.obs),
-        :(LearnAPI.input),
+        :(LearnAPI.features),
         :(LearnAPI.target),
         :(LearnAPI.predict),
         :(LearnAPI.coefficients),
@@ -325,7 +333,7 @@ LearnAPI.minimize(model::RidgeFitted) =
         :(LearnAPI.algorithm),
         :(LearnAPI.minimize),
         :(LearnAPI.obs),
-        :(LearnAPI.input),
+        :(LearnAPI.features),
         :(LearnAPI.target),
         :(LearnAPI.predict),
         :(LearnAPI.coefficients),
@@ -423,7 +431,7 @@ LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
     predict(model, LiteralTarget(), obs(model, Xnew))
 ```
 
-### `target` and `input` methods
+### `target` and `features` methods
 
 We provide an additional overloading of [`LearnAPI.target`](@ref) to handle the additional
 supported data argument of `fit`:
@@ -432,11 +440,11 @@ supported data argument of `fit`:
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 ```
 
-Similarly, we must overload [`LearnAPI.input`](@ref), which extracts inputs from training
-data (objects that can be passed to `predict`) like this
+Similarly, we must overload [`LearnAPI.features`](@ref), which extracts features from
+training data (objects that can be passed to `predict`) like this
 
 ```@example anatomy2
-LearnAPI.input(::Ridge, observations::RidgeFitObs) = observations.A
+LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 ```
 as the fallback mentioned above is no longer adequate.
 
@@ -481,6 +489,9 @@ ẑ = predict(model, MLUtils.getobs(observations_for_predict, test))
 ```julia
 @assert ẑ == ŷ
 ```
+
+For an application of [`obs`](@ref) to efficient cross-validation, see [here](@ref
+obs_workflows).
 
 ---
 

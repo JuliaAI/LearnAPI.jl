@@ -1,6 +1,7 @@
 # [Accessor Functions](@id accessor_functions)
 
-The sole argument of an accessor function is the output, `model`, of [`fit`](@ref).
+The sole argument of an accessor function is the output, `model`, of
+[`fit`](@ref). Algorithms are free to implement any number of these, or none of them.
 
 - [`LearnAPI.algorithm(model)`](@ref)
 - [`LearnAPI.extras(model)`](@ref)
@@ -14,6 +15,9 @@ The sole argument of an accessor function is the output, `model`, of [`fit`](@re
 - [`LearnAPI.training_predictions(model)`](@ref)
 - [`LearnAPI.training_scores(model)`](@ref)
 - [`LearnAPI.components(model)`](@ref)
+
+Algorithm-specific accessor functions may also be implemented. The names of all accessor
+functions are included in the list returned by [`LearnAPI.functions(algorithm)`](@ref).
 
 ## Implementation guide
 

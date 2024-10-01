@@ -67,7 +67,7 @@ to be overloaded. However, the user will get no performance benefits by using `o
 that case.
 
 When overloading `obs(algorithm, data)` to output new model-specific representations of
-data, it may be necessary to also overload [`LearnAPI.input`](@ref),
+data, it may be necessary to also overload [`LearnAPI.features`](@ref),
 [`LearnAPI.target`](@ref) (supervised algorithms), and/or [`LearnAPI.weights`](@ref) (if
 weights are supported), for extracting relevant parts of the representation.
 
