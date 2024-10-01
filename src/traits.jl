@@ -3,7 +3,7 @@
 
 const DOC_UNKNOWN =
     "Returns `\"unknown\"` if the algorithm implementation has "*
-    "failed to overload the trait. "
+    "not overloaded the trait. "
 const DOC_ON_TYPE = "The value of the trait must depend only on the type of `algorithm`. "
 
 DOC_ONLY_ONE(func) =
@@ -38,21 +38,11 @@ const TRAITS = [
     :iteration_parameter,
     :data_interface,
     :predict_or_transform_mutates,
-    :fit_scitype,
     :fit_observation_scitype,
-    :fit_type,
-    :fit_observation_type,
     :target_observation_scitype,
-    :predict_input_scitype,
-    :predict_output_scitype,
-    :predict_input_type,
-    :predict_output_type,
-    :transform_input_scitype,
-    :transform_output_scitype,
-    :transform_input_type,
-    :transform_output_type,
     :name,
     :is_algorithm,
+    :target,
 ]
 
 
@@ -147,9 +137,8 @@ data...)` has a guaranteed implementation. Each such `kind` subtypes
 [`LearnAPI.KindOfProxy`](@ref). Examples are `LiteralTarget()` (for predicting actual
 target values) and `Distributions()` (for predicting probability mass/density functions).
 
-If a `predict(model, data)` is overloaded to return predictions for a specific kind of
-proxy (e.g., `predict(model::MyModel, data) = predict(model, Distribution(), data)`) then
-that kind appears first in the returned tuple.
+The call `predict(model, data)` always returns `predict(model, kind, data)`, where `kind`
+is the first element of the trait's return value.
 
 See also [`LearnAPI.predict`](@ref), [`LearnAPI.KindOfProxy`](@ref).
 
@@ -157,9 +146,10 @@ See also [`LearnAPI.predict`](@ref), [`LearnAPI.KindOfProxy`](@ref).
 
 # New implementations
 
-Implementation is optional but recommended whenever `predict` is overloaded.
+Must be overloaded whenever `predict` is implemented.
 
-Elements of the returned tuple must be one of these: $CONCRETE_TARGET_PROXY_TYPES_LIST.
+Elements of the returned tuple must be one of the following, described further in
+LearnAPI.jl documentation: $CONCRETE_TARGET_PROXY_TYPES_LIST.
 
 Suppose, for example, we have the following implementation of a supervised learner
 returning only probabilistic predictions:
@@ -173,6 +163,8 @@ Then we can declare
 ```julia
 @trait MyNewAlgorithmType kinds_of_proxy = (LearnaAPI.Distribution(),)
 ```
+
+LearnAPI.jl provides the fallback for `predict(model, data)`.
 
 For more on target variables and target proxies, refer to the LearnAPI documentation.
 
@@ -336,7 +328,7 @@ to return `"K-nearest neighbors regressor"`. Ideally, this is a "concrete" noun 
 `"ridge regressor"` rather than an "abstract" noun like `"ridge regression"`.
 
 """
-human_name(M) = snakecase(name(M), delim=' ') # `name` defined below
+human_name(algorithm) = snakecase(name(alogorithm), delim=' ') # `name` defined below
 
 """
     LearnAPI.data_interface(algorithm)
@@ -389,23 +381,6 @@ iteration_parameter(::Any) = nothing
 
 
 """
-    LearnAPI.fit_scitype(algorithm)
-
-Return an upper bound `S` on the scitype of `data` guaranteed to work when calling
-`fit(algorithm, data)`: if `ScientificTypes.scitype(data) <: S`, then is `fit(algorithm,
-data)` is supported.
-
-See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_observation_scitype`](@ref),
-[`LearnAPI.fit_observation_type`](@ref).
-
-# New implementations
-
-Optional. The fallback return value is `Union{}`.  $(DOC_ONLY_ONE(:fit))
-
-"""
-fit_scitype(::Any) = Union{}
-
-"""
     LearnAPI.fit_observation_scitype(algorithm)
 
 Return an upper bound `S` on the scitype of individual observations guaranteed to work
@@ -415,8 +390,7 @@ when calling `fit`: if `observations = obs(algorithm, data)` and
 
 $DOC_EXPLAIN_EACHOBS
 
-See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
-[`LearnAPI.fit_observation_type`](@ref).
+See also [`LearnAPI.target_observation_scitype`](@ref).
 
 # New implementations
 
@@ -424,42 +398,6 @@ Optional. The fallback return value is `Union{}`. $(DOC_ONLY_ONE(:fit))
 
 """
 fit_observation_scitype(::Any) = Union{}
-
-"""
-    LearnAPI.fit_type(algorithm)
-
-Return an upper bound `T` on the type of `data` guaranteed to work when calling
-`fit(algorithm, data)`: if `typeof(data) <: T`, then `fit(algorithm, data)` is supported.
-
-See also [`LearnAPI.fit_scitype`](@ref), [`LearnAPI.fit_observation_type`](@ref).
-[`LearnAPI.fit_observation_scitype`](@ref)
-
-# New implementations
-
-Optional. The fallback return value is `Union{}`. $(DOC_ONLY_ONE(:fit))
-
-"""
-fit_type(::Any) = Union{}
-
-"""
-    LearnAPI.fit_observation_type(algorithm)
-
-Return an upper bound `T` on the type of individual observations guaranteed to work
-when calling `fit`: if `observations = obs(algorithm, data)` and
-`typeof(o) <:S` for each `o` in `observations`, then the call
-`fit(algorithm, data)` is supported.
-
-$DOC_EXPLAIN_EACHOBS
-
-See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
-[`LearnAPI.fit_observation_scitype`](@ref).
-
-# New implementations
-
-Optional. The fallback return value is `Union{}`. $(DOC_ONLY_ONE(:fit))
-
-"""
-fit_observation_type(::Any) = Union{}
 
 """
     LearnAPI.target_observation_scitype(algorithm)
@@ -494,235 +432,10 @@ Optional. The fallback return value is `Any`.
 target_observation_scitype(::Any) = Any
 
 
-function DOC_INPUT_SCITYPE(op)
-    extra = op == :predict ? " kind_of_proxy," : ""
-    ONLY = DOC_ONLY_ONE(op)
-    """
-        LearnAPI.$(op)_input_scitype(algorithm)
-
-    Return an upper bound `S` on the scitype of `data` guaranteed to work in the call
-    `$op(algorithm,$extra data)`: if `ScientificTypes.scitype(data) <: S`,
-    then `$op(algorithm,$extra data)` is supported.
-
-    See also [`LearnAPI.$(op)_input_type`](@ref).
-
-    # New implementations
-
-    Implementation is optional. The fallback return value is `Union{}`. $ONLY
-
-   """
-end
-
-function DOC_INPUT_OBSERVATION_SCITYPE(op)
-    extra = op == :predict ? " kind_of_proxy," : ""
-    ONLY = DOC_ONLY_ONE(op)
-    """
-        LearnAPI.$(op)_observation_scitype(algorithm)
-
-    Return an upper bound `S` on the scitype of individual observations guaranteed to work
-    when calling `$op`: if `observations = obs(model, data)`, for some `model` returned by
-    `fit(algorithm, ...)`, and `ScientificTypes.scitype(o) <: S` for each `o` in
-    `observations`, then the call `$(op)(model,$extra data)` is supported.
-
-    $DOC_EXPLAIN_EACHOBS
-
-    See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
-    [`LearnAPI.fit_observation_type`](@ref).
-
-    # New implementations
-
-    Optional. The fallback return value is `Union{}`. $ONLY
-
-    """
-end
-
-function DOC_INPUT_TYPE(op)
-    extra = op == :predict ? " kind_of_proxy," : ""
-    ONLY = DOC_ONLY_ONE(op)
-    """
-        LearnAPI.$(op)_input_type(algorithm)
-
-    Return an upper bound `T` on the scitype of `data` guaranteed to work in the call
-    `$op(algorithm,$extra data)`: if `typeof(data) <: T`,
-    then `$op(algorithm,$extra data)` is supported.
-
-    See also [`LearnAPI.$(op)_input_type`](@ref).
-
-    # New implementations
-
-    Implementation is optional. The fallback return value is `Union{}`. Should not be
-    overloaded if `LearnAPI.$(op)_input_scitype` is overloaded.
-
-    """
-end
-
-function DOC_INPUT_OBSERVATION_TYPE(op)
-    extra = op == :predict ? " kind_of_proxy," : ""
-    ONLY = DOC_ONLY_ONE(op)
-    """
-        LearnAPI.$(op)_observation_type(algorithm)
-
-    Return an upper bound `T` on the scitype of individual observations guaranteed to work
-    when calling `$op`: if `observations = obs(model, data)`, for some `model` returned by
-    `fit(algorithm, ...)`, and `typeof(o) <: T` for each `o` in
-    `observations`, then the call `$(op)(model,$extra data)` is supported.
-
-    $DOC_EXPLAIN_EACHOBS
-
-    See also See also [`LearnAPI.fit_type`](@ref), [`LearnAPI.fit_scitype`](@ref),
-    [`LearnAPI.fit_observation_type`](@ref).
-
-    # New implementations
-
-    Optional. The fallback return value is `Union{}`. $ONLY
-
-    """
-end
-
-DOC_OUTPUT_SCITYPE(op) =
-    """
-        LearnAPI.$(op)_output_scitype(algorithm)
-
-    Return an upper bound on the scitype of the output of the `$op` operation.
-
-    See also [`LearnAPI.$(op)_input_scitype`](@ref).
-
-    # New implementations
-
-    Implementation is optional. The fallback return value is `Any`.
-
-    """
-
-DOC_OUTPUT_TYPE(op) =
-    """
-        LearnAPI.$(op)_output_type(algorithm)
-
-    Return an upper bound on the type of the output of the `$op` operation.
-
-    # New implementations
-
-    Implementation is optional. The fallback return value is `Any`.
-
-    """
-
-"$(DOC_INPUT_SCITYPE(:predict))"
-predict_input_scitype(::Any) = Union{}
-
-"$(DOC_INPUT_OBSERVATION_SCITYPE(:predict))"
-predict_input_observation_scitype(::Any) = Union{}
-
-"$(DOC_INPUT_TYPE(:predict))"
-predict_input_type(::Any) = Union{}
-
-"$(DOC_INPUT_OBSERVATION_TYPE(:predict))"
-predict_input_observation_type(::Any) = Union{}
-
-"$(DOC_INPUT_SCITYPE(:transform))"
-transform_input_scitype(::Any) = Union{}
-
-"$(DOC_INPUT_OBSERVATION_SCITYPE(:transform))"
-transform_input_observation_scitype(::Any) = Union{}
-
-"$(DOC_INPUT_TYPE(:transform))"
-transform_input_type(::Any) = Union{}
-
-"$(DOC_INPUT_OBSERVATION_TYPE(:transform))"
-transform_input_observation_type(::Any) = Union{}
-
-"$(DOC_OUTPUT_SCITYPE(:transform))"
-transform_output_scitype(::Any) = Any
-
-"$(DOC_OUTPUT_TYPE(:transform))"
-transform_output_type(::Any) = Any
-
-
-# # TWO-ARGUMENT TRAITS
-
-# Here `s` is `:type` or `:scitype`:
-const DOC_PREDICT_OUTPUT(s)  =
-    """
-        LearnAPI.predict_output_$s(algorithm, kind_of_proxy::KindOfProxy)
-
-    Return an upper bound for the $(s)s of predictions of the specified form where
-    supported, and otherwise return `Any`. For example, if
-
-        ŷ = predict(model, Distribution(), data)
-
-    successfully returns (i.e., `algorithm` supports predictions of target probability
-    distributions) then the following is guaranteed to hold:
-
-        $(s)(ŷ) <: predict_output_$(s)(algorithm, Distribution())
-
-    **Note.** This trait has a single-argument "convenience" version
-    `LearnAPI.predict_output_$(s)(algorithm)` derived from this one, which returns a
-    dictionary keyed on target proxy types.
-
-    See also [`LearnAPI.KindOfProxy`](@ref), [`predict`](@ref),
-    [`predict_input_$(s)`](@ref).
-
-    # New implementations
-
-    Overloading the trait is optional. Here's a sample implementation for a supervised
-    regressor type `MyRgs` that only predicts actual values of the target:
-
-    ```julia
-    @trait MyRgs predict_output_$(s) = AbstractVector{ScientificTypesBase.Continuous}
-    ```
-
-    The fallback method returns `Any`.
-
-    """
-
-"$(DOC_PREDICT_OUTPUT(:scitype))"
-predict_output_scitype(algorithm, kind_of_proxy) = Any
-
-"$(DOC_PREDICT_OUTPUT(:type))"
-predict_output_type(algorithm, kind_of_proxy) = Any
-
-
 # # DERIVED TRAITS
 
-name(A) = split(string(constructor(A)), ".") |> last
-
-is_algorithm(A) = !isempty(functions(A))
-
+name(algorithm) = split(string(constructor(algorithm)), ".") |> last
+is_algorithm(algorithm) = !isempty(functions(algorithm))
 preferred_kind_of_proxy(algorithm) = first(kinds_of_proxy(algorithm))
-
-const DOC_PREDICT_OUTPUT2(s) =
-    """
-        LearnAPI.predict_output_$(s)(algorithm)
-
-    Return a dictionary of upper bounds on the $(s) of predictions, keyed on concrete
-    subtypes of [`LearnAPI.KindOfProxy`](@ref). Each of these subtypes represents a
-    different form of target prediction (`LiteralTarget`, `Distribution`,
-    `SurvivalFunction`, etc) possibly supported by `algorithm`, but the existence of a key
-    does not guarantee that form is supported.
-
-    As an example, if
-
-        ŷ = predict(model, Distribution(), data...)
-
-    successfully returns (i.e., `algorithm` supports predictions of target probability
-    distributions) then the following is guaranteed to hold:
-
-        $(s)(ŷ) <: LearnAPI.predict_output_$(s)s(algorithm)[Distribution]
-
-    See also [`LearnAPI.KindOfProxy`](@ref), [`predict`](@ref),
-    [`LearnAPI.predict_input_$(s)`](@ref).
-
-    # New implementations
-
-    This single argument trait should not be overloaded. Instead, overload
-    [`LearnAPI.predict_output_$(s)`](@ref)(algorithm, kind_of_proxy).
-
-    """
-
-"$(DOC_PREDICT_OUTPUT2(:scitype))"
-predict_output_scitype(algorithm) =
-    Dict(T => predict_output_scitype(algorithm, T())
-         for T in CONCRETE_TARGET_PROXY_TYPES)
-
-"$(DOC_PREDICT_OUTPUT2(:type))"
-predict_output_type(algorithm) =
-    Dict(T => predict_output_type(algorithm, T())
-         for T in CONCRETE_TARGET_PROXY_TYPES)
+target(algorithm) = :(LearnAPI.target) in functions(algorithm)
+weights(algorithm) = :(LearnAPI.weights) in functions(algorithm)
