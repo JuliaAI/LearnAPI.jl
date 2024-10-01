@@ -16,7 +16,7 @@ Overload a number of traits for algorithms of type `TypeEx`. For example, the co
 ```julia
 @trait(
     RidgeRegressor,
-    descriptors = ("regression", ),
+    tags = ("regression", ),
     doc_url = "https://some.cool.documentation",
 )
 ```
@@ -24,7 +24,7 @@ Overload a number of traits for algorithms of type `TypeEx`. For example, the co
 is equivalent to
 
 ```julia
-LearnAPI.descriptors(::RidgeRegressor) = ("regression", ),
+LearnAPI.tags(::RidgeRegressor) = ("regression", ),
 LearnAPI.doc_url(::RidgeRegressor) = "https://some.cool.documentation",
 ```
 

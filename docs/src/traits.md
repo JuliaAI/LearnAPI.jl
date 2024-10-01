@@ -25,7 +25,7 @@ package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.
 | [`LearnAPI.constructor`](@ref)`(algorithm)`                           | constructor for generating new or modified versions of `algorithm`                                                               | (no fallback)                                         | `RidgeRegressor`                                         |
 | [`LearnAPI.functions`](@ref)`(algorithm)`                             | functions you can apply to `algorithm` or associated model (traits excluded)                                                     | `()`                                                  | `(:fit, :predict, :minimize, :(LearnAPI.algorithm), :obs)`      |
 | [`LearnAPI.kinds_of_proxy`](@ref)`(algorithm)`                        | instances `kind` of `KindOfProxy` for which an implementation of `LearnAPI.predict(algorithm, kind, ...)` is guaranteed.         | `()`                                                  | `(Distribution(), Interval())`                           |
-| [`LearnAPI.descriptors`](@ref)`(algorithm)`                           | lists one or more suggestive algorithm descriptors from `LearnAPI.descriptors()`                                                 | `()`                                                  | (:regression, :probabilistic)                            |
+| [`LearnAPI.tags`](@ref)`(algorithm)`                           | lists one or more suggestive algorithm tags from `LearnAPI.tags()`                                                 | `()`                                                  | (:regression, :probabilistic)                            |
 | [`LearnAPI.is_pure_julia`](@ref)`(algorithm)`                         | `true` if implementation is 100% Julia code                                                                                      | `false`                                               | `true`                                                   |
 | [`LearnAPI.pkg_name`](@ref)`(algorithm)`                              | name of package providing core code (may be different from package providing LearnAPI.jl implementation)                         | `"unknown"`                                           | `"DecisionTree"`                                         |
 | [`LearnAPI.pkg_license`](@ref)`(algorithm)`                           | name of license of package providing core code                                                                                   | `"unknown"`                                           | `"MIT"`                                                  |
@@ -114,7 +114,7 @@ informative (as in `LearnAPI.predict_type(algorithm) = Any`).
 LearnAPI.constructor
 LearnAPI.functions
 LearnAPI.kinds_of_proxy
-LearnAPI.descriptors
+LearnAPI.tags
 LearnAPI.is_pure_julia
 LearnAPI.pkg_name
 LearnAPI.pkg_license

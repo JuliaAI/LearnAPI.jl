@@ -15,7 +15,7 @@ makedocs(
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
         "Reference" => [
             "Overview" => "reference.md",
-            "fit/update" => "fit.md",
+            "fit/update" => "fit_update.md",
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
             "minimize" => "minimize.md",

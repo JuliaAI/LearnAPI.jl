@@ -27,7 +27,7 @@ const TRAITS = [
     :constructor,
     :functions,
     :kinds_of_proxy,
-    :descriptors,
+    :tags,
     :is_pure_julia,
     :pkg_name,
     :pkg_license,
@@ -179,7 +179,7 @@ For more on target variables and target proxies, refer to the LearnAPI documenta
 """
 kinds_of_proxy(::Any) = ()
 
-descriptors() = [
+tags() = [
     "regression",
     "classification",
     "clustering",
@@ -206,12 +206,12 @@ descriptors() = [
     "image processing",
 ]
 
-const DOC_DESCRIPTORS_LIST = join(map(d -> "`\"$d\"`", descriptors()), ", ")
+const DOC_TAGS_LIST = join(map(d -> "`\"$d\"`", tags()), ", ")
 
 """
-    LearnAPI.descriptors(algorithm)
+    LearnAPI.tags(algorithm)
 
-Lists one or more suggestive algorithm descriptors. Do `LearnAPI.descriptors()` to list
+Lists one or more suggestive algorithm tags. Do `LearnAPI.tags()` to list
 all possible.
 
 !!! warning
@@ -223,7 +223,7 @@ all possible.
 This trait should return a tuple of strings, as in `("classifier", "text analysis")`.
 
 """
-descriptors(::Any) = ()
+tags(::Any) = ()
 
 """
     LearnAPI.is_pure_julia(algorithm)

@@ -5,7 +5,7 @@ import InteractiveUtils.subtypes
 include("tools.jl")
 include("types.jl")
 include("predict_transform.jl")
-include("fit.jl")
+include("fit_update.jl")
 include("minimize.jl")
 include("target_weights_features.jl")
 include("obs.jl")

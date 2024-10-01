@@ -220,7 +220,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
     Ridge,
     constructor = Ridge,
     kinds_of_proxy=(LiteralTarget(),),
-    descriptors = (:regression,),
+    tags = (:regression,),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
@@ -327,7 +327,7 @@ LearnAPI.minimize(model::RidgeFitted) =
     Ridge,
     constructor = Ridge,
     kinds_of_proxy=(LiteralTarget(),),
-    descriptors = (:regression,),
+    tags = (:regression,),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
