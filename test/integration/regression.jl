@@ -87,12 +87,12 @@ LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 LearnAPI.obs(::RidgeFitted, X) = Tables.matrix(X)'
 
 # matrix input:
-LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, observations::AbstractMatrix) =
+LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
         observations'*model.coefficients
 
 # tabular input:
-LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
-        predict(model, LiteralTarget(), obs(model, Xnew))
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+        predict(model, Point(), obs(model, Xnew))
 
 # accessor function:
 LearnAPI.feature_importances(model::RidgeFitted) = model.feature_importances
@@ -103,7 +103,7 @@ LearnAPI.minimize(model::RidgeFitted) =
 @trait(
     Ridge,
     constructor = Ridge,
-    kinds_of_proxy = (LiteralTarget(),),
+    kinds_of_proxy = (Point(),),
     tags = ("regression",)
     functions = (
         :(LearnAPI.fit),
@@ -155,7 +155,7 @@ data = (X, y)
         ),
     )
 
-    ŷ = predict(model, LiteralTarget(), Tables.subset(X, test))
+    ŷ = predict(model, Point(), Tables.subset(X, test))
     @test ŷ isa Vector{Float64}
     @test predict(model, Tables.subset(X, test)) == ŷ
 
@@ -163,7 +163,7 @@ data = (X, y)
     predictobs = LearnAPI.obs(model, X)
     model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
     @test LearnAPI.target(algorithm, fitobs) == y
-    @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) ≈ ŷ
+    @test predict(model, Point(), MLUtils.getobs(predictobs, test)) ≈ ŷ
     @test predict(model, LearnAPI.features(algorithm, fitobs)) ≈ predict(model, X)
 
     @test LearnAPI.feature_importances(model) isa Vector{<:Pair{Symbol}}
@@ -177,7 +177,7 @@ data = (X, y)
     @test LearnAPI.algorithm(recovered_model) == algorithm
     @test predict(
         recovered_model,
-        LiteralTarget(),
+        Point(),
         MLUtils.getobs(predictobs, test)
     ) ≈ ŷ
 
@@ -227,7 +227,7 @@ LearnAPI.target(::BabyRidge, data) = last(data)
 
 LearnAPI.algorithm(model::BabyRidgeFitted) = model.algorithm
 
-LearnAPI.predict(model::BabyRidgeFitted, ::LiteralTarget, Xnew) =
+LearnAPI.predict(model::BabyRidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 
 LearnAPI.minimize(model::BabyRidgeFitted) =
@@ -236,7 +236,7 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
 @trait(
     BabyRidge,
     constructor = BabyRidge,
-    kinds_of_proxy = (LiteralTarget(),),
+    kinds_of_proxy = (Point(),),
     tags = ("regression",)
     functions = (
         :(LearnAPI.fit),
@@ -254,13 +254,13 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
     algorithm = BabyRidge(lambda=0.5)
 
     model = fit(algorithm, Tables.subset(X, train), y[train]; verbosity=0)
-    ŷ = predict(model, LiteralTarget(), Tables.subset(X, test))
+    ŷ = predict(model, Point(), Tables.subset(X, test))
     @test ŷ isa Vector{Float64}
 
     fitobs = obs(algorithm, data)
     predictobs = LearnAPI.obs(model, X)
     model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
-    @test predict(model, LiteralTarget(), MLUtils.getobs(predictobs, test)) == ŷ ==
+    @test predict(model, Point(), MLUtils.getobs(predictobs, test)) == ŷ ==
         predict(model, MLUtils.getobs(predictobs, test))
     @test LearnAPI.target(algorithm, data) == y
     @test LearnAPI.predict(model, X) ≈

@@ -8,14 +8,14 @@ minimize(model) -> <smaller version of model suitable for serialization>
 
 ```julia
 model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
-ŷ = predict(model, LiteralTarget(), Xnew)
+ŷ = predict(model, Point(), Xnew)
 LearnAPI.feature_importances(model)
 
 small_model = minimize(model)
 serialize("my_model.jls", small_model)
 
 recovered_model = deserialize("my_random_forest.jls")
-@assert predict(recovered_model, LiteralTarget(), Xnew) == ŷ
+@assert predict(recovered_model, Point(), Xnew) == ŷ
 
 # throws MethodError:
 LearnAPI.feature_importances(recovered_model)

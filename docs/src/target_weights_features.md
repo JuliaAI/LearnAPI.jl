@@ -22,7 +22,7 @@ target:
 model = fit(algorithm, data)
 X = LearnAPI.features(algorithm, data)
 y = LearnAPI.target(algorithm, data)
-ŷ = predict(model, LiteralTarget(), X)
+ŷ = predict(model, Point(), X)
 training_loss = sum(ŷ .!= y)
 ```
 

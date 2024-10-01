@@ -129,19 +129,19 @@ end
 Users will be able to call `predict` like this:
 
 ```julia
-predict(model, LiteralTarget(), Xnew)
+predict(model, Point(), Xnew)
 ```
 
-where `Xnew` is a table (of the same form as `X` above). The argument `LiteralTarget()`
+where `Xnew` is a table (of the same form as `X` above). The argument `Point()`
 signals that literal predictions of the target variable are sought, as opposed to some
-proxy for the target, such as probability density functions.  `LiteralTarget` is an
+proxy for the target, such as probability density functions.  `Point` is an
 example of a [`LearnAPI.KindOfProxy`](@ref proxy_types) type. Targets and target proxies
 are discussed [here](@ref proxy).
 
 We provide this implementation for our ridge regressor:
 
 ```@example anatomy
-LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 ```
 
@@ -210,7 +210,7 @@ Because we have implemented `predict`, we are required to overload the
 target, we make this definition:
 
 ```julia
-LearnAPI.kinds_of_proxy(::Ridge) = (LiteralTarget(),)
+LearnAPI.kinds_of_proxy(::Ridge) = (Point(),)
 ```
 
 A macro provides a shortcut, convenient when multiple traits are to be defined:
@@ -219,7 +219,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
 @trait(
     Ridge,
     constructor = Ridge,
-    kinds_of_proxy=(LiteralTarget(),),
+    kinds_of_proxy=(Point(),),
     tags = (:regression,),
     functions = (
         :(LearnAPI.fit),
@@ -326,7 +326,7 @@ LearnAPI.minimize(model::RidgeFitted) =
 @trait(
     Ridge,
     constructor = Ridge,
-    kinds_of_proxy=(LiteralTarget(),),
+    kinds_of_proxy=(Point(),),
     tags = (:regression,),
     functions = (
         :(LearnAPI.fit),
@@ -424,11 +424,11 @@ case:
 ```@example anatomy2
 LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)'
 
-LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, observations::AbstractMatrix) =
+LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
     observations'*model.coefficients
 
-LearnAPI.predict(model::RidgeFitted, ::LiteralTarget, Xnew) =
-    predict(model, LiteralTarget(), obs(model, Xnew))
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+    predict(model, Point(), obs(model, Xnew))
 ```
 
 ### `target` and `features` methods

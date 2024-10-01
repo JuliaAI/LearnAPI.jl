@@ -57,7 +57,7 @@ DOC_DATA_INTERFACE(method) =
 
 The first signature returns target predictions, or proxies for target predictions, for
 input features `data`, according to some `model` returned by [`fit`](@ref). Where
-supported, these are literally target predictions if `kind_of_proxy = LiteralTarget()`,
+supported, these are literally target predictions if `kind_of_proxy = Point()`,
 and probability density/mass functions if `kind_of_proxy = Distribution()`. List all
 options with [`LearnAPI.kinds_of_proxy(algorithm)`](@ref), where `algorithm =
 LearnAPI.algorithm(model)`.
@@ -75,7 +75,7 @@ training features `X`, training target `y`, and test features `Xnew`:
 
 ```julia
 model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
-predict(model, LiteralTarget(), Xnew)
+predict(model, Point(), Xnew)
 ```
 
 See also [`fit`](@ref), [`transform`](@ref), [`inverse_transform`](@ref).

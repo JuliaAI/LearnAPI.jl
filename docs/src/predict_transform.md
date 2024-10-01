@@ -27,7 +27,7 @@ ŷ = predict(model, Distribution(), Xnew)
 Generate point predictions:
 
 ```julia
-ŷ = predict(model, LiteralTarget(), Xnew)
+ŷ = predict(model, Point(), Xnew)
 ```
 
 Train a dimension-reducing `algorithm`:
@@ -49,7 +49,7 @@ inverse_transform(model, Xnew_reduced)
 fitobs = obs(algorithm, (X, y)) # algorithm-specific repr. of data
 model = fit(algorithm, MLUtils.getobs(fitobs, 1:100))
 predictobs = obs(model, MLUtils.getobs(X, 101:150))
-ŷ = predict(model, LiteralTarget(), predictobs)
+ŷ = predict(model, Point(), predictobs)
 ```
 
 
@@ -65,7 +65,7 @@ ŷ = predict(model, LiteralTarget(), predictobs)
 
 If the algorithm has a notion of [target variable](@ref proxy), then use 
 [`predict`](@ref) to output each supported [kind of target proxy](@ref
-proxy_types) (`LiteralTarget()`, `Distribution()`, etc).
+proxy_types) (`Point()`, `Distribution()`, etc).
 
 For output not associated with a target variable, implement [`transform`](@ref)
 instead, which does not dispatch on [`LearnAPI.KindOfProxy`](@ref), but can be optionally

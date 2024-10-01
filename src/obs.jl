@@ -24,7 +24,7 @@ Usual workflow, using data-specific resampling methods:
 data = (X, y) # a DataFrame and a vector
 data_train = (Tables.select(X, 1:100), y[1:100])
 model = fit(algorithm, data_train)
-ŷ = predict(model, LiteralTarget(), X[101:150])
+ŷ = predict(model, Point(), X[101:150])
 ```
 
 Alternative workflow using `obs` and the MLUtils.jl method `getobs` (assumes
@@ -37,7 +37,7 @@ fit_observations = obs(algorithm, data)
 model = fit(algorithm, MLUtils.getobs(fit_observations, 1:100))
 
 predict_observations = obs(model, X)
-ẑ = predict(model, LiteralTarget(), MLUtils.getobs(predict_observations, 101:150))
+ẑ = predict(model, Point(), MLUtils.getobs(predict_observations, 101:150))
 @assert ẑ == ŷ
 ```
 

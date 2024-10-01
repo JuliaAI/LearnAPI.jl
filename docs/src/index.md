@@ -50,7 +50,7 @@ LearnAPI.functions(forest)
 model = fit(forest, X, y)
 
 # Generate point predictions:
-ŷ = predict(model, Xnew) # or `predict(model, LiteralTarget(), Xnew)`
+ŷ = predict(model, Xnew) # or `predict(model, Point(), Xnew)`
 
 # Predict probability distributions:
 predict(model, Distribution(), Xnew)
@@ -65,10 +65,10 @@ serialize("my_random_forest.jls", small_model)
 # Recover saved model and algorithm configuration:
 recovered_model = deserialize("my_random_forest.jls")
 @assert LearnAPI.algorithm(recovered_model) == forest
-@assert predict(recovered_model, LiteralTarget(), Xnew) == ŷ
+@assert predict(recovered_model, Point(), Xnew) == ŷ
 ```
 
-`Distribution` and `LiteralTarget` are singleton types owned by LearnAPI.jl. They allow
+`Distribution` and `Point` are singleton types owned by LearnAPI.jl. They allow
 dispatch based on the [kind of target proxy](@ref proxy), a key LearnAPI.jl concept.
 LearnAPI.jl places more emphasis on the notion of target variables and target proxies than
 on the usual supervised/unsupervised learning dichotomy. From this point of view, a

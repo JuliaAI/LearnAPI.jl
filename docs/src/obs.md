@@ -68,7 +68,7 @@ scores = map(train_test_folds) do (train, test)
         global never_trained = false
     end
     predictobs_subset = MLUtils.getobs(predictobs, test)
-    ŷ = predict(model, LiteralTarget(), predictobs_subset)
+    ŷ = predict(model, Point(), predictobs_subset)
 
     return <score comparing ŷ with y[test]>
 

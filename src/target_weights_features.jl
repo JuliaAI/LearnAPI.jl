@@ -46,7 +46,7 @@ implemented, as in the following sample workflow:
 ```julia
 model = fit(algorithm, data)
 X = features(data)
-ŷ = predict(algorithm, kind_of_proxy, X) # eg, `kind_of_proxy = LiteralTarget()`
+ŷ = predict(algorithm, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 ```
 
 The return value has the same number of observations as `data` does. For supervised models

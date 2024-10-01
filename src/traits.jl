@@ -134,7 +134,7 @@ functions(::Any) = ()
 
 Returns a tuple of all instances, `kind`, for which for which `predict(algorithm, kind,
 data...)` has a guaranteed implementation. Each such `kind` subtypes
-[`LearnAPI.KindOfProxy`](@ref). Examples are `LiteralTarget()` (for predicting actual
+[`LearnAPI.KindOfProxy`](@ref). Examples are `Point()` (for predicting actual
 target values) and `Distributions()` (for predicting probability mass/density functions).
 
 The call `predict(model, data)` always returns `predict(model, kind, data)`, where `kind`
