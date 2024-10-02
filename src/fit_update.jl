@@ -96,7 +96,7 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
 
 When following the call `fit(algorithm, data)`, the `update` call is semantically
-equivalent to retraining ab initio using a concatentation of `data` and `new_data`,
+equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
 *provided there are no hyperparameter replacements.* Behaviour is otherwise
 algorithm-specific.
 
@@ -131,7 +131,7 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
 
 When following the call `fit(algorithm, data)`, the `update` call is semantically
-equivalent to retraining ab initio using a concatentation of `data` and `new_data`,
+equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
 *provided there are no hyperparameter replacements.* Behaviour is otherwise
 algorithm-specific.
 

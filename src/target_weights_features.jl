@@ -5,7 +5,7 @@ Return, for each form of `data` supported in a call of the form [`fit(algorithm,
 data)`](@ref), the target variable part of `data`. If `nothing` is returned, the
 `algorithm` does not see a target variable in training (is unsupervised).
 
-Refer to LearnAPI.jl documenation for the precise meaning of "target".
+Refer to LearnAPI.jl documentation for the precise meaning of "target".
 
 # New implementations
 
@@ -22,7 +22,7 @@ target(::Any, data) = nothing
 
 Return, for each form of `data` supported in a call of the form `[`fit(algorithm,
 data)`](@ref), the per-observation weights part of `data`. Where `nothing` is returned, no
-weights are part of `data`, which is to be interpretted as uniform weighting.
+weights are part of `data`, which is to be interpreted as uniform weighting.
 
 # New implementations
 
@@ -51,7 +51,7 @@ ŷ = predict(algorithm, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 
 The return value has the same number of observations as `data` does. For supervised models
 (i.e., where `:(LearnAPI.target) in LearnAPI.functions(algorithm)`) `ŷ` above is generally
-inteneded to be an approximate proxy for `LearnAPI.target(algorithm, data)`, the training
+intended to be an approximate proxy for `LearnAPI.target(algorithm, data)`, the training
 target.
 
 

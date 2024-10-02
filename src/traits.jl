@@ -87,7 +87,7 @@ function constructor end
 """
     LearnAPI.functions(algorithm)
 
-Return a tuple of expressions respresenting functions that can be meaningfully applied
+Return a tuple of expressions representing functions that can be meaningfully applied
 with `algorithm`, or an associated model (object returned by `fit(algorithm, ...)`, as the
 first argument. Algorithm traits (methods for which `algorithm` is the *only* argument)
 are excluded.
@@ -328,7 +328,7 @@ to return `"K-nearest neighbors regressor"`. Ideally, this is a "concrete" noun 
 `"ridge regressor"` rather than an "abstract" noun like `"ridge regression"`.
 
 """
-human_name(algorithm) = snakecase(name(alogorithm), delim=' ') # `name` defined below
+human_name(algorithm) = snakecase(name(algorithm), delim=' ') # `name` defined below
 
 """
     LearnAPI.data_interface(algorithm)
