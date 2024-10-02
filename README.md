@@ -7,8 +7,7 @@ A base Julia interface for machine learning and statistics
 
 - [X] Detailed proposal stage ([this
       documentation](https://juliaai.github.io/LearnAPI.jl/dev/)). 
-- [ ] Initial feedback stage (opened mid-January, 2023). General feedback can be provided at [this Julia Discourse thread](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048/20). 
-- [ ] Implement feedback and finish "To do" list (below)
+- [X] Initial feedback stage (opened mid-January, 2023). General feedback can be provided at [this Julia Discourse thread](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048/20). 
 - [ ] Proof of concept implementation
 - [ ] Polish
 - [ ] **Register 0.2.0**
@@ -17,8 +16,8 @@ You can join a discussion on the LearnAPI proposal at [this](https://discourse.j
 
 To do:
 
-- [ ] Add methods to create/save persistent representation of learned parameters
-- [ ] Add more repo tests
+- [ ] ~~Add methods to create/save persistent representation of learned parameters~~
+- [X] Add more repo tests
 - [ ] Add methods to test an implementation
 - [ ] Add user guide ("Common Implementation Patterns" section of manual)
 
