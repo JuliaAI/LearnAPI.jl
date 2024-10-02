@@ -14,7 +14,7 @@ LearnAPI.KindOfProxy
 LearnAPI.IID
 ```
 
-## Proxies for density estimation lgorithms
+## Proxies for density estimation algorithms
 
 ```@docs
 LearnAPI.Single
