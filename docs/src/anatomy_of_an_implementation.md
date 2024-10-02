@@ -20,7 +20,7 @@ A transformer ordinarily implements `transform` instead of
 
     By default, it is assumed that `data` supports the [`LearnAPI.RandomAccess`](@ref)
     interface; this includes all matrices, with observations-as-columns, most tables, and
-    tuples thereof). See [`LearnAPI.RandomAccess`](@ref) for details. If this is not the
+    tuples thereof. See [`LearnAPI.RandomAccess`](@ref) for details. If this is not the
     case then an implementation must either: 
 
     If the `data` object consumed by `fit`, `predict`, or `transform` is not
