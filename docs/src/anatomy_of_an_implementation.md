@@ -76,7 +76,7 @@ the docstring to the *constructor*, not the struct.
 ## Implementing `fit`
 
 A ridge regressor requires two types of data for training: input features `X`, which here
-we suppose are tabular¹, and a [target](@ref proxy) `y`, which we suppose is a vector.
+we suppose are tabular¹, and a [target](@ref proxy) `y`, which we suppose is a vector.⁴
 
 It is convenient to define a new type for the `fit` output, which will include
 coefficients labelled by feature name for inspection after training:
@@ -501,3 +501,9 @@ like the native ones, they must be included in the [`LearnAPI.functions`](@ref)
 declaration.
 
 ³ The last index must be the observation index.
+
+⁴ The `data = (X, y)` pattern implemented here is not only supported pattern. For,
+example, `data` might be a single table containing both features and target variable. In
+this case, it will be necessary to overload [`LearnAPI.features`](@ref) in addition to
+[`LearnAPI.target`](@ref); the name of the target column would need to be a hyperparameter
+or `fit` keyword argument.
