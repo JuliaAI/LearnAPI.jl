@@ -104,7 +104,7 @@ LearnAPI.minimize(model::RidgeFitted) =
     Ridge,
     constructor = Ridge,
     kinds_of_proxy = (Point(),),
-    tags = ("regression",)
+    tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
@@ -237,7 +237,7 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
     BabyRidge,
     constructor = BabyRidge,
     kinds_of_proxy = (Point(),),
-    tags = ("regression",)
+    tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
