@@ -12,16 +12,11 @@ A transformer ordinarily implements `transform` instead of
 
     New implementations of `fit`, `predict`, etc,
     always have a *single* `data` argument, as in
-        `LearnAPI.fit(algorithm, data; verbosity=1) = ...`.
+    `LearnAPI.fit(algorithm, data; verbosity=1) = ...`.
     For convenience, user-calls, such as `fit(algorithm, X, y)`, automatically fallback
-        to `fit(algorithm, (X, y))`.
+    to `fit(algorithm, (X, y))`.
 
 !!! note
-
-    By default, it is assumed that `data` supports the [`LearnAPI.RandomAccess`](@ref)
-    interface; this includes all matrices, with observations-as-columns, most tables, and
-    tuples thereof. See [`LearnAPI.RandomAccess`](@ref) for details. If this is not the
-    case then an implementation must either: 
 
     If the `data` object consumed by `fit`, `predict`, or `transform` is not
     not a suitable table¹, array³, tuple of tables and arrays, or some
@@ -29,7 +24,7 @@ A transformer ordinarily implements `transform` instead of
     the MLUtils.jl `getobs`/`numobs` interface,
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
-    it, as illustrated below under 
+    this interface, as illustrated below under 
 	[Providing an advanced data interface](@ref); or (ii) overload the trait
     [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
     API. 
