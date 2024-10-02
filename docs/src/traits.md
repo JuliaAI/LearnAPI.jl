@@ -10,8 +10,8 @@ training). They may also record more mundane information, such as a package lice
 
 ### [Overloadable traits](@id traits_list)
 
-In the examples column of the table below, `Table`, `Continuous`, `Sampleable` are names owned by the
-package [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
+In the examples column of the table below, `Continuous` is a name owned the package
+[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl/).
 
 | trait                                                        | return value                                                                                                             | fallback value                                        | example                                                    |
 |:-------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|:-----------------------------------------------------------|
