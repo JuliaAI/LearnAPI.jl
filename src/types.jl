@@ -181,7 +181,7 @@ All arrays implement `RandomAccess`, with the last index being the observation i
 
 A Tables.jl compatible table `data` implements `RandomAccess` if `Tables.istable(data)` is
 true and if `data` implements `DataAPI.nrows`. This includes many tables, and in
-particular, `DataFrame`s. Tables that are also tuples are excluded.
+particular, `DataFrame`s. Tables that are also tuples are explicitly excluded.
 
 Any tuple of objects implementing `RandomAccess` also implements `RandomAccess`.
 
