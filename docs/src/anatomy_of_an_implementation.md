@@ -198,8 +198,8 @@ predictions.
 ## Algorithm traits
 
 Algorithm [traits](@ref traits) record extra generic information about an algorithm, or
-make specific promises of behavior. They usually have an algorithm as the single argument,
-and so we regard [`LearnAPI.constructor`](@ref) defined above as a trait.
+make specific promises of behavior. They are methods that have an algorithm as the solve
+argument, and so we regard [`LearnAPI.constructor`](@ref) defined above as a trait.
 
 Because we have implemented `predict`, we are required to overload the
 [`LearnAPI.kinds_of_proxy`](@ref) trait. Because we can only make point predictions of the
