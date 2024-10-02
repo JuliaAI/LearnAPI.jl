@@ -1,101 +1,110 @@
-# [`obs`](@id data_interface)
+# [`obs` and Data Interfaces](@id data_interface)
 
-The [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) package provides two methods
-`getobs` and `numobs` for resampling data divided into multiple observations, including
-arrays and tables. The data objects returned below are guaranteed to implement this
-interface and can be passed to the relevant method (`obsfit`, `obspredict` or
-`obstransform`) possibly after resampling using `MLUtils.getobs`. This may provide
-performance advantages over naive workflows.
+The `obs` method takes data intended as input to `fit`, `predict` or `transform`, and
+transforms it to an algorithm-specific form guaranteed to implement a form of observation
+access designated by the algorithm. The transformed data can then be resampled and passed
+on to the relevant method in place of the original input. Using `obs` may provide
+performance advantages over naive workflows in some cases (e.g., cross-validation).
 
 ```julia
-obs(fit, algorithm, data...) -> <combined data object for fit>
-obs(predict, algorithm, data...) -> <combined data object for predict>
-obs(transform, algorithm, data...) -> <combined data object for transform>
+obs(algorithm, data) # can be passed to `fit` instead of `data`
+obs(model, data)     # can be passed to `predict` or `transform` instead of `data`
 ```
 
-## Typical workflows
+## [Typical workflows](@id obs_workflows)
 
-LearnAPI.jl makes no assumptions about the form of data `X` and `y` in a call like
-`fit(algorithm, X, y)`. The particular `algorithm` is free to articulate it's own
-requirements.  However, in this example, the definition
+LearnAPI.jl makes no universal assumptions about the form of `data` in a call
+like `fit(algorithm, data)`. However, if we define
 
 ```julia
-obsdata = obs(fit, algorithm, X, y)
+observations = obs(algorithm, data)
 ```
 
-combines `X` and `y` in a single object guaranteed to implement the MLUtils.jl
-`getobs`/`numobs` interface, which can be passed to `obsfit` instead of `fit`, as is, or
-after resampling using `MLUtils.getobs`:
+then, assuming the typical case that `LearnAPI.data_interface(algorithm) ==
+LearnAPI.RandomAccess()`, `observations` implements the
+[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs`/`numobs` interface, for
+grabbing and counting observations. Moreover, we can pass `observations` to `fit` in place
+of the original data, or first resample it using `MLUtils.getobs`:
 
 ```julia
-# equivalent to `mode = fit(algorithm, X, y)`:
-model = obsfit(algorithm, obsdata)
+# equivalent to `model = fit(algorithm, data)`
+model = fit(algorithm, observations)
 
 # with resampling:
-resampled_obsdata = MLUtils.getobs(obsdata, 1:100)
-model = obsfit(algorithm, resampled_obsdata)
+resampled_observations = MLUtils.getobs(observations, 1:10)
+model = fit(algorithm, resampled_observations)
 ```
 
 In some implementations, the alternative pattern above can be used to avoid repeating
 unnecessary internal data preprocessing, or inefficient resampling.  For example, here's
-how a user might call `obs` and `MLUtils.getobs` to perform efficient
-cross-validation:
+how a user might call `obs` and `MLUtils.getobs` to perform efficient cross-validation:
 
 ```julia
 using LearnAPI
 import MLUtils
 
-X = <some data frame with 30 rows>
-y = <some categorical vector with 30 rows>
-algorithm = <some LearnAPI-compliant algorithm>
+algorithm = <some supervised learner>
 
-test_train_folds = map([1:10, 11:20, 21:30]) do test
-    (test, setdiff(1:30, test))
-end 
+data = <some data that `fit` can consume, with 30 observations>
+X = LearnAPI.features(algorithm, data)
+y = LearnAPI.target(algorithm, data)
 
-# create fixed model-specific representations of the whole data set:
-fit_data = obs(fit, algorithm, X, y)
-predict_data = obs(predict, algorithm, predict, X)
+train_test_folds = map([1:10, 11:20, 21:30]) do test
+    (setdiff(1:30, test), test)
+end
 
-scores = map(train_test_folds) do (train_indices, test_indices)
-    
-	# train using model-specific representation of data:
-	train_data = MLUtils.getobs(fit_data, train_indices)
-	model = obsfit(algorithm, train_data)
-	
-	# predict on the fold complement:
-	test_data = MLUtils.getobs(predict_data, test_indices)
-	ŷ = obspredict(model, LiteralTarget(), test_data)
+fitobs = obs(algorithm, data)
+never_trained = true
+
+scores = map(train_test_folds) do (train, test)
+
+    # train using model-specific representation of data:
+    fitobs_subset = MLUtils.getobs(fitobs, train)
+    model = fit(algorithm, fitobs_subset)
+
+    # predict on the fold complement:
+    if never_trained
+        global predictobs = obs(model, X)
+        global never_trained = false
+    end
+    predictobs_subset = MLUtils.getobs(predictobs, test)
+    ŷ = predict(model, Point(), predictobs_subset)
 
     return <score comparing ŷ with y[test]>
-	
-end 
+
+end
 ```
-
-Note here that the output of `obspredict` will match the representation of `y` , i.e.,
-there is no concept of an algorithm-specific representation of *outputs*, only inputs.
-
 
 ## Implementation guide
 
-| method        | compulsory? | fallback               |
-|:--------------|:-----------:|:----------------------:|
-| [`obs`](@ref) | depends     | slurps `data` argument |
-|               |             |                        |
+| method                                  | compulsory? | fallback       |
+|:----------------------------------------|:-----------:|:--------------:|
+| [`obs(algorithm_or_model, data)`](@ref) | depends     | returns `data` |
+|                                         |             |                |
 
-If the `data` consumed by `fit`, `predict` or `transform` consists only of tables and
-arrays (with last dimension the observation dimension) then overloading `obs` is
-optional. However, if an implementation overloads `obs` to return a (thinly wrapped)
-representation of user data that is closer to what the core algorithm actually uses, and
-overloads `MLUtils.getobs` (or, more typically `Base.getindex`) to make resampling of that
-representation efficient, then those optimizations become available to the user, without
-the user concerning herself with the details of the representation.
+A sample implementation is given in [Providing an advanced data interface](@ref). 
 
-A sample implementation is given in the [`obs`](@ref) document-string below.
 
 ## Reference
 
 ```@docs
 obs
+```
+
+### Data interfaces
+
+New implementations must overload [`LearnAPI.data_interface(algorithm)`](@ref) if the
+output of [`obs`](@ref) does not implement [`LearnAPI.RandomAccess`](@ref). (Arrays, most
+tables, and all tuples thereof, implement `RandomAccess`.)
+
+- [`LearnAPI.RandomAccess`](@ref) (default)
+- [`LearnAPI.FiniteIterable`](@ref)
+- [`LearnAPI.Iterable`](@ref)
+
+
+```@docs
+LearnAPI.RandomAccess
+LearnAPI.FiniteIterable
+LearnAPI.Iterable
 ```
 

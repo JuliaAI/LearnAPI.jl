@@ -31,7 +31,7 @@ is `true`.
 # New implementations
 
 Implementation is compulsory for new algorithm types. The behaviour described above is the
-only contract. $(DOC_IMPLEMENTED_METHODS(:algorithm))
+only contract. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.algorithm)"))
 
 """
 function algorithm end
@@ -44,7 +44,7 @@ Return the algorithm-specific feature importances of a `model` output by
 an abstract vector of `feature::Symbol => importance::Real` pairs (e.g `[:gender => 0.23,
 :height => 0.7, :weight => 0.1]`).
 
-The `algorithm` supports feature importances if `LearnAPI.feature_importances in
+The `algorithm` supports feature importances if `:(LearnAPI.feature_importances) in
 LearnAPI.functions(algorithm)`.
 
 If an algorithm is sometimes unable to report feature importances then
@@ -55,7 +55,7 @@ If an algorithm is sometimes unable to report feature importances then
 
 Implementation is optional.
 
-$(DOC_IMPLEMENTED_METHODS(:feature_importances)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.feature_importances)")).
 
 """
 function feature_importances end
@@ -68,7 +68,7 @@ an abstract vector of `feature_or_class::Symbol => coefficient::Real` pairs (e.g
 => 0.23, :height => 0.7, :weight => 0.1]`) or, in the case of multi-targets,
 `feature::Symbol => coefficients::AbstractVector{<:Real}` pairs.
 
-The `model` reports coefficients if `LearnAPI.coefficients in
+The `model` reports coefficients if `:(LearnAPI.coefficients) in
 LearnAPI.functions(Learn.algorithm(model))`.
 
 See also [`LearnAPI.intercept`](@ref).
@@ -77,7 +77,7 @@ See also [`LearnAPI.intercept`](@ref).
 
 Implementation is optional.
 
-$(DOC_IMPLEMENTED_METHODS(:coefficients)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.coefficients)")).
 
 """
 function coefficients end
@@ -88,7 +88,7 @@ function coefficients end
 For a linear model, return the learned intercept.  The value returned is `Real` (single
 target) or an `AbstractVector{<:Real}` (multi-target).
 
-The `model` reports intercept if `LearnAPI.intercept in
+The `model` reports intercept if `:(LearnAPI.intercept) in
 LearnAPI.functions(Learn.algorithm(model))`.
 
 See also [`LearnAPI.coefficients`](@ref).
@@ -97,7 +97,7 @@ See also [`LearnAPI.coefficients`](@ref).
 
 Implementation is optional.
 
-$(DOC_IMPLEMENTED_METHODS(:intercept)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.intercept)")).
 
 """
 function intercept end
@@ -120,7 +120,7 @@ See also [`LearnAPI.trees`](@ref).
 
 Implementation is optional.
 
-$(DOC_IMPLEMENTED_METHODS(:tree)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.tree)")).
 
 """
 function tree end
@@ -137,7 +137,7 @@ See also [`LearnAPI.tree`](@ref).
 
 Implementation is optional.
 
-$(DOC_IMPLEMENTED_METHODS(:trees)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.trees)")).
 
 """
 function trees end
@@ -155,10 +155,28 @@ See also [`fit`](@ref).
 Implement for iterative algorithms that compute and record training losses as part of
 training (e.g. neural networks).
 
-$(DOC_IMPLEMENTED_METHODS(:training_losses)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_losses)")).
 
 """
 function training_losses end
+
+"""
+    LearnAPI.training_predictions(model)
+
+Return internally computed training predictions when running `model = fit(algorithm, ...)`
+for some `algorithm`.
+
+See also [`fit`](@ref).
+
+# New implementations
+
+Implement for iterative algorithms that compute and record training losses as part of
+training (e.g. neural networks).
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_predictions)")).
+
+"""
+function training_predictions end
 
 """
     LearnAPI.training_scores(model)
@@ -174,7 +192,7 @@ Implement for algorithms, such as outlier detection algorithms, which associate 
 with each observation during training, where these scores are of interest in later
 processes (e.g, in defining normalized scores for new data).
 
-$(DOC_IMPLEMENTED_METHODS(:training_scores)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_scores)")).
 
 """
 function training_scores end
@@ -194,9 +212,9 @@ See also [`is_composite`](@ref).
 
 # New implementations
 
-Implementent if and only if `model` is a composite model. 
+Implementent if and only if `model` is a composite model.
 
-$(DOC_IMPLEMENTED_METHODS(:components)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.components)")).
 
 """
 function components end
@@ -211,7 +229,7 @@ See also [`fit`](@ref).
 
 # New implementations
 
-$(DOC_IMPLEMENTED_METHODS(:training_labels)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
 
 """
 function training_labels end
@@ -227,6 +245,7 @@ const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     feature_importances,
     training_labels,
     training_losses,
+    training_predictions,
     training_scores,
     components,
 )
@@ -254,7 +273,7 @@ See also [`fit`](@ref).
 Implementation is discouraged for byproducts already covered by other LearnAPI.jl accessor
 functions: $ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS_LIST.
 
-$(DOC_IMPLEMENTED_METHODS(:training_labels)).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
 
 """
 function extras end
@@ -268,4 +287,3 @@ const ACCESSOR_FUNCTIONS_LIST = join(
     ", ",
     " and ",
 )
-

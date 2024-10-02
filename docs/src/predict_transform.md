@@ -1,81 +1,102 @@
-# [`predict`, `transform`, and relatives](@id operations)
-
-Standard methods:
+# [`predict`, `transform` and `inverse_transform`](@id operations)
 
 ```julia
-predict(model, kind_of_proxy, data...) -> prediction
-transform(model, data...) -> transformed_data
-inverse_transform(model, data...) -> inverted_data
+predict(model, kind_of_proxy, data)
+transform(model, data)
+inverse_transform(model, data)
 ```
 
-Methods consuming output, `obsdata`, of data-preprocessor [`obs`](@ref):
+When a method expects a tuple form of argument, `data = (X1, ..., Xn)`, then a slurping
+signature is also provided, as in `transform(model, X1, ..., Xn)`.
+
+
+## [Typical worklows](@id predict_workflow)
+
+Train some supervised `algorithm`:
 
 ```julia
-obspredict(model, kind_of_proxy, obsdata) -> prediction
-obstransform(model, obsdata) -> transformed_data
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
 ```
 
-## Typical worklows
+Predict probability distributions:
 
 ```julia
-# Train some supervised `algorithm`:
-model = fit(algorithm, X, y)
-
-# Predict probability distributions:
 ŷ = predict(model, Distribution(), Xnew)
-
-# Generate point predictions:
-ŷ = predict(model, LiteralTarget(), Xnew)
 ```
 
+Generate point predictions:
+
 ```julia
-# Training a dimension-reducing `algorithm`:
+ŷ = predict(model, Point(), Xnew)
+```
+
+Train a dimension-reducing `algorithm`:
+
+```julia
 model = fit(algorithm, X)
 Xnew_reduced = transform(model, Xnew)
+```
 
-# Apply an approximate right inverse:
+Apply an approximate right inverse:
+
+```julia
 inverse_transform(model, Xnew_reduced)
 ```
 
 ### An advanced workflow
 
 ```julia
-fitdata = obs(fit, algorithm, X, y)
-predictdata = obs(predict, algorithm, Xnew)
-model = obsfit(algorithm, obsdata)
-ŷ = obspredict(model, LiteralTarget(), predictdata)
+fitobs = obs(algorithm, (X, y)) # algorithm-specific repr. of data
+model = fit(algorithm, MLUtils.getobs(fitobs, 1:100))
+predictobs = obs(model, MLUtils.getobs(X, 101:150))
+ŷ = predict(model, Point(), predictobs)
 ```
 
 
-## Implementation guide
+## [Implementation guide](@id predict_guide)
 
-The methods `predict` and `transform` are not directly overloaded. Implement `obspredict`
-and `obstransform` instead:
-
-| method                      | compulsory? | fallback | requires                              |
-|:----------------------------|:-----------:|:--------:|:-------------------------------------:|
-| [`obspredict`](@ref)        | no          | none     | [`fit`](@ref)                         |
-| [`obstransform`](@ref)      | no          | none     | [`fit`](@ref)                         |
-| [`inverse_transform`](@ref) | no          | none     | [`fit`](@ref), [`obstransform`](@ref) |
+| method                      | compulsory? | fallback |
+|:----------------------------|:-----------:|:--------:|
+| [`predict`](@ref)           | no          | none     |
+| [`transform`](@ref)         | no          | none     |
+| [`inverse_transform`](@ref) | no          | none     |
 
 ### Predict or transform?
 
-If the algorithm has a notion of [target variable](@ref proxy), then arrange for
-[`obspredict`](@ref) to output each supported [kind of target proxy](@ref
-proxy_types) (`LiteralTarget()`, `Distribution()`, etc).
+If the algorithm has a notion of [target variable](@ref proxy), then use 
+[`predict`](@ref) to output each supported [kind of target proxy](@ref
+proxy_types) (`Point()`, `Distribution()`, etc).
 
-For output not associated with a target variable, implement [`obstransform`](@ref)
+For output not associated with a target variable, implement [`transform`](@ref)
 instead, which does not dispatch on [`LearnAPI.KindOfProxy`](@ref), but can be optionally
-paired with an implementation of [`inverse_transform`](@ref) for returning (approximate)
+paired with an implementation of [`inverse_transform`](@ref), for returning (approximate)
 right inverses to `transform`.
 
 
-## Reference
+### [One-liners combining fit and transform/predict](@id one_liners)
+
+Algorithms may optionally overload `transform` to apply `fit` first, using the supplied
+data if required, and then immediately `transform` the same data. The same applies to
+`predict`. In that case the first argument of `transform`/`predict` is an *algorithm*
+instead of the output of `fit`:
+
+```julia
+predict(algorithm, kind_of_proxy, data) # `fit` implied
+transform(algorithm, data) # `fit` implied
+```
+
+For example, if `fit(algorithm, X)` is defined, then `predict(algorithm, X)` will be
+shorthand for
+
+```julia
+model = fit(algorithm, X)
+predict(model, X)
+```
+
+## [Reference](@id predict_ref)
 
 ```@docs
 predict
-obspredict
 transform
-obstransform
 inverse_transform
 ```
