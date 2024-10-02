@@ -25,7 +25,8 @@ A transformer ordinarily implements `transform` instead of
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     this interface, as illustrated below under 
-	[Providing an advanced data interface](@ref); or (ii) overload the trait
+	[Providing an advanced data interface](@ref), and which may additionally 
+	enable certain performance benefits; or (ii) overload the trait
     [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
     API. 
 
