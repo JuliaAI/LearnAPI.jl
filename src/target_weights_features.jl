@@ -20,7 +20,7 @@ target(::Any, data) = nothing
 """
     LearnAPI.weights(algorithm, data) -> weights
 
-Return, for each form of `data` supported in a call of the form `[`fit(algorithm,
+Return, for each form of `data` supported in a call of the form [`fit(algorithm,
 data)`](@ref), the per-observation weights part of `data`. Where `nothing` is returned, no
 weights are part of `data`, which is to be interpreted as uniform weighting.
 
@@ -36,7 +36,7 @@ weights(::Any, data) = nothing
 """
     LearnAPI.features(algorithm, data)
 
-Return, for each form of `data` supported in a call of the form `[`fit(algorithm,
+Return, for each form of `data` supported in a call of the form [`fit(algorithm,
 data)`](@ref), the "features" part of `data` (as opposed to the target
 variable, for example). 
 
