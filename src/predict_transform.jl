@@ -97,7 +97,7 @@ Implementation is optional. Only the first signature is implemented, but each
 `kind_of_proxy` that gets an implementation must be added to the list returned by
 [`LearnAPI.kinds_of_proxy`](@ref).
 
-$(DOC_IMPLEMENTED_METHODS(":predict"))
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predict)"))
 
 $(DOC_MINIMIZE(:predict))
 
@@ -160,7 +160,7 @@ See also [`fit`](@ref), [`predict`](@ref),
 # New implementations
 
 Implementation for new LearnAPI.jl algorithms is optional. A fallback provides the
-slurping version. $(DOC_IMPLEMENTED_METHODS(":transform"))
+slurping version. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.transform)"))
 
 $(DOC_MINIMIZE(:transform))
 
@@ -196,7 +196,7 @@ See also [`fit`](@ref), [`transform`](@ref), [`predict`](@ref).
 
 # New implementations
 
-Implementation is optional. $(DOC_IMPLEMENTED_METHODS(":inverse_transform"))
+Implementation is optional. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.inverse_transform)"))
 
 $(DOC_MINIMIZE(:inverse_transform))
 
