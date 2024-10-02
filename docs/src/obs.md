@@ -91,7 +91,7 @@ A sample implementation is given in [Providing an advanced data interface](@ref)
 obs
 ```
 
-### Data interfaces
+### [Data interfaces](@id data_interfaces)
 
 New implementations must overload [`LearnAPI.data_interface(algorithm)`](@ref) if the
 output of [`obs`](@ref) does not implement [`LearnAPI.RandomAccess`](@ref). (Arrays, most

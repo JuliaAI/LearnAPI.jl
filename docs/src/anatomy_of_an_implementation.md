@@ -461,11 +461,9 @@ argument, overloading `obs` is optional. This is provided data in publicized
 `fit`/`predict` signatures consists only of objects implement the
 [`LearnAPI.RandomAccess`](@ref) interface (most tables¹, arrays³, and tuples thereof).
 
-To buy out of supporting the MLUtils.jl interface altogether, an implementation must
-overload the trait, [`LearnAPI.data_interface(algorithm)`](@ref).
-
-For more on data interfaces, see [`obs`](@ref) and
-[`LearnAPI.data_interface(algorithm)`](@ref).
+To opt out of supporting the MLUtils.jl interface altogether, an implementation must
+overload the trait, [`LearnAPI.data_interface(algorithm)`](@ref). See [Data
+interfaces](@ref data_interfaces) for details.
 
 
 ## Demonstration of an advanced `obs` workflow
