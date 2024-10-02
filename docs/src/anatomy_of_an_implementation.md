@@ -500,7 +500,7 @@ declaration.
 
 ³ The last index must be the observation index.
 
-⁴ The `data = (X, y)` pattern implemented here is not only supported pattern. For,
+⁴ The `data = (X, y)` pattern implemented here is not the only supported pattern. For,
 example, `data` might be a single table containing both features and target variable. In
 this case, it will be necessary to overload [`LearnAPI.features`](@ref) in addition to
 [`LearnAPI.target`](@ref); the name of the target column would need to be a hyperparameter
