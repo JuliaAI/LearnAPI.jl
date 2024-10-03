@@ -32,7 +32,7 @@ Predict:
 
 ```julia
 julia> predict(model, data)[1]
-"setosa"
+"virginica"
 ```
 
 Predict a probability distribution ([proxy](https://juliaai.github.io/LearnAPI.jl/dev/kinds_of_target_proxy/#proxy_types) for the target):
