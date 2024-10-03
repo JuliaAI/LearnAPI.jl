@@ -34,7 +34,12 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 
+- [Feature Engineering](@ref)
+
 - [Missing Value Imputation](@ref): Transformers that replace missing values.
+
+- [Transformers](@ref): Other transformers, such as standardizers, and categorical
+  encoders.
 
 - [Clusterering](@ref): Algorithms that group data into clusters for classification and
   possibly dimension reduction. May be true learners (generalize to new data) or static.
@@ -52,4 +57,6 @@ implementations fall into one (or more) of the following informally understood p
 - [Supervised Bayesian Algorithms](@ref)
 
 - [Survival Analysis](@ref)
+
+- [Meta-algorithms](@ref)
 

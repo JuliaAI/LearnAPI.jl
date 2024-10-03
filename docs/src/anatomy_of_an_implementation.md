@@ -24,11 +24,11 @@ A transformer ordinarily implements `transform` instead of
     the MLUtils.jl `getobs`/`numobs` interface,
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
-    this interface, as illustrated below under 
-	[Providing an advanced data interface](@ref), and which may additionally 
-	enable certain performance benefits; or (ii) overload the trait
+    this interface, as illustrated below under
+    [Providing an advanced data interface](@ref), and which may additionally
+    enable certain performance benefits; or (ii) overload the trait
     [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
-    API. 
+    API.
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -503,5 +503,5 @@ declaration.
 ⁴ The `data = (X, y)` pattern implemented here is not the only supported pattern. For,
 example, `data` might be a single table containing both features and target variable. In
 this case, it will be necessary to overload [`LearnAPI.features`](@ref) in addition to
-[`LearnAPI.target`](@ref); the name of the target column would need to be a hyperparameter
-or `fit` keyword argument.
+[`LearnAPI.target`](@ref); the name of the target column would need to be a
+hyperparameter.
