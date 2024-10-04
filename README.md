@@ -44,6 +44,7 @@ UnivariateFinite{Multiclass{3}}(setosa=>0.0, versicolor=>0.25, virginica=>0.75)
 
 ## Credits
 
-Created by Anthony Blaom, in cooperation with [members of the Julia
+Created by Anthony Blaom, in cooperation with Cameron Bieganek and other [members of the
+Julia
 community](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048).
 
