@@ -105,5 +105,4 @@ LearnAPI.iteration_parameter
 LearnAPI.fit_observation_scitype
 LearnAPI.target_observation_scitype
 LearnAPI.predict_or_transform_mutates
-LearnAPI.@trait
 ```

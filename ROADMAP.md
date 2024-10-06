@@ -39,11 +39,6 @@
   - [ ] meta-algorithms
 
 - [ ] In a utility package provide:
-   - [ ] Method to clone an algorithm with user-specified property (hyperparameter)
-     replacement in `LearnAPI.clone(algorithm, p1=value1, p22=value2, ...)` (since
-     `algorithm` can have any type, can't really overload `Base.replace` without
-     piracy). This will be needed in tuning meta-algorithms. Or should this be in
-     LearnAPI.jl proper, to expose it to all users?
    - [ ] Methods to facilitate common-use case data interfaces: support simultaneously
      `fit` data of the form `data = (X, y)` where `X` is table *or* matrix, and `data` a
      table with target specified by hyperparameter; here `obs` will return a thin wrapping

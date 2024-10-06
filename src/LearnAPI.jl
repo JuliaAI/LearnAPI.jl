@@ -11,6 +11,7 @@ include("target_weights_features.jl")
 include("obs.jl")
 include("accessor_functions.jl")
 include("traits.jl")
+include("clone.jl")
 
 export @trait
 export fit, update, update_observations, update_features

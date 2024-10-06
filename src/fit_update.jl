@@ -59,14 +59,15 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 `update` call, but with the specified hyperparameter replacements, in the form `p1=value1,
 p2=value2, ...`.
 
-Provided that `data` is identical with the data presented in a preceding `fit` call, as in
-the example below, execution is semantically equivalent to the call `fit(algorithm,
-data)`, where `algorithm` is `LearnAPI.algorithm(model)` with the specified
-replacements. In some cases (typically, when changing an iteration parameter) there may be
-a performance benefit to using `update` instead of retraining ab initio.
+Provided that `data` is identical with the data presented in a preceding `fit` call *and*
+there is at most one hyperparameter replacement, as in the example below, execution is
+semantically equivalent to the call `fit(algorithm, data)`, where `algorithm` is
+`LearnAPI.algorithm(model)` with the specified replacements. In some cases (typically,
+when changing an iteration parameter) there may be a performance benefit to using `update`
+instead of retraining ab initio.
 
-If `data` differs from that in the preceding `fit` or `update` call, then behaviour is
-algorithm-specific.
+If `data` differs from that in the preceding `fit` or `update` call, or there is more than
+one hyperparameter replacement, then behaviour is algorithm-specific.
 
 ```julia
 algorithm = MyForest(ntrees=100)
@@ -84,6 +85,8 @@ See also [`fit`](@ref), [`update_observations`](@ref), [`update_features`](@ref)
 
 Implementation is optional. The signature must include
 `verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update)"))
+
+See also [`LearnAPI.clone`](@ref)
 
 """
 update(model, data1, datas...; kwargs...) = update(model, (data1, datas...); kwargs...)
@@ -119,6 +122,8 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 Implementation is optional. The signature must include
 `verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_observations)"))
 
+See also [`LearnAPI.clone`](@ref).
+
 """
 update_observations(algorithm, data1, datas...; kwargs...) =
     update_observations(algorithm, (data1, datas...); kwargs...)
@@ -143,6 +148,8 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
 Implementation is optional. The signature must include
 `verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_features)"))
+
+See also [`LearnAPI.clone`](@ref).
 
 """
 update_features(algorithm, data1, datas...; kwargs...) =

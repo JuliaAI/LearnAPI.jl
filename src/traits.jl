@@ -105,29 +105,43 @@ value is non-empty.
 All new implementations must overload this trait. Here's a checklist for elements in the
 return value:
 
-| symbol                            | implementation/overloading compulsory? | include in returned tuple?         |
-|-----------------------------------|----------------------------------------|------------------------------------|
-| `:(LearnAPI.fit)`                 | yes                                    | yes                                |
-| `:(LearnAPI.algorithm)`           | yes                                    | yes                                |
-| `:(LearnAPI.minimize)`            | no                                     | yes                                |
-| `:(LearnAPI.obs)`                 | no                                     | yes                                |
-| `:(LearnAPI.features)`            | no                                     | yes, unless `fit` consumes no data |
-| `:(LearnAPI.update)`              | no                                     | only if implemented                |
-| `:(LearnAPI.update_observations)` | no                                     | only if implemented                |
-| `:(LearnAPI.update_features)`     | no                                     | only if implemented                |
-| `:(LearnAPI.target)`              | no                                     | only if implemented                |
-| `:(LearnAPI.weights)`             | no                                     | only if implemented                |
-| `:(LearnAPI.predict)`             | no                                     | only if implemented                |
-| `:(LearnAPI.transform)`           | no                                     | only if implemented                |
-| `:(LearnAPI.inverse_transform)`   | no                                     | only if implemented                |
-| <accessor functions>              | no                                     | only if implemented                |
+| expression                        | implementation compulsory? | include in returned tuple?         |
+|-----------------------------------|----------------------------|------------------------------------|
+| `:(LearnAPI.fit)`                 | yes                        | yes                                |
+| `:(LearnAPI.algorithm)`           | yes                        | yes                                |
+| `:(LearnAPI.minimize)`            | no                         | yes                                |
+| `:(LearnAPI.obs)`                 | no                         | yes                                |
+| `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
+| `:(LearnAPI.target)`              | no                         | only if implemented                |
+| `:(LearnAPI.weights)`             | no                         | only if implemented                |
+| `:(LearnAPI.update)`              | no                         | only if implemented                |
+| `:(LearnAPI.update_observations)` | no                         | only if implemented                |
+| `:(LearnAPI.update_features)`     | no                         | only if implemented                |
+| `:(LearnAPI.predict)`             | no                         | only if implemented                |
+| `:(LearnAPI.transform)`           | no                         | only if implemented                |
+| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented                |
+| <accessor functions>              | no                         | only if implemented                |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
 algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST.
 
 """
 functions(::Any) = ()
-
+functions() = (
+    :(LearnAPI.fit),
+    :(LearnAPI.algorithm),
+    :(LearnAPI.minimize),
+    :(LearnAPI.obs),
+    :(LearnAPI.features),
+    :(LearnAPI.target),
+    :(LearnAPI.weights),
+    :(LearnAPI.update),
+    :(LearnAPI.update_observations),
+    :(LearnAPI.update_features),
+    :(LearnAPI.predict),
+    :(LearnAPI.transform),
+    :(LearnAPI.inverse_transform),
+)
 
 """
     LearnAPI.kinds_of_proxy(algorithm)

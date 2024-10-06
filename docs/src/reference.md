@@ -91,8 +91,14 @@ named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), propertie
 @assert algorithm == LearnAPI.constructor(algorithm)(; named_properties...)
 ```
 
+which can be tested with `@assert `[`LearnAPI.clone(algorithm)`](@ref)` == algorithm`.
+
 Note that if if `algorithm` is an instance of a *mutable* struct, this requirement
 generally requires overloading `Base.==` for the struct.
+
+No LearnAPI.jl method is permitted to mutate an algorithm. In particular, one should make
+deep copies of RNG hyperparameters before using them in a new implementation of
+[`fit`](@ref).
 
 #### Composite algorithms (wrappers)
 
@@ -178,6 +184,14 @@ Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref)
 - [Algorithm traits](@ref traits): methods that promise specific algorithm behavior or
   record general information about the algorithm. Only [`LearnAPI.constructor`](@ref) and
   [`LearnAPI.functions`](@ref) are universally compulsory.
+
+
+## Utilities
+
+```@docs
+LearnAPI.clone
+LearnAPI.@trait
+```
 
 ---
 
