@@ -346,19 +346,30 @@ tables, and tuples of these. See the doc-string for details.
 data_interface(::Any) = LearnAPI.RandomAccess()
 
 """
-    LearnAPI.predict_or_transform_mutates(algorithm)
+    LearnAPI.is_static(algorithm)
 
-Returns `true` if [`predict`](@ref) or [`transform`](@ref) possibly mutate their first
-argument, `model`, when `LearnAPI.algorithm(model) == algorithm`. If `false`, no arguments
-are ever mutated.
+Returns `true` if [`fit`](@ref) is called with no data arguments, as in
+`fit(algorithm)`. That is, `algorithm` does not generalize to new data, and data is only
+provided at the `predict` or `transform` step.
+
+For example, some clustering algorithms are applied with this workflow, to label points
+observations in `X`:
+
+```julia
+model = fit(algorithm) # no training data
+labels = predict(model, X) # may mutate `model`!
+
+# extract some byproducts of the clustering algorithm (e.g., outliers):
+LearnAPI.extras(model)
+```
 
 # New implementations
 
 This trait, falling back to `false`, may only be overloaded when `fit` has no data
-arguments (`algorithm` does not generalize to new data). See more at [`fit`](@ref).
+arguments. See more at [`fit`](@ref).
 
 """
-predict_or_transform_mutates(::Any) = false
+is_static(::Any) = false
 
 """
     LearnAPI.iteration_parameter(algorithm)

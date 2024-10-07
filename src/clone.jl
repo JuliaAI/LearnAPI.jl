@@ -7,7 +7,7 @@ Return a shallow copy of `algorithm` with the specified hyperparameter replaceme
 clone(algorithm; epochs=100, learning_rate=0.01)
 ```
 
-It is guaranted that `LearnAPI.clone(algorithm) == algorithm`.
+It is guaranteed that `LearnAPI.clone(algorithm) == algorithm`.
 
 """
 function clone(algorithm; replacements...)

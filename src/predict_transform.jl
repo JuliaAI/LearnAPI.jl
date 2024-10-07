@@ -11,11 +11,9 @@ const DOC_OPERATIONS_LIST_FUNCTION = join(map(op -> "`LearnAPI.$op`", OPERATIONS
 DOC_MUTATION(op) =
     """
 
-    If [`LearnAPI.predict_or_transform_mutates(algorithm)`](@ref) is overloaded to return
-    `true`, then `$op` may mutate it's first argument, but not in a way that alters the
-    result of a subsequent call to `predict`, `transform` or
-    `inverse_transform`. This is necessary for some non-generalizing algorithms but is
-    otherwise discouraged. See more at [`fit`](@ref).
+    If [`LearnAPI.is_static(algorithm)`](@ref) is `true`, then `$op` may mutate it's first
+    argument, but not in a way that alters the result of a subsequent call to `predict`,
+    `transform` or `inverse_transform`. See more at [`fit`](@ref).
 
     """
 
@@ -86,7 +84,7 @@ If `predict` supports data in the form of a tuple `data = (X1, ..., Xn)`, then a
 signature is also provided, as in `predict(model, X1, ..., Xn)`.
 
 Note `predict ` does not mutate any argument, except in the special case
-`LearnAPI.predict_or_transform_mutates(algorithm) = true`.
+`LearnAPI.is_static(algorithm) == true`.
 
 # New implementations
 
@@ -150,7 +148,7 @@ W = transform(algorithm, X)
 ```
 
 Note `transform` does not mutate any argument, except in the special case
-`LearnAPI.predict_or_transform_mutates(algorithm) = true`.
+`LearnAPI.is_static(algorithm) == true`.
 
 See also [`fit`](@ref), [`predict`](@ref),
 [`inverse_transform`](@ref).

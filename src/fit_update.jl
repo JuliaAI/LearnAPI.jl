@@ -10,8 +10,8 @@ returning an object, `model`, on which other methods, such as [`predict`](@ref) 
 list of methods that can be applied to either `algorithm` or `model`.
 
 The second signature is provided by algorithms that do not generalize to new observations
-("static" algorithms). In that case, `transform(model, data)` or `predict(model, ...,
-data)` carries out the actual algorithm execution, writing any byproducts of that
+(called *static algorithms*). In that case, `transform(model, data)` or `predict(model,
+..., data)` carries out the actual algorithm execution, writing any byproducts of that
 operation to the mutable object `model` returned by `fit`.
 
 Whenever `fit` expects a tuple form of argument, `data = (X1, ..., Xn)`, then the
@@ -33,14 +33,16 @@ See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
 
 # New implementations
 
-Implementation is compulsory. The signature must include `verbosity`. A fallback for the
-first signature calls the second, ignoring `data`:
+Implementation is compulsory. The signature must include `verbosity`. Fallbacks provide
+the data slurping versions.  A fallback for the first signature calls the second, ignoring
+`data`:
 
 ```julia
 fit(algorithm, data; kwargs...) = fit(algorithm; kwargs...)
 ```
 
-Fallbacks also provide the data slurping versions.
+If only the `fit(algorithm)` signature is expliclty implemented, then the trait
+[`LearnAPI.is_static`](@ref) must be overloaded to return `true`.
 
 $(DOC_DATA_INTERFACE(:fit))
 

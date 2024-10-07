@@ -36,10 +36,12 @@ function LearnAPI.transform(algorithm::Selector, X)
     transform(model, X)
 end
 
+# note the necessity of overloading `is_static` (`fit` consumes no data):
 @trait(
     Selector,
     constructor = Selector,
     tags = ("feature engineering",),
+    is_static = true,
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
@@ -63,9 +65,7 @@ end
 # # FEATURE SELECTOR THAT REPORTS BYPRODUCTS OF SELECTION PROCESS
 
 # This a variation of `Selector` above that stores the names of rejected features in the
-# model object, for inspection by an accessor function called `rejected`. Since
-# `transform(model, X)` mutates `model` in this case, we must overload the
-# `predict_or_transform_mutates` trait.
+# output of `fit`, for inspection by an accessor function called `rejected`.
 
 struct Selector2
     names::Vector{Symbol}
@@ -101,10 +101,11 @@ function LearnAPI.transform(algorithm::Selector2, X)
     transform(model, X)
 end
 
+# note the necessity of overloading `is_static` (`fit` consumes no data):
 @trait(
     Selector2,
     constructor = Selector2,
-    predict_or_transform_mutates = true,
+    is_static = true,
     tags = ("feature engineering",),
     functions = (
         :(LearnAPI.fit),

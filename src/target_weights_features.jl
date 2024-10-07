@@ -70,4 +70,4 @@ return `nothing`.
 features(algorithm, data) = _first(data)
 _first(data) = data
 _first(data::Tuple) = first(data)
-# note the factoring above guards agains method ambiguities
+# note the factoring above guards against method ambiguities

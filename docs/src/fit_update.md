@@ -26,6 +26,8 @@ Data slurping forms are similarly provided for updating methods.
 
 ## Typical workflows
 
+### Supervised models
+
 Supposing `Algorithm` is some supervised classifier type, with an iteration parameter `n`:
 
 ```julia
@@ -43,15 +45,32 @@ model = update(model; n=150)
 predict(model, Distribution(), X)
 ```
 
-### A static algorithm (no "learning")
+### Tranformers
+
+A dimension-reducing transformer, `algorithm`  might be used in this way:
 
 ```julia
-# Apply some clustering algorithm which cannot be generalized to new data:
+model = fit(algorithm, X)
+transform(model, X) # or `transform(model, Xnew)`
+```
+
+or, if implemented, using a single call:
+
+```julia
+transform(algorithm, X) # `fit` implied
+```
+
+### Static algorithms (no "learning")
+
+Suppose `algorithm` is some clustering algorithm that cannot be generalized to new data
+(e.g. DBSCAN):
+
+```julia
 model = fit(algorithm) # no training data
-labels = predict(model, LabelAmbiguous(), X) # may mutate `model`
+labels = predict(model, X) # may mutate `model`
 
 # Or, in one line:
-labels = predict(algorithm, LabelAmbiguous(), X)
+labels = predict(algorithm, X)
 
 # But two-line version exposes byproducts of the clustering algorithm (e.g., outliers):
 LearnAPI.extras(model)
