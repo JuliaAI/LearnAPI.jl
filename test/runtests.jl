@@ -6,6 +6,7 @@ test_files = [
     "clone.jl",
     "integration/regression.jl",
     "integration/static_algorithms.jl",
+    "integration/iterative_algorithms.jl",
 ]
 
 files = isempty(ARGS) ? test_files : ARGS

@@ -17,14 +17,14 @@
   - [ ] classification
   - [ ] clustering
   - [ ] gradient descent
-  - [ ] iterative algorithms
+  - [x] iterative algorithms
   - [ ] incremental algorithms
   - [ ] dimension reduction
   - [x] feature engineering
   - [x] static algorithms
   - [ ] missing value imputation
   - [ ] transformers
-  - [ ] ensemble algorithms
+  - [x] ensemble algorithms
   - [ ] time series forecasting
   - [ ] time series classification
   - [ ] survival analysis
