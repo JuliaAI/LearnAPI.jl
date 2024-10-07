@@ -26,8 +26,8 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 | [`LearnAPI.load_path`](@ref)`(algorithm)`                    | string locating name returned by `LearnAPI.constructor(algorithm)`, beginning with a package name                        | "unknown"`                                            | `FastTrees.LearnAPI.DecisionTreeClassifier`                |
 | [`LearnAPI.is_composite`](@ref)`(algorithm)`                 | `true` if one or more properties of `algorithm` may be an algorithm                                                      | `false`                                               | `true`                                                     |
 | [`LearnAPI.human_name`](@ref)`(algorithm)`                   | human name for the algorithm; should be a noun                                                                           | type name with spaces                                 | "elastic net regressor"                                    |
-| [`LearnAPI.data_interface`](@ref)`(algorithm)`               | Interface implemented by objects returned by [`obs`](@ref)                                                               | `Base.HasLength()` (supports `MLUtils.getobs/numobs`) | `Base.SizeUnknown()` (supports `iterate`)                  |
 | [`LearnAPI.iteration_parameter`](@ref)`(algorithm)`          | symbolic name of an iteration parameter                                                                                  | `nothing`                                             | :epochs                                                    |
+| [`LearnAPI.data_interface`](@ref)`(algorithm)`               | Interface implemented by objects returned by [`obs`](@ref)                                                               | `Base.HasLength()` (supports `MLUtils.getobs/numobs`) | `Base.SizeUnknown()` (supports `iterate`)                  |
 | [`LearnAPI.fit_observation_scitype`](@ref)`(algorithm)`      | upper bound on `scitype(observation)` for `observation` in `data` ensuring `fit(algorithm, data)` works                  | `Union{}`                                             | `Tuple{AbstractVector{Continuous}, Continuous}`            |
 | [`LearnAPI.target_observation_scitype`](@ref)`(algorithm)`   | upper bound on the scitype of each observation of the targget                                                            | `Any`                                                 | `Continuous`                                               |
 | [`LearnAPI.predict_or_transform_mutates`](@ref)`(algorithm)` | `true` if `predict` or `transform` mutates first argument                                                                | `false`                                               | `true`                                                     |
@@ -36,12 +36,12 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 
 The following are provided for convenience but should not be overloaded by new algorithms:
 
-| trait                              | return value                                                         | example |
-|:-----------------------------------|:---------------------------------------------------------------------|:--------|
-| `LearnAPI.name(algorithm)`         | algorithm type name as string                                        | "PCA"   |
-| `LearnAPI.is_algorithm(algorithm)` | `true` if `algorithm` is LearnAPI.jl-compliant                          | `true`  |
-| `LearnAPI.target(algorithm)`       | `true` if [`LearnAPI.target(algorithm, data)`](@ref) is implemented  | `false` |
-| `LearnAPI.weights(algorithm)`      | `true` if [`LearnAPI.weights(algorithm, data)`](@ref) is implemented | `false` |
+| trait                              | return value                                                             | example |
+|:-----------------------------------|:-------------------------------------------------------------------------|:--------|
+| `LearnAPI.name(algorithm)`         | algorithm type name as string                                            | "PCA"   |
+| `LearnAPI.is_algorithm(algorithm)` | `true` if `algorithm` is LearnAPI.jl-compliant                           | `true`  |
+| `LearnAPI.target(algorithm)`       | `true` if `fit` sees a target variable; see [`LearnAPI.target`](@ref)    | `false` |
+| `LearnAPI.weights(algorithm)`      | `true` if `fit` supports per-observation; see [`LearnAPI.weights`](@ref) | `false` |
 
 ## Implementation guide
 

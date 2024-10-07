@@ -7,55 +7,56 @@ using Random
 using Statistics
 using StableRNGs
 
-# # ENSEMBLE OF RIDGE REGRESSORS
+# # ENSEMBLE OF REGRESSORS (A MODEL WRAPPER)
 
-# We implement a toy algorithm that creates an bagged ensemble of ridge regressors (as
-# defined already in test/integration/regressors.jl), i.e, where each atomic model is
-# trained on a random sample of the training observations (same number, but sampled with
-# replacement). In particular this algorithm has an iteration parameter `n`, and we
-# implement `update` for warm restarts when `n` increases.
+# We implement a toy algorithm that creates an bagged ensemble of regressors, i.e, where
+# each atomic model is trained on a random sample of the training observations (same
+# number, but sampled with replacement). In particular this algorithm has an iteration
+# parameter `n`, and we implement `update` for warm restarts when `n` increases.
 
-# no docstring here - that goes with the constructor
-struct RidgeEnsemble
-    lambda::Float64
-    rng # leaving abstract for simplicity
+# no docstring here - that goes with the constructor; some fields left abstract for
+# simplicity
+#
+struct Ensemble
+    atom # the base regressor being bagged
+    rng
     n::Int
 end
 
+# Since the `atom` hyperparameter is another algorithm, it doesn't need a default in the
+# kwarg constructor, but we do need to overload the `LearnAPI.is_composite` trait (done
+# later).
+
 """
-    RidgeEnsemble(; lambda=0.1, rng=Random.default_rng(), n=10)
+    Ensemble(atom; rng=Random.default_rng(), n=10)
 
-Instantiate a RidgeEnsemble algorithm, bla, bla, bla...
+Instantiate a bagged ensemble of `n` regressors, with base regressor `atom`, etc
 
 """
-RidgeEnsemble(; lambda=0.1, rng=Random.default_rng(), n=10) =
-    RidgeEnsemble(lambda, rng, n) # LearnAPI.constructor defined later
+Ensemble(atom; rng=Random.default_rng(), n=10) =
+    Ensemble(atom, rng, n) # `LearnAPI.constructor` defined later
 
-struct RidgeEnsembleFitted
-    algorithm::RidgeEnsemble
+struct EnsembleFitted
+    algorithm::Ensemble
     atom::Ridge
     rng    # mutated copy of `algorithm.rng`
     models # leaving type abstract for simplicity
 end
 
-LearnAPI.algorithm(model::RidgeEnsembleFitted) = model.algorithm
+LearnAPI.algorithm(model::EnsembleFitted) = model.algorithm
 
-# We add the same data interface we provided for `Ridge` in regression.jl. This is an
-# optional step on which the later code does not depend.
-LearnAPI.obs(algorithm::RidgeEnsemble, data) = LearnAPI.obs(Ridge(), data)
-LearnAPI.obs(model::RidgeEnsembleFitted, data) = LearnAPI.obs(first(model.models), data)
-LearnAPI.target(algorithm::RidgeEnsemble, data) = LearnAPI.target(Ridge(), data)
-LearnAPI.features(algorithm::Ridge, data) = LearnAPI.features(Ridge(), data)
+# We add the same data interface that the atomic regressor uses:
+LearnAPI.obs(algorithm::Ensemble, data) = LearnAPI.obs(algorithm.atom, data)
+LearnAPI.obs(model::EnsembleFitted, data) = LearnAPI.obs(first(model.models), data)
+LearnAPI.target(algorithm::Ensemble, data) = LearnAPI.target(algorithm.atom, data)
+LearnAPI.features(algorithm::Ridge, data) = LearnAPI.features(algorithm.atom, data)
 
-function LearnAPI.fit(algorithm::RidgeEnsemble, data; verbosity=1)
+function LearnAPI.fit(algorithm::Ensemble, data; verbosity=1)
 
     # unpack hyperparameters:
-    lambda = algorithm.lambda
-    rng = deepcopy(algorithm.rng) # to prevent mutation of `algorithm`
+    atom = algorithm.atom
+    rng = deepcopy(algorithm.rng) # to prevent mutation of `algorithm`!
     n = algorithm.n
-
-    # instantiate atomic algorithm:
-    atom = Ridge(lambda)
 
     # ensure data can be subsampled using MLUtils.jl, and that we're feeding the atomic
     # `fit` data in an efficient (pre-processed) form:
@@ -80,15 +81,16 @@ function LearnAPI.fit(algorithm::RidgeEnsemble, data; verbosity=1)
     # make some noise, if allowed:
     verbosity > 0 && @info "Trained $n ridge regression models. "
 
-    return RidgeEnsembleFitted(algorithm, atom, rng, models)
+    return EnsembleFitted(algorithm, atom, rng, models)
 
 end
 
-# If `n` is increased, this `update` adds new regressors to the ensemble, including any
-# new # hyperparameter updates (e.g, `lambda`) when computing the new
-# regressors. Otherwise, update is equivalent to retraining from scratch, with the
-# provided hyperparameter updates.
-function LearnAPI.update(model::RidgeEnsembleFitted, data; verbosity=1, replacements...)
+# Consistent with the documented `update` contract, we implement this behaviour: If `n` is
+# increased, `update` adds new regressors to the ensemble, including any new
+# hyperparameter updates (e.g, new `atom`) when computing the new atomic
+# models. Otherwise, update is equivalent to retraining from scratch, with the provided
+# hyperparameter updates.
+function LearnAPI.update(model::EnsembleFitted, data; verbosity=1, replacements...)
     :n in keys(replacements) || return fit(model, data)
 
     algorithm_old = LearnAPI.algorithm(model)
@@ -97,7 +99,7 @@ function LearnAPI.update(model::RidgeEnsembleFitted, data; verbosity=1, replacem
     Δn = n - algorithm_old.n
     n < 0 && return fit(model, algorithm)
 
-    atom = Ridge(; lambda=algorithm.lambda)
+    atom = algorithm.atom
     observations = obs(atom, data)
     N = MLUtils.numobs(observations)
 
@@ -116,15 +118,15 @@ function LearnAPI.update(model::RidgeEnsembleFitted, data; verbosity=1, replacem
     # make some noise, if allowed:
     verbosity > 0 && @info "Trained $Δn additional ridge regression models. "
 
-    return RidgeEnsembleFitted(algorithm, atom, rng, models)
+    return EnsembleFitted(algorithm, atom, rng, models)
 end
 
-LearnAPI.predict(model::RidgeEnsembleFitted, ::Point, data) =
+LearnAPI.predict(model::EnsembleFitted, ::Point, data) =
     mean(model.models) do atomic_model
         predict(atomic_model, Point(), data)
     end
 
-LearnAPI.minimize(model::RidgeEnsembleFitted) = RidgeEnsembleFitted(
+LearnAPI.minimize(model::EnsembleFitted) = EnsembleFitted(
     model.algorithm,
     model.atom,
     model.rng,
@@ -133,9 +135,10 @@ LearnAPI.minimize(model::RidgeEnsembleFitted) = RidgeEnsembleFitted(
 
 # note the inclusion of `iteration_parameter`:
 @trait(
-    RidgeEnsemble,
-    constructor = RidgeEnsemble,
+    Ensemble,
+    constructor = Ensemble,
     iteration_parameter = :n,
+    is_composite = true,
     kinds_of_proxy = (Point(),),
     tags = ("regression", "ensemble algorithms", "iterative models"),
     functions = (
@@ -165,7 +168,8 @@ Xtest = Tables.subset(X, test)
 
 @testset "test an implementation of bagged ensemble of ridge regressors" begin
     rng = StableRNG(123)
-    algorithm = RidgeEnsemble(lambda=0.5, n=4; rng)
+    atom = Ridge()
+    algorithm = Ensemble(atom; n=4, rng)
     @test LearnAPI.clone(algorithm) == algorithm
     @test :(LearnAPI.obs) in LearnAPI.functions(algorithm)
     @test LearnAPI.target(algorithm, data) == y
@@ -190,7 +194,6 @@ Xtest = Tables.subset(X, test)
     # compare with cold restart:
     model = fit(LearnAPI.clone(algorithm; n=7), Xtrain, y[train]; verbosity=0);
     @test ŷ7 ≈ predict(model, Xtest)
-
 end
 
 true

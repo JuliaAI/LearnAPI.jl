@@ -141,7 +141,9 @@ for each.
     [`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
     [`LearnAPI.functions`](@ref).
 
-Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref).
+Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
+bare minimum implementation, see the implementation of `SmallAlgorithm`
+[here](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/traits.jl).
 
 ### List of methods
 

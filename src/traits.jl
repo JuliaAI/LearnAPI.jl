@@ -23,29 +23,6 @@ const DOC_EXPLAIN_EACHOBS =
 
     """
 
-const TRAITS = [
-    :constructor,
-    :functions,
-    :kinds_of_proxy,
-    :tags,
-    :is_pure_julia,
-    :pkg_name,
-    :pkg_license,
-    :doc_url,
-    :load_path,
-    :is_composite,
-    :human_name,
-    :iteration_parameter,
-    :data_interface,
-    :predict_or_transform_mutates,
-    :fit_observation_scitype,
-    :target_observation_scitype,
-    :name,
-    :is_algorithm,
-    :target,
-]
-
-
 # # OVERLOADABLE TRAITS
 
 """
@@ -426,7 +403,7 @@ variable. Specifically:
   variables) then "target" means anything returned by `LearnAPI.target(algorithm, data)`,
   where `data` is an admissible argument in the call `fit(algorithm, data)`.
 
-- `S` will always be an upper bound on the scitype of observations that could be
+- `S` will always be an upper bound on the scitype of (point) observations that could be
   conceivably extracted from the output of [`predict`](@ref).
 
 To illustate the second case, suppose we have
