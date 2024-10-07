@@ -352,8 +352,8 @@ Returns `true` if [`fit`](@ref) is called with no data arguments, as in
 `fit(algorithm)`. That is, `algorithm` does not generalize to new data, and data is only
 provided at the `predict` or `transform` step.
 
-For example, some clustering algorithms are applied with this workflow, to label points
-observations in `X`:
+For example, some clustering algorithms are applied with this workflow, to assign labels
+to the observations in `X`:
 
 ```julia
 model = fit(algorithm) # no training data
