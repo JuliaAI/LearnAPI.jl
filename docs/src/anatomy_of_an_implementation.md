@@ -411,7 +411,7 @@ specified by the trait* [`LearnAPI.data_interface(algorithm)`](@ref). Assuming t
 ```@example anatomy2
 Base.getindex(data::RidgeFitObs, I) =
     RidgeFitObs(data.A[:,I], data.names, y[I])
-Base.length(data::RidgeFitObs, I) = length(data.y)
+Base.length(data::RidgeFitObs) = length(data.y)
 ```
 
 We can do something similar for `predict`, but there's no need for a new type in this

@@ -28,13 +28,11 @@ training_loss = sum(ŷ .!= y)
 
 # Implementation guide
 
-The fallback returns `first(data)`, assuming `data` is a tuple, and `data` otherwise.
-
-| method                      | fallback          | compulsory?            |
-|:----------------------------|:-----------------:|------------------------|
-| [`LearnAPI.target`](@ref)   | returns `nothing` | no                     |
-| [`LearnAPI.weights`](@ref)  | returns `nothing` | no                     |
-| [`LearnAPI.features`](@ref) | see docstring     | only if fallback fails |
+| method                      | fallback          | compulsory?              |
+|:----------------------------|:-----------------:|--------------------------|
+| [`LearnAPI.target`](@ref)   | returns `nothing` | no                       |
+| [`LearnAPI.weights`](@ref)  | returns `nothing` | no                       |
+| [`LearnAPI.features`](@ref) | see docstring     | if fallback insufficient |
 
 
 # Reference

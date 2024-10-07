@@ -38,7 +38,7 @@ weights(::Any, data) = nothing
 
 Return, for each form of `data` supported in a call of the form [`fit(algorithm,
 data)`](@ref), the "features" part of `data` (as opposed to the target
-variable, for example). 
+variable, for example).
 
 The returned object `X` may always be passed to `predict` or `transform`, where
 implemented, as in the following sample workflow:
@@ -49,7 +49,7 @@ X = features(data)
 ŷ = predict(algorithm, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 ```
 
-The return value has the same number of observations as `data` does. For supervised models
+The returned object has the same number of observations as `data`. For supervised models
 (i.e., where `:(LearnAPI.target) in LearnAPI.functions(algorithm)`) `ŷ` above is generally
 intended to be an approximate proxy for `LearnAPI.target(algorithm, data)`, the training
 target.
@@ -57,14 +57,9 @@ target.
 
 # New implementations
 
-The only contract `features` must satisfy is the one about passability of the output to
-`predict` or `transform`, for each supported input `data`. The following fallbacks
-typically make overloading `LearnAPI.features` unnecessary:
-
-```julia
-LearnAPI.features(algorithm, data) = data
-LearnAPI.features(algorithm, data::Tuple) = first(data)
-```
+That the output can be passed to `predict` and/or `transform`, and has the same number of
+observations as `data`, are the only contracts. A fallback returns `first(data)` if `data`
+is a tuple, and otherwise returns `data`.
 
 Overloading may be necessary if [`obs(algorithm, data)`](@ref) is overloaded to return
 some algorithm-specific representation of training `data`. For density estimators, whose
@@ -72,5 +67,7 @@ some algorithm-specific representation of training `data`. For density estimator
 return `nothing`.
 
 """
-features(algorithm, data) = data
-features(algorithm, data::Tuple) = first(data)
+features(algorithm, data) = _first(data)
+_first(data) = data
+_first(data::Tuple) = first(data)
+# note the factoring above guards agains method ambiguities

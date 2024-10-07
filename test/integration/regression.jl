@@ -39,7 +39,7 @@ LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
 
 Base.getindex(data::RidgeFitObs, I) =
     RidgeFitObs(data.A[:,I], data.names, data.y[I])
-Base.length(data::RidgeFitObs, I) = length(data.y)
+Base.length(data::RidgeFitObs) = length(data.y)
 
 # observations for consumption by `fit`:
 function LearnAPI.obs(::Ridge, data)
