@@ -105,8 +105,9 @@ deep copies of RNG hyperparameters before using them in a new implementation of
 A *composite algorithm* is one with at least one property that can take other algorithms
 as values; for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true`
 (fallback is `false`). Generally, the keyword constructor provided by
-[`LearnAPI.constructor`](@ref) must provide default values for all fields that are not
-algorithm-valued.
+[`LearnAPI.constructor`](@ref) must provide default values for all properties that are not
+algorithm-valued. Instead, these algorithm-valued properties can have a `nothing` default,
+with the constructor throwing an error if the default value persists.
 
 Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
 understood to have a valid implementation of the LearnAPI.jl interface.
