@@ -6,7 +6,7 @@ using LearnAPI
 # does nothing useful
 struct SmallAlgorithm end
 LearnAPI.fit(algorithm::SmallAlgorithm, data; verbosity=1) = algorithm
-LearnAPI.algorithm(algorithm::SmallAlgorithm) = algorithm
+LearnAPI.algorithm(model::SmallAlgorithm) = model
 @trait(
     SmallAlgorithm,
     constructor = SmallAlgorithm,
