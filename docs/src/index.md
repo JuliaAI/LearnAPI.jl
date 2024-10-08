@@ -16,7 +16,7 @@ algorithms buy into functionality, such as hyperparameter optimization and model
 composition, as provided by ML/statistics toolboxes and other packages. LearnAPI.jl also
 provides a number of Julia [traits](@ref traits) for promising specific behavior.
 
-LearnAPI.jl has no package dependencies.
+LearnAPI.jl's only dependency is the standard library `InteractiveUtils`. 
 
 ```@raw html
 &#128679;
