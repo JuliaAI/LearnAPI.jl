@@ -60,7 +60,7 @@ or, if implemented, using a single call:
 transform(algorithm, X) # `fit` implied
 ```
 
-### Static algorithms (no "learning")
+### [Static algorithms (no "learning")](@id static_algorithms)
 
 Suppose `algorithm` is some clustering algorithm that cannot be generalized to new data
 (e.g. DBSCAN):

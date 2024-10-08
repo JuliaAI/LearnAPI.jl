@@ -148,9 +148,9 @@ bare minimum implementation, see the implementation of `SmallAlgorithm`
 ### List of methods
 
 - [`fit`](@ref fit): for training or updating algorithms that generalize to new data. Or,
-  for non-generalizing algorithms (see [Static Algorithms](@ref)), for wrapping
-  `algorithm` in a mutable struct that can be mutated by `predict`/`transform` to record
-  byproducts of those operations.
+  for non-generalizing algorithms (see [here](@ref static_algorithms) and [Static
+  Algorithms](@ref)), for wrapping `algorithm` in a mutable struct that can be mutated by
+  `predict`/`transform` to record byproducts of those operations.
   
 - [`update`](@ref fit): for updating learning outcomes after hyperparameter changes, such
   as increasing an iteration parameter.
