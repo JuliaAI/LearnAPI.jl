@@ -36,6 +36,12 @@ Instantiate a bagged ensemble of `n` regressors, with base regressor `atom`, etc
 Ensemble(atom; rng=Random.default_rng(), n=10) =
     Ensemble(atom, rng, n) # `LearnAPI.constructor` defined later
 
+# pure keyword argument constructor:
+function Ensemble(; atom=nothing, kwargs...)
+    isnothing(atom) && error("You must specify `atom=...` ")
+    Ensemble(atom; kwargs...)
+end
+
 struct EnsembleFitted
     algorithm::Ensemble
     atom::Ridge

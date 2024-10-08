@@ -54,9 +54,12 @@ named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), propertie
 @assert algorithm == LearnAPI.constructor(algorithm)(; named_properties...)
 ```
 
+which can be tested with `@assert LearnAPI.clone(algorithm) == algorithm`.
+
 The keyword constructor provided by `LearnAPI.constructor` must provide default values for
 all properties, with the exception of those that can take other LearnAPI.jl algorithms as
-values.
+values. These can be provided with the default `nothing`, with the constructor throwing an
+error if the default value persists.
 
 """
 function constructor end
