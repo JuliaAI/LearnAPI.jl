@@ -26,9 +26,14 @@ LearnAPI.algorithm(model::SmallAlgorithm) = model
 # OVERLOADABLE TRAITS
 
 small = SmallAlgorithm()
+@test LearnAPI.constructor(small) == SmallAlgorithm
+@test LearnAPI.functions(small) == (:(LearnAPI.fit), :(LearnAPI.algorithm))
+@test isempty(LearnAPI.kinds_of_proxy(small))
+@test isempty(LearnAPI.tags(small))
 @test !LearnAPI.is_pure_julia(small)
 @test LearnAPI.pkg_name(small) == "unknown"
 @test LearnAPI.pkg_license(small) == "unknown"
+@test LearnAPI.doc_url(small) == "unknown"
 @test LearnAPI.load_path(small) == "unknown"
 @test !LearnAPI.is_composite(small)
 @test LearnAPI.human_name(small) == "small algorithm"
