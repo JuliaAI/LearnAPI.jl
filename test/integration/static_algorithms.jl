@@ -55,6 +55,8 @@ end
     algorithm = Selector(names=[:x, :w])
     X = DataFrames.DataFrame(rand(3, 4), [:x, :y, :z, :w])
     model = fit(algorithm) # no data arguments!
+    # if provided, data is ignored:
+    @test fit(algorithm, "junk")[] == model[]
     @test LearnAPI.algorithm(model) == algorithm
     W = transform(model, X)
     @test W == DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
