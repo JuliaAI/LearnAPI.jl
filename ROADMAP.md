@@ -16,7 +16,7 @@
   - [x] regression
   - [ ] classification
   - [ ] clustering
-  - [ ] gradient descent
+  - [x] gradient descent
   - [x] iterative algorithms
   - [ ] incremental algorithms
   - [ ] dimension reduction

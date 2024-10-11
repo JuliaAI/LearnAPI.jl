@@ -194,13 +194,14 @@ Xtest = Tables.subset(X, test)
     ŷ7 = predict(model, Xtest)
 
     # compare with cold restart:
-    model = fit(LearnAPI.clone(algorithm; n=7), Xtrain, y[train]; verbosity=0);
-    @test ŷ7 ≈ predict(model, Xtest)
+    model_cold = fit(LearnAPI.clone(algorithm; n=7), Xtrain, y[train]; verbosity=0);
+    @test ŷ7 ≈ predict(model_cold, Xtest)
 
-    # test cold restart if another hyperparameter is changed:
+    # test that we get a cold restart if another hyperparameter is changed:
     model2 = update(model, Xtrain, y[train]; atom=Ridge(0.05))
-    algorithm2 = LearnAPI.clone(LearnAPI.algorithm(model); atom=Ridge(0.05))
-    @test predict(model, Xtest) ≈ predict(model2, Xtest)
+    algorithm2 = Ensemble(Ridge(0.05); n=7, rng)
+    model_cold = fit(algorithm2, Xtrain, y[train]; verbosity=0)
+    @test predict(model2, Xtest) ≈ predict(model_cold, Xtest)
 
 end
 
