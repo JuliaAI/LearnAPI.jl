@@ -4,6 +4,8 @@ test_files = [
     "tools.jl",
     "traits.jl",
     "clone.jl",
+    "fit_update.jl",
+    "accessor_functions.jl",
     "integration/regression.jl",
     "integration/static_algorithms.jl",
     "integration/ensembling.jl",
