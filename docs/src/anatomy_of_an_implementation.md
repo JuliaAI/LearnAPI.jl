@@ -181,10 +181,10 @@ LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
 nothing #hide
 ```
 
-## Tearing a model down for serialization
-
-The `LearnAPI.strip` method falls back to the identity. Here, for the sake of illustration, we
-overload it to dump the named version of the coefficients:
+The [`LearnAPI.strip(model)`](@ref) accessor function is for returning a version of
+`model` suitable for serialization (typically smaller and data anonymized). It has a
+fallback that just returns `model` but for the sake of illustration, we overload it to
+dump the named version of the coefficients:
 
 ```@example anatomy
 LearnAPI.strip(model::RidgeFitted) =
