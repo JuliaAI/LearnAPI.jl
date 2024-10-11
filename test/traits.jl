@@ -13,6 +13,9 @@ LearnAPI.algorithm(model::SmallAlgorithm) = model
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
     ),
 )
 ######## END OF IMPLEMENTATION ##################
@@ -27,7 +30,7 @@ LearnAPI.algorithm(model::SmallAlgorithm) = model
 
 small = SmallAlgorithm()
 @test LearnAPI.constructor(small) == SmallAlgorithm
-@test LearnAPI.functions(small) == (:(LearnAPI.fit), :(LearnAPI.algorithm))
+@test :(LearnAPI.algorithm) in LearnAPI.functions(small)
 @test isempty(LearnAPI.kinds_of_proxy(small))
 @test isempty(LearnAPI.tags(small))
 @test !LearnAPI.is_pure_julia(small)

@@ -1,4 +1,4 @@
-# Density Estimation
+# Incremental Algorithms
 
 See these examples from tests:
 

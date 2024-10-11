@@ -1,8 +1,6 @@
 # Common Implementation Patterns
 
-```@raw html
-&#128679;
-```
+!!! warning
 
 	This section is only an implementation guide. The definitive specification of the
 	Learn API is given in [Reference](@ref reference).
@@ -25,7 +23,7 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Iterative Algorithms](@ref)
 
-- Incremental Algorithms
+- [Incremental Algorithms](@ref): Algorithms that can be updated with new observations.
 
 - [Feature Engineering](@ref): Algorithms for selecting or combining features
 
@@ -48,7 +46,7 @@ implementations fall into one (or more) of the following informally understood p
 
 - Survival Analysis
 
-- Density Estimation: Algorithms that learn a probability distribution
+- [Density Estimation](@ref): Algorithms that learn a probability distribution
 
 - Bayesian Algorithms
 

@@ -66,6 +66,9 @@ which lists all supported target proxies.
 
 The argument `model` is anything returned by a call of the form `fit(algorithm, ...)`.
 
+If `LearnAPI.features(LearnAPI.algorithm(model)) == nothing`, then argument `data` is
+omitted. An example is density estimators.
+
 # Example
 
 In the following, `algorithm` is some supervised learning algorithm with
@@ -105,6 +108,7 @@ $(DOC_DATA_INTERFACE(:predict))
 
 """
 predict(model, data) = predict(model, kinds_of_proxy(algorithm(model)) |> first, data)
+predict(model) = predict(model, kinds_of_proxy(algorithm(model)) |> first)
 
 # automatic slurping of multiple data arguments:
 predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
