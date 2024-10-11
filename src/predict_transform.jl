@@ -4,10 +4,6 @@ function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     "[`LearnAPI.functions`](@ref) trait. "
 end
 
-const OPERATIONS = (:predict, :transform, :inverse_transform)
-const DOC_OPERATIONS_LIST_SYMBOL = join(map(op -> "`:$op`", OPERATIONS), ", ")
-const DOC_OPERATIONS_LIST_FUNCTION = join(map(op -> "`LearnAPI.$op`", OPERATIONS), ", ")
-
 DOC_MUTATION(op) =
     """
 
@@ -66,6 +62,9 @@ which lists all supported target proxies.
 
 The argument `model` is anything returned by a call of the form `fit(algorithm, ...)`.
 
+If `LearnAPI.features(LearnAPI.algorithm(model)) == nothing`, then argument `data` is
+omitted. An example is density estimators.
+
 # Example
 
 In the following, `algorithm` is some supervised learning algorithm with
@@ -105,6 +104,7 @@ $(DOC_DATA_INTERFACE(:predict))
 
 """
 predict(model, data) = predict(model, kinds_of_proxy(algorithm(model)) |> first, data)
+predict(model) = predict(model, kinds_of_proxy(algorithm(model)) |> first)
 
 # automatic slurping of multiple data arguments:
 predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
@@ -167,8 +167,8 @@ $(DOC_MUTATION(:transform))
 $(DOC_DATA_INTERFACE(:transform))
 
 """
-transform(model, data1, data2...; kwargs...) =
-    transform(model, (data1, datas...); kwargs...) # automatic slurping
+transform(model, data1, data2, datas...; kwargs...) =
+    transform(model, (data1, data2, datas...); kwargs...) # automatic slurping
 
 """
     inverse_transform(model, data)
