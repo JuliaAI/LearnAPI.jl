@@ -46,7 +46,7 @@ implementations fall into one (or more) of the following informally understood p
   re-executed for each new data set (do not generalize), but which have hyperparameters
   and/or deliver ancillary information about the computation.
   
-- [Ensemble Algorithms](@ref): Algorithms that blend predictions of multiple algorithms
+- [Ensembling](@ref): Algorithms that blend predictions of multiple algorithms
 
 - Time Series Forecasting
 
