@@ -55,7 +55,7 @@ LearnAPI.algorithm(model::EnsembleFitted) = model.algorithm
 LearnAPI.obs(algorithm::Ensemble, data) = LearnAPI.obs(algorithm.atom, data)
 LearnAPI.obs(model::EnsembleFitted, data) = LearnAPI.obs(first(model.models), data)
 LearnAPI.target(algorithm::Ensemble, data) = LearnAPI.target(algorithm.atom, data)
-LearnAPI.features(algorithm::Ridge, data) = LearnAPI.features(algorithm.atom, data)
+LearnAPI.features(algorithm::Ensemble, data) = LearnAPI.features(algorithm.atom, data)
 
 function LearnAPI.fit(algorithm::Ensemble, data; verbosity=1)
 
@@ -97,10 +97,11 @@ end
 # models. Otherwise, update is equivalent to retraining from scratch, with the provided
 # hyperparameter updates.
 function LearnAPI.update(model::EnsembleFitted, data; verbosity=1, replacements...)
-    :n in keys(replacements) || return fit(model, data)
-
     algorithm_old = LearnAPI.algorithm(model)
     algorithm = LearnAPI.clone(algorithm_old; replacements...)
+
+    :n in keys(replacements) || return fit(algorithm, data)
+
     n = algorithm.n
     Δn = n - algorithm_old.n
     n < 0 && return fit(model, algorithm)
@@ -156,7 +157,6 @@ LearnAPI.minimize(model::EnsembleFitted) = EnsembleFitted(
         :(LearnAPI.target),
         :(LearnAPI.update),
         :(LearnAPI.predict),
-        :(LearnAPI.feature_importances),
    )
 )
 
@@ -190,16 +190,18 @@ Xtest = Tables.subset(X, test)
     @test ŷ4 == predict(model, Xtest)
 
     # add 3 atomic models to the ensemble:
-    # model = @test_logs(
-    #     (:info, r"Trained 3 additional"),
-    #     update(model, Xtrain, y[train]; n=7),
-    # )
     model = update(model, Xtrain, y[train]; verbosity=0, n=7);
     ŷ7 = predict(model, Xtest)
 
     # compare with cold restart:
     model = fit(LearnAPI.clone(algorithm; n=7), Xtrain, y[train]; verbosity=0);
     @test ŷ7 ≈ predict(model, Xtest)
+
+    # test cold restart if another hyperparameter is changed:
+    model2 = update(model, Xtrain, y[train]; atom=Ridge(0.05))
+    algorithm2 = LearnAPI.clone(LearnAPI.algorithm(model); atom=Ridge(0.05))
+    @test predict(model, Xtest) ≈ predict(model2, Xtest)
+
 end
 
 true
