@@ -4,9 +4,9 @@ test_files = [
     "tools.jl",
     "traits.jl",
     "clone.jl",
-    "integration/regression.jl",
-    "integration/static_algorithms.jl",
-    "integration/ensembling.jl",
+    "patterns/regression.jl",
+    "patterns/static_algorithms.jl",
+    "patterns/ensembling.jl",
 ]
 
 files = isempty(ARGS) ? test_files : ARGS
