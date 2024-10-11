@@ -4,12 +4,6 @@
 &#128679;
 ```
 
-!!! warning
-
-    Under construction
-
-!!! warning
-
 	This section is only an implementation guide. The definitive specification of the
 	Learn API is given in [Reference](@ref reference).
 
