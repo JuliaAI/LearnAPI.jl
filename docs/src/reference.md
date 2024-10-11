@@ -138,9 +138,9 @@ for each.
 
 !!! note "Compulsory methods"
 
-    All new algorithm types must implement [`fit`](@ref),
-    [`LearnAPI.algorithm`](@ref algorithm_minimize), [`LearnAPI.constructor`](@ref) and
-    [`LearnAPI.functions`](@ref).
+	All new algorithm types must implement [`fit`](@ref),
+	[`LearnAPI.algorithm`](@ref), [`LearnAPI.constructor`](@ref) and
+	[`LearnAPI.functions`](@ref).
 
 Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
 bare minimum implementation, see the implementation of `SmallAlgorithm`
@@ -152,10 +152,10 @@ bare minimum implementation, see the implementation of `SmallAlgorithm`
   for non-generalizing algorithms (see [here](@ref static_algorithms) and [Static
   Algorithms](@ref)), for wrapping `algorithm` in a mutable struct that can be mutated by
   `predict`/`transform` to record byproducts of those operations.
-  
+
 - [`update`](@ref fit): for updating learning outcomes after hyperparameter changes, such
   as increasing an iteration parameter.
-  
+
 - [`update_observations`](@ref fit), [`update_features`](@ref fit): update learning
   outcomes by presenting additional training data.
 
@@ -168,9 +168,6 @@ bare minimum implementation, see the implementation of `SmallAlgorithm`
 - [`inverse_transform`](@ref operations): for inverting the output of
   `transform` ("inverting" broadly understood)
 
-- [`minimize`](@ref algorithm_minimize): for stripping the `model` output by `fit` of
-  inessential content, for purposes of serialization.
-
 - [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
   [`LearnAPI.features`](@ref): for extracting relevant parts of training data, where
   defined.
@@ -181,8 +178,10 @@ bare minimum implementation, see the implementation of `SmallAlgorithm`
   [`LearnAPI.data_interface(algorithm)`](@ref).
 
 - [Accessor functions](@ref accessor_functions): these include functions like
-  `feature_importances` and `training_losses`, for extracting, from training outcomes,
-  information common to many algorithms.
+  `LearnAPI.feature_importances` and `LearnAPI.training_losses`, for extracting, from
+  training outcomes, information common to many algorithms. This includes
+  [`LearnAPI.strip(model)`](@ref) for replacing a learning outcome `model` with a
+  serializable version that can still `predict` or `transform`.
 
 - [Algorithm traits](@ref traits): methods that promise specific algorithm behavior or
   record general information about the algorithm. Only [`LearnAPI.constructor`](@ref) and

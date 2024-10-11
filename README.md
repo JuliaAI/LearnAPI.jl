@@ -18,7 +18,7 @@ Configure a learning algorithm, and inspect available functionality:
 ```julia
 julia> algorithm = Ridge(lambda=0.1)
 julia> LearnAPI.functions(algorithm)
-(:(LearnAPI.fit), :(LearnAPI.algorithm), :(LearnAPI.minimize), :(LearnAPI.obs), 
+(:(LearnAPI.fit), :(LearnAPI.algorithm), :(LearnAPI.strip), :(LearnAPI.obs), 
 :(LearnAPI.features), :(LearnAPI.target), :(LearnAPI.predict), :(LearnAPI.coefficients))
 ```
 

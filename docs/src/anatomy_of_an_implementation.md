@@ -183,15 +183,15 @@ nothing #hide
 
 ## Tearing a model down for serialization
 
-The `minimize` method falls back to the identity. Here, for the sake of illustration, we
+The `LearnAPI.strip` method falls back to the identity. Here, for the sake of illustration, we
 overload it to dump the named version of the coefficients:
 
 ```@example anatomy
-LearnAPI.minimize(model::RidgeFitted) =
+LearnAPI.strip(model::RidgeFitted) =
     RidgeFitted(model.algorithm, model.coefficients, nothing)
 ```
 
-Crucially, we can still use `LearnAPI.minimize(model)` in place of `model` to make new
+Crucially, we can still use `LearnAPI.strip(model)` in place of `model` to make new
 predictions.
 
 
@@ -220,7 +220,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
         :(LearnAPI.target),
@@ -285,7 +285,7 @@ Serialization/deserialization:
 
 ```@example anatomy
 using Serialization
-small_model = minimize(model)
+small_model = LearnAPI.strip(model)
 filename = tempname()
 serialize(filename, small_model)
 ```
@@ -316,7 +316,7 @@ end
 
 LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
-LearnAPI.minimize(model::RidgeFitted) =
+LearnAPI.strip(model::RidgeFitted) =
     RidgeFitted(model.algorithm, model.coefficients, nothing)
 
 @trait(
@@ -327,7 +327,7 @@ LearnAPI.minimize(model::RidgeFitted) =
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
         :(LearnAPI.target),

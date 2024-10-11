@@ -89,7 +89,7 @@ return value:
 |-----------------------------------|----------------------------|------------------------------------|
 | `:(LearnAPI.fit)`                 | yes                        | yes                                |
 | `:(LearnAPI.algorithm)`           | yes                        | yes                                |
-| `:(LearnAPI.minimize)`            | no                         | yes                                |
+| `:(LearnAPI.strip)`               | no                         | yes                                |
 | `:(LearnAPI.obs)`                 | no                         | yes                                |
 | `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
 | `:(LearnAPI.target)`              | no                         | only if implemented                |
@@ -100,17 +100,18 @@ return value:
 | `:(LearnAPI.predict)`             | no                         | only if implemented                |
 | `:(LearnAPI.transform)`           | no                         | only if implemented                |
 | `:(LearnAPI.inverse_transform)`   | no                         | only if implemented                |
-| <accessor functions>              | no                         | only if implemented                |
+| < accessor functions>             | no                         | only if implemented                |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
-algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST.
+algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
+(`LearnAPI.strip` is always included).
 
 """
 functions(::Any) = ()
 functions() = (
     :(LearnAPI.fit),
     :(LearnAPI.algorithm),
-    :(LearnAPI.minimize),
+    :(LearnAPI.strip),
     :(LearnAPI.obs),
     :(LearnAPI.features),
     :(LearnAPI.target),

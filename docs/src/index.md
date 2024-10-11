@@ -60,7 +60,7 @@ predict(model, Distribution(), Xnew)
 LearnAPI.feature_importances(model)
 
 # Slim down and otherwise prepare model for serialization:
-small_model = minimize(model)
+small_model = LearnAPI.strip(model)
 serialize("my_random_forest.jls", small_model)
 
 # Recover saved model and algorithm configuration:

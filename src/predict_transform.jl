@@ -21,11 +21,11 @@ DOC_MUTATION(op) =
 DOC_MINIMIZE(func) =
     """
 
-    If, additionally, [`minimize(model)`](@ref) is overloaded, then the following identity
+    If, additionally, [`LearnAPI.strip(model)`](@ref) is overloaded, then the following identity
     must hold:
 
     ```julia
-    $func(minimize(model), args...) = $func(model, args...)
+    $func(LearnAPI.strip(model), args...) = $func(model, args...)
     ```
 
     """

@@ -133,11 +133,11 @@ LearnAPI.predict(model::EnsembleFitted, ::Point, data) =
         predict(atomic_model, Point(), data)
     end
 
-LearnAPI.minimize(model::EnsembleFitted) = EnsembleFitted(
+LearnAPI.strip(model::EnsembleFitted) = EnsembleFitted(
     model.algorithm,
     model.atom,
     model.rng,
-    minimize.(Ref(model.atom), models),
+    LearnAPI.strip.(Ref(model.atom), models),
 )
 
 # note the inclusion of `iteration_parameter`:
@@ -151,7 +151,7 @@ LearnAPI.minimize(model::EnsembleFitted) = EnsembleFitted(
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
         :(LearnAPI.target),

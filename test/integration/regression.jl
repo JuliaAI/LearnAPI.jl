@@ -97,7 +97,7 @@ LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
 # accessor function:
 LearnAPI.feature_importances(model::RidgeFitted) = model.feature_importances
 
-LearnAPI.minimize(model::RidgeFitted) =
+LearnAPI.strip(model::RidgeFitted) =
     RidgeFitted(model.algorithm, model.coefficients, nothing)
 
 @trait(
@@ -108,7 +108,7 @@ LearnAPI.minimize(model::RidgeFitted) =
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
         :(LearnAPI.target),
@@ -170,7 +170,7 @@ data = (X, y)
 
     filename = tempname()
     using Serialization
-    small_model = minimize(model)
+    small_model = LearnAPI.strip(model)
     serialize(filename, small_model)
 
     recovered_model = deserialize(filename)
@@ -230,7 +230,7 @@ LearnAPI.algorithm(model::BabyRidgeFitted) = model.algorithm
 LearnAPI.predict(model::BabyRidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 
-LearnAPI.minimize(model::BabyRidgeFitted) =
+LearnAPI.strip(model::BabyRidgeFitted) =
     BabyRidgeFitted(model.algorithm, model.coefficients, nothing)
 
 @trait(
@@ -241,7 +241,7 @@ LearnAPI.minimize(model::BabyRidgeFitted) =
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
         :(LearnAPI.target),

@@ -6,7 +6,6 @@ include("tools.jl")
 include("types.jl")
 include("predict_transform.jl")
 include("fit_update.jl")
-include("minimize.jl")
 include("target_weights_features.jl")
 include("obs.jl")
 include("accessor_functions.jl")
@@ -15,7 +14,7 @@ include("clone.jl")
 
 export @trait
 export fit, update, update_observations, update_features
-export predict, transform, inverse_transform, minimize, obs
+export predict, transform, inverse_transform, obs
 
 for name in Symbol.(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS)
     @eval export $name

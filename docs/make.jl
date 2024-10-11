@@ -18,7 +18,6 @@ makedocs(
             "fit/update" => "fit_update.md",
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
-            "minimize" => "minimize.md",
             "target/weights/features" => "target_weights_features.md",
             "obs" => "obs.md",
             "Accessor Functions" => "accessor_functions.md",

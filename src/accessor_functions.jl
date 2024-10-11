@@ -16,15 +16,15 @@ const DOC_STATIC =
 
 """
     LearnAPI.algorithm(model)
-    LearnAPI.algorithm(minimized_model)
+    LearnAPI.algorithm(LearnAPI.stripd_model)
 
-Recover the algorithm used to train `model` or the output of [`minimize(model)`](@ref).
+Recover the algorithm used to train `model` or the output of [`LearnAPI.strip(model)`](@ref).
 
 In other words, if `model = fit(algorithm, data...)`, for some `algorithm` and `data`,
 then
 
 ```julia
-LearnAPI.algorithm(model) == algorithm == LearnAPI.algorithm(minimize(model))
+LearnAPI.algorithm(model) == algorithm == LearnAPI.algorithm(LearnAPI.strip(model))
 ```
 is `true`.
 
@@ -35,6 +35,61 @@ only contract. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.algorithm)"))
 
 """
 function algorithm end
+
+"""
+    LearnAPI.strip(model; options...)
+
+Return a version of `model` that will generally have a smaller memory allocation than
+`model`, suitable for serialization. Here `model` is any object returned by
+[`fit`](@ref). Accessor functions that can be called on `model` may not work on
+`LearnAPI.strip(model)`, but [`predict`](@ref), [`transform`](@ref) and
+[`inverse_transform`](@ref) will work, if implemented. Check
+`LearnAPI.functions(LearnAPI.algorithm(model))` to view see what the original `model`
+implements.
+
+Specific algorithms may provide keyword `options` to control how much of the original
+functionality is preserved by `LearnAPI.strip`.
+
+# Typical workflow
+
+```julia
+model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+ŷ = predict(model, Point(), Xnew)
+
+small_model = LearnAPI.strip(model)
+serialize("my_model.jls", small_model)
+
+recovered_model = deserialize("my_random_forest.jls")
+@assert predict(recovered_model, Point(), Xnew) == ŷ
+```
+
+# Extended help
+
+# New implementations
+
+Overloading `LearnAPI.strip` for new algorithms is optional. The fallback is the
+identity.
+
+New implementations must enforce the following identities, whenever the right-hand side is
+defined:
+
+```julia
+predict(LearnAPI.strip(model; options...), args...; kwargs...) ==
+    predict(model, args...; kwargs...)
+transform(LearnAPI.strip(model; options...), args...; kwargs...) ==
+    transform(model, args...; kwargs...)
+inverse_transform(LearnAPI.strip(model; options), args...; kwargs...) ==
+    inverse_transform(model, args...; kwargs...)
+```
+
+Additionally:
+
+```julia
+LearnAPI.strip(LearnAPI.strip(model)) == LearnAPI.strip(model)
+```
+
+"""
+LearnAPI.strip(model) = model
 
 """
     LearnAPI.feature_importances(model)

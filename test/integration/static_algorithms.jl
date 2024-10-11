@@ -45,7 +45,7 @@ end
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.transform),
     ),
@@ -112,7 +112,7 @@ end
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.algorithm),
-        :(LearnAPI.minimize),
+        :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.transform),
         :(MyPkg.rejected), # accessor function not owned by LearnAPI.jl,
