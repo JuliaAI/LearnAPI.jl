@@ -77,10 +77,11 @@ end
 
 ## Implementation guide
 
-| method                                  | compulsory? | fallback       |
-|:----------------------------------------|:-----------:|:--------------:|
-| [`obs(algorithm_or_model, data)`](@ref) | depends     | returns `data` |
-|                                         |             |                |
+| method                         | comment                             | compulsory?   | fallback       |
+|:-------------------------------|:------------------------------------|:-------------:|:---------------|
+| [`obs(algorithm, data)`](@ref) | here `data` is `fit`-consumable     | not typically | returns `data` |
+| [`obs(model, data)`](@ref)     | here `data` is `predict`-consumable | not typically | returns `data` |
+
 
 A sample implementation is given in [Providing an advanced data interface](@ref). 
 

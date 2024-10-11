@@ -9,12 +9,13 @@ A base Julia interface for machine learning and statistics </span>
 <br>
 ```
 
-LearnAPI.jl is a lightweight, functional-style interface, providing a
-collection of [methods](@ref Methods), such as `fit` and `predict`, to be implemented by
-algorithms from machine learning and statistics. Through such implementations, these
-algorithms buy into functionality, such as hyperparameter optimization and model
-composition, as provided by ML/statistics toolboxes and other packages. LearnAPI.jl also
-provides a number of Julia [traits](@ref traits) for promising specific behavior.
+LearnAPI.jl is a lightweight, functional-style interface, providing a collection of
+[methods](@ref Methods), such as `fit` and `predict`, to be implemented by algorithms from
+machine learning and statistics. Its careful design ensures algorithms implementing
+LearnAPI.jl can buy into functionality, such as external performance estimates,
+hyperparameter optimization and model composition, provided by ML/statistics toolboxes and
+other packages. LearnAPI.jl includes a number of Julia [traits](@ref traits) for promising
+specific behavior.
 
 LearnAPI.jl's only dependency is the standard library `InteractiveUtils`. 
 
@@ -90,6 +91,18 @@ input consumed by the algorithm already implements that interface (tables, array
 then overloading `obs` is completely optional. Plain iteration interfaces, with or without
 knowledge of the number of observations, can also be specified (to support, e.g., data
 loaders reading images from disk).
+
+## Hooks for adding functionality
+
+A key to enabling toolboxes to enhance LearnAPI.jl algorithm functionality is the
+implementation of two key additional methods, beyond the usual `fit` and
+`predict`/`transform`. Given any training `data` consumed by `fit` (such as `data = (X,
+y)` in the example above) [`LearnAPI.features(algorithm, data)`](@ref input) tells us what
+part of `data` comprises *features*, which is something that can be passsed onto to
+`predict` or `transform` (`X` in the example) while [`LearnAPI.target(algorithm,
+data)`](@ref), if implemented, tells us what part comprises the target (`y` in the
+example). By explicitly requiring such methods, we free algorithms to consume data in
+multiple forms, including optimised, algorithm-specific forms, as described above.
 
 ## Learning more
 

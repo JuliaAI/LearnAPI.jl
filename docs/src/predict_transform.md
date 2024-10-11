@@ -72,6 +72,10 @@ instead, which does not dispatch on [`LearnAPI.KindOfProxy`](@ref), but can be o
 paired with an implementation of [`inverse_transform`](@ref), for returning (approximate)
 right inverses to `transform`.
 
+Of course, the one algorithm can implement both a `predict` and `transform` method. For
+example a K-means clustering algorithm can `predict` labels and `transform` to reduce
+dimension using distances from the cluster centres.
+
 
 ### [One-liners combining fit and transform/predict](@id one_liners)
 

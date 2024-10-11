@@ -8,8 +8,8 @@ Return an algorithm-specific representation of `data`, suitable for passing to `
 algorithm, `algorithm`.
 
 The returned object is guaranteed to implement observation access as indicated by
-[`LearnAPI.data_interface(algorithm)`](@ref) (typically
-[`LearnAPI.RandomAccess()`](@ref)).
+[`LearnAPI.data_interface(algorithm)`](@ref), typically
+[`LearnAPI.RandomAccess()`](@ref).
 
 Calling `fit`/`predict`/`transform` on the returned objects may have performance
 advantages over calling directly on `data` in some contexts. And resampling the returned
