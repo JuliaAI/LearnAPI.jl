@@ -22,12 +22,12 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Regression](@ref): Supervised learners for continuous targets
 
-- Classification: Supervised learners for categorical targets 
+- [Classification](@ref): Supervised learners for categorical targets 
 
 - Clusterering: Algorithms that group data into clusters for classification and
   possibly dimension reduction. May be true learners (generalize to new data) or static.
 
-- Gradient Descent: Including neural networks.
+- [Gradient Descent](@ref): Including neural networks.
 
 - [Iterative Algorithms](@ref)
 
