@@ -6,13 +6,6 @@ const DOC_UNKNOWN =
     "not overloaded the trait. "
 const DOC_ON_TYPE = "The value of the trait must depend only on the type of `algorithm`. "
 
-DOC_ONLY_ONE(func) =
-    "Ordinarily, at most one of the following should be overloaded for given "*
-    "algorithm "*
-    "`LearnAPI.$(func)_scitype`, `LearnAPI.$(func)_type`, "*
-    "`LearnAPI.$(func)_observation_scitype`, "*
-    "`LearnAPI.$(func)_observation_type`."
-
 const DOC_EXPLAIN_EACHOBS =
     """
 
@@ -82,7 +75,7 @@ value is non-empty.
 
 # New implementations
 
-All new implementations must overload this trait. Here's a checklist for elements in the
+All new implementations must implement this trait. Here's a checklist for elements in the
 return value:
 
 | expression                        | implementation compulsory? | include in returned tuple?         |
@@ -107,7 +100,6 @@ algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCT
 (`LearnAPI.strip` is always included).
 
 """
-functions(::Any) = ()
 functions() = (
     :(LearnAPI.fit),
     :(LearnAPI.algorithm),
@@ -195,8 +187,6 @@ tags() = [
     "image processing",
     "meta-algorithms"
 ]
-
-const DOC_TAGS_LIST = join(map(d -> "`\"$d\"`", tags()), ", ")
 
 """
     LearnAPI.tags(algorithm)
@@ -403,7 +393,7 @@ See also [`LearnAPI.target_observation_scitype`](@ref).
 
 # New implementations
 
-Optional. The fallback return value is `Union{}`. $(DOC_ONLY_ONE(:fit))
+Optional. The fallback return value is `Union{}`. 
 
 """
 fit_observation_scitype(::Any) = Union{}
