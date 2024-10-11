@@ -44,6 +44,7 @@ small = SmallAlgorithm()
 @test LearnAPI.data_interface(small) == LearnAPI.RandomAccess()
 @test !(6 isa LearnAPI.fit_observation_scitype(small))
 @test 6 isa LearnAPI.target_observation_scitype(small)
+@test !LearnAPI.is_static(small)
 
 # DERIVED TRAITS
 
