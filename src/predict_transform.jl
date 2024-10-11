@@ -4,10 +4,6 @@ function DOC_IMPLEMENTED_METHODS(name; overloaded=false)
     "[`LearnAPI.functions`](@ref) trait. "
 end
 
-const OPERATIONS = (:predict, :transform, :inverse_transform)
-const DOC_OPERATIONS_LIST_SYMBOL = join(map(op -> "`:$op`", OPERATIONS), ", ")
-const DOC_OPERATIONS_LIST_FUNCTION = join(map(op -> "`LearnAPI.$op`", OPERATIONS), ", ")
-
 DOC_MUTATION(op) =
     """
 
@@ -171,8 +167,8 @@ $(DOC_MUTATION(:transform))
 $(DOC_DATA_INTERFACE(:transform))
 
 """
-transform(model, data1, data2...; kwargs...) =
-    transform(model, (data1, datas...); kwargs...) # automatic slurping
+transform(model, data1, data2, datas...; kwargs...) =
+    transform(model, (data1, data2, datas...); kwargs...) # automatic slurping
 
 """
     inverse_transform(model, data)
