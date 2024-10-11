@@ -134,7 +134,7 @@ PerceptronClassifier(; epochs=50, optimiser=Optimisers.Adam(), rng=Random.defaul
 LearnAPI.target(algorithm::PerceptronClassifier, data::Tuple) = last(data)
 
 # For wrapping pre-processed training data (output of `obs(algorithm, data)`):
-struct PerceptronClassifierObservations
+struct PerceptronClassifierObs
     X::Matrix{Float32}
     y_hot::BitMatrix  # one-hot encoded target
     classes           # the (ordered) pool of `y`, as `CategoricalValue`s
@@ -145,12 +145,12 @@ function LearnAPI.obs(algorithm::PerceptronClassifier, data::Tuple)
     X, y = data
     classes = CategoricalDistributions.classes(y)
     y_hot = classes .== permutedims(y) # one-hot encoding
-    return PerceptronClassifierObservations(X, y_hot, classes)
+    return PerceptronClassifierObs(X, y_hot, classes)
 end
 
 # implement `RadomAccess()` interface for output of `obs`:
-Base.length(observations::PerceptronClassifierObservations) = length(observations.y)
-Base.getindex(observations, I) = PerceptronClassifierObservations(
+Base.length(observations::PerceptronClassifierObs) = length(observations.y)
+Base.getindex(observations, I) = PerceptronClassifierObs(
     (@view observations.X[:, I]),
     (@view observations.y[I]),
     observations.classes,
@@ -158,12 +158,12 @@ Base.getindex(observations, I) = PerceptronClassifierObservations(
 
 LearnAPI.target(
     algorithm::PerceptronClassifier,
-    observations::PerceptronClassifierObservations,
+    observations::PerceptronClassifierObs,
 ) = observations.y
 
 LearnAPI.features(
     algorithm::PerceptronClassifier,
-    observations::PerceptronClassifierObservations,
+    observations::PerceptronClassifierObs,
 ) = observations.X
 
 # Note that data consumed by `predict` needs no pre-processing, so no need to overload
@@ -186,7 +186,7 @@ LearnAPI.algorithm(model::PerceptronClassifierFitted) = model.algorithm
 # `fit` for pre-processed data (output of `obs(algorithm, data)`):
 function LearnAPI.fit(
     algorithm::PerceptronClassifier,
-    observations::PerceptronClassifierObservations;
+    observations::PerceptronClassifierObs;
     verbosity=1,
     )
 
@@ -221,7 +221,7 @@ LearnAPI.fit(algorithm::PerceptronClassifier, data; kwargs...) =
 # see the `PerceptronClassifier` docstring for `update_observations` logic.
 function LearnAPI.update_observations(
     model::PerceptronClassifierFitted,
-    observations_new::PerceptronClassifierObservations;
+    observations_new::PerceptronClassifierObs;
     verbosity=1,
     replacements...,
     )
@@ -253,7 +253,7 @@ LearnAPI.update_observations(model::PerceptronClassifierFitted, data; kwargs...)
 # see the `PerceptronClassifier` docstring for `update` logic.
 function LearnAPI.update(
     model::PerceptronClassifierFitted,
-    observations::PerceptronClassifierObservations;
+    observations::PerceptronClassifierObs;
     verbosity=1,
     replacements...,
     )
