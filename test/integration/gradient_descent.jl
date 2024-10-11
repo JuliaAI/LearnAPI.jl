@@ -120,7 +120,7 @@ If `Δepochs = n - perceptron.epochs` is non-negative, then return an updated mo
 the weights and bias of the previously learned perceptron used as the starting state in
 new gradient descent updates for `Δepochs` epochs, and using the provided `newdata`
 instead of the previous training data. Any other hyperparaameter `replacements` are also
-adopted. In `Δepochs` is negative or not specified, instead return `fit(algorithm,
+adopted. If `Δepochs` is negative or not specified, instead return `fit(algorithm,
 newdata)`, where `algorithm=LearnAPI.clone(algorithm; epochs=n, replacements....)`.
 
 """
