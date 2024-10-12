@@ -4,7 +4,7 @@ A base Julia interface for machine learning and statistics
 
 [![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](ROADMAP.md)
 [![Build Status](https://github.com/JuliaAI/LearnAPI.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/LearnAPI.jl/actions)
-[![Coverage](https://codecov.io/gh/JuliaAI/LearnAPI.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/LearnAPI.jl?branch=master)
+[![codecov](https://codecov.io/gh/JuliaAI/LearnAPI.jl/graph/badge.svg?token=9IWT9KYINZ)](https://codecov.io/gh/JuliaAI/LearnAPI.jl?branch=dev)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaai.github.io/LearnAPI.jl/dev/)
 
 Comprehensive documentation is [here](https://juliaai.github.io/LearnAPI.jl/dev/).
