@@ -10,6 +10,9 @@ import DataFrames
 # We overload `obs` to expose internal representation of data. See later for a simpler
 # variation using the `obs` fallback.
 
+
+# ## Implementation
+
 # no docstring here - that goes with the constructor
 struct Ridge
     lambda::Float64
@@ -117,6 +120,13 @@ LearnAPI.strip(model::RidgeFitted) =
    )
 )
 
+# convenience method:
+LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
+    fit(algorithm, (X, y); kwargs...)
+
+
+# ## Tests
+
 # synthetic test data:
 n = 30 # number of observations
 train = 1:6
@@ -190,6 +200,9 @@ struct BabyRidge
     lambda::Float64
 end
 
+
+# ## Implementation
+
 """
     BabyRidge(; lambda=0.1)
 
@@ -249,6 +262,13 @@ LearnAPI.strip(model::BabyRidgeFitted) =
         :(LearnAPI.feature_importances),
    )
 )
+
+# convenience method:
+LearnAPI.fit(algorithm::BabyRidge, X, y; kwargs...) =
+    fit(algorithm, (X, y); kwargs...)
+
+
+# ## Tests
 
 @testset "test a variation  which does not overload LearnAPI.obs" begin
     algorithm = BabyRidge(lambda=0.5)

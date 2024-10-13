@@ -1,20 +1,27 @@
 # Anatomy of an Implementation
 
-This section explains a detailed implementation of the LearnAPI for naive [ridge
+This section explains a detailed implementation of the LearnAPI.jl for naive [ridge
 regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. The kind of
 workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
 refer to the [demonstration](@ref workflow) of the implementation given later.
 
-A transformer ordinarily implements `transform` instead of
-`predict`. For more on `predict` versus `transform`, see [Predict or transform?](@ref)
+The core LearnAPI.jl pattern looks like this:
+
+```julia
+model = fit(algorithm, data)
+predict(model, newdata)
+```
+
+A transformer ordinarily implements `transform` instead of `predict`. For more on
+`predict` versus `transform`, see [Predict or transform?](@ref)
 
 !!! note
 
     New implementations of `fit`, `predict`, etc,
-    always have a *single* `data` argument, as in
-    `LearnAPI.fit(algorithm, data; verbosity=1) = ...`.
-    For convenience, user-calls, such as `fit(algorithm, X, y)`, automatically fallback
-    to `fit(algorithm, (X, y))`.
+    always have a *single* `data` argument as above.
+    For convenience, a signature such as `fit(algorithm, X, y)`, calling
+    `fit(algorithm, (X, y))`, can be added, but the LearnAPI.jl specification is
+    silent on the meaning or existence of signatures with extra arguments.
 
 !!! note
 
@@ -52,7 +59,7 @@ nothing # hide
 
 Instances of `Ridge` will be [algorithms](@ref algorithms), in LearnAPI.jl parlance.
 
-Associated with each new type of LearnAPI [algorithm](@ref algorithms) will be a keyword
+Associated with each new type of LearnAPI.jl [algorithm](@ref algorithms) will be a keyword
 argument constructor, providing default values for all properties (struct fields) that are
 not other algorithms, and we must implement [`LearnAPI.constructor(algorithm)`](@ref), for
 recovering the constructor from an instance:
@@ -244,6 +251,14 @@ in LearnAPI.functions(algorithm)`, for every instance `algorithm`. With [some
 exceptions](@ref trait_contract), the value of a trait should depend only on the *type* of
 the argument.
 
+## Signatures added for convenience
+
+We add one `fit` signature for user-convenience only. The LearnAPI.jl specification has
+nothing to say about `fit` signatures with more than two positional arguments.
+
+```@example anatomy
+LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) = fit(algorithm, (X, y); kwargs...)
+```
 
 ## [Demonstration](@id workflow)
 
@@ -465,6 +480,14 @@ To opt out of supporting the MLUtils.jl interface altogether, an implementation 
 overload the trait, [`LearnAPI.data_interface(algorithm)`](@ref). See [Data
 interfaces](@ref data_interfaces) for details.
 
+
+### Addition of signatures for user convenience
+
+As above, we add a signature which plays no role vis-à-vis LearnAPI.jl.
+
+```@example anatomy2
+LearnAPI.fit(algorithm::Ridge, X, y; kwargs...)  = fit(algorithm, (X, y); kwargs...)
+```
 
 ## Demonstration of an advanced `obs` workflow
 
