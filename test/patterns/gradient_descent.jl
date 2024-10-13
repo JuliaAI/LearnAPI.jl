@@ -227,9 +227,9 @@ function LearnAPI.update_observations(
     )
 
     # unpack data:
-    X = observations.X
-    y_hot = observations.y_hot
-    classes = observations.classes
+    X = observations_new.X
+    y_hot = observations_new.y_hot
+    classes = observations_new.classes
     nclasses = length(classes)
 
     classes == model.classes || error("New training target has incompatible classes.")
@@ -326,6 +326,16 @@ LearnAPI.training_losses(model::PerceptronClassifierFitted) = model.losses
         :(LearnAPI.training_losses),
    )
 )
+
+
+# ### Convenience methods
+
+LearnAPI.fit(algorithm::PerceptronClassifier, X, y; kwargs...) =
+    fit(algorithm, (X, y); kwargs...)
+LearnAPI.update_observations(algorithm::PerceptronClassifier, X, y; kwargs...) =
+    update_observations(algorithm, (X, y); kwargs...)
+LearnAPI.update(algorithm::PerceptronClassifier, X, y; kwargs...) =
+    update(algorithm, (X, y); kwargs...)
 
 
 # ## Tests

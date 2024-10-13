@@ -11,8 +11,6 @@ A "static" algorithm is one that does not generalize to new observations (e.g., 
 clustering algorithms); there is no trainiing data and the algorithm is executed by
 `predict` or `transform` which receive the data. See example below.
 
-When `fit` expects a tuple form of argument, `data = (X1, ..., Xn)`, then the signature
-`fit(algorithm, X1, ..., Xn)` is also provided.
 
 ### Updating
 
@@ -32,7 +30,7 @@ Supposing `Algorithm` is some supervised classifier type, with an iteration para
 
 ```julia
 algorithm = Algorithm(n=100)
-model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+model = fit(algorithm, (X, y))
 
 # Predict probability distributions:
 ŷ = predict(model, Distribution(), Xnew) 
@@ -74,6 +72,22 @@ labels = predict(algorithm, X)
 
 # But two-line version exposes byproducts of the clustering algorithm (e.g., outliers):
 LearnAPI.extras(model)
+```
+
+### Density estimation
+
+In density estimation, `fit` consumes no features, only a target variable; `predict`,
+which consumes no data, returns the learned density:
+
+```julia
+model = fit(algorithm, y) # no features
+predict(model)            # shortcut for  `predict(model, Distribution())`
+```
+
+A one-liner will typically be implemented as well:
+
+```julia
+predict(algorithm, y)
 ```
 
 ## Implementation guide

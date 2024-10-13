@@ -6,16 +6,15 @@ transform(model, data)
 inverse_transform(model, data)
 ```
 
-When a method expects a tuple form of argument, `data = (X1, ..., Xn)`, then a slurping
-signature is also provided, as in `transform(model, X1, ..., Xn)`.
-
+Versions without the `data` argument may also appear, for example in [Density
+estimation](@ref).
 
 ## [Typical worklows](@id predict_workflow)
 
 Train some supervised `algorithm`:
 
 ```julia
-model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+model = fit(algorithm, (X, y))
 ```
 
 Predict probability distributions:

@@ -13,12 +13,20 @@ DOC_MUTATION(op) =
 
     """
 
+DOC_SLURPING(op) =
+    """
+
+    An algorithm is free to implement `$op` signatures with additional positional
+    arguments (eg., data-slurping signatures) but LearnAPI.jl is silent about their
+    interpretation or existence.
+
+    """
 
 DOC_MINIMIZE(func) =
     """
 
-    If, additionally, [`LearnAPI.strip(model)`](@ref) is overloaded, then the following identity
-    must hold:
+    If, additionally, [`LearnAPI.strip(model)`](@ref) is overloaded, then the following
+    identity must hold:
 
     ```julia
     $func(LearnAPI.strip(model), args...) = $func(model, args...)
@@ -63,7 +71,7 @@ which lists all supported target proxies.
 The argument `model` is anything returned by a call of the form `fit(algorithm, ...)`.
 
 If `LearnAPI.features(LearnAPI.algorithm(model)) == nothing`, then argument `data` is
-omitted. An example is density estimators.
+omitted in both signatures. An example is density estimators.
 
 # Example
 
@@ -79,10 +87,7 @@ See also [`fit`](@ref), [`transform`](@ref), [`inverse_transform`](@ref).
 
 # Extended help
 
-If `predict` supports data in the form of a tuple `data = (X1, ..., Xn)`, then a slurping
-signature is also provided, as in `predict(model, X1, ..., Xn)`.
-
-Note `predict ` does not mutate any argument, except in the special case
+Note `predict ` must not mutate any argument, except in the special case
 `LearnAPI.is_static(algorithm) == true`.
 
 # New implementations
@@ -90,9 +95,12 @@ Note `predict ` does not mutate any argument, except in the special case
 If there is no notion of a "target" variable in the LearnAPI.jl sense, or you need an
 operation with an inverse, implement [`transform`](@ref) instead.
 
-Implementation is optional. Only the first signature is implemented, but each
-`kind_of_proxy` that gets an implementation must be added to the list returned by
-[`LearnAPI.kinds_of_proxy`](@ref).
+Implementation is optional. Only the first signature (with or without the `data` argument)
+is implemented, but each `kind_of_proxy` that gets an implementation must be added to the
+list returned by [`LearnAPI.kinds_of_proxy`](@ref).
+
+If `data` is not present in the implemented signature (eg., for density estimators) then
+[`LearnAPI.features(algorithm, data)`](@ref) must return `nothing`.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predict)"))
 
@@ -106,22 +114,11 @@ $(DOC_DATA_INTERFACE(:predict))
 predict(model, data) = predict(model, kinds_of_proxy(algorithm(model)) |> first, data)
 predict(model) = predict(model, kinds_of_proxy(algorithm(model)) |> first)
 
-# automatic slurping of multiple data arguments:
-predict(model, k::KindOfProxy, data1, data2, datas...; kwargs...) =
-    predict(model, k, (data1, data2, datas...); kwargs...)
-predict(model, data1, data2, datas...; kwargs...) =
-    predict(model, (data1, data2, datas...); kwargs...)
-
-
-
 """
     transform(model, data)
 
 Return a transformation of some `data`, using some `model`, as returned by
 [`fit`](@ref).
-
-For `data` that consists of a tuple, a slurping version is also provided, i.e., you can do
-`transform(model, X1, X2, X3)` in place of `transform(model, (X1, X2, X3))`.
 
 # Example
 
@@ -157,8 +154,10 @@ See also [`fit`](@ref), [`predict`](@ref),
 
 # New implementations
 
-Implementation for new LearnAPI.jl algorithms is optional. A fallback provides the
-slurping version. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.transform)"))
+Implementation for new LearnAPI.jl algorithms is
+optional. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.transform)"))
+
+$(DOC_SLURPING(:transform))
 
 $(DOC_MINIMIZE(:transform))
 

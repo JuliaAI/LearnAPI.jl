@@ -14,13 +14,10 @@ The second signature is provided by algorithms that do not generalize to new obs
 ..., data)` carries out the actual algorithm execution, writing any byproducts of that
 operation to the mutable object `model` returned by `fit`.
 
-Whenever `fit` expects a tuple form of argument, `data = (X1, ..., Xn)`, then the
-signature `fit(algorithm, X1, ..., Xn)` is also provided.
-
-For example, a supervised classifier will typically admit this workflow:
+For example, a supervised classifier might have a workflow like this:
 
 ```julia
-model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+model = fit(algorithm, (X, y))
 ŷ = predict(model, Xnew)
 ```
 
@@ -33,16 +30,16 @@ See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
 
 # New implementations
 
-Implementation is compulsory. The signature must include `verbosity`. Fallbacks provide
-the data slurping versions.  A fallback for the first signature calls the second, ignoring
-`data`:
+Implementation of exactly one of the signatures is compulsory. If `fit(algorithm;
+verbosity=1)` is implemented, then the trait [`LearnAPI.is_static`](@ref) must be
+overloaded to return `true`.
 
-```julia
-fit(algorithm, data; kwargs...) = fit(algorithm; kwargs...)
-```
+The signature must include `verbosity`.
 
-If only the `fit(algorithm)` signature is expliclty implemented, then the trait
-[`LearnAPI.is_static`](@ref) must be overloaded to return `true`.
+The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
+two arguments. For convenience, for example, an algorithm is free to implement a slurping
+signature, such as `fit(algorithm, X, y, extras...) = fit(algorithm, (X, y, extras...))` but
+LearnAPI.jl does not guarantee such signatures are actually implemented.
 
 $(DOC_DATA_INTERFACE(:fit))
 
