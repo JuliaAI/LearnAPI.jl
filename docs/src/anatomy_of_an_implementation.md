@@ -485,7 +485,7 @@ interfaces](@ref data_interfaces) for details.
 
 As above, we add a signature which plays no role vis-à-vis LearnAPI.jl.
 
-```@exammple anatomy2
+```@example anatomy2
 LearnAPI.fit(algorithm::Ridge, X, y; kwargs...)  = fit(algorithm, (X, y); kwargs...)
 ```
 
