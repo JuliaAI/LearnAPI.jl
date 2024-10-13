@@ -92,17 +92,15 @@ then overloading `obs` is completely optional. Plain iteration interfaces, with 
 knowledge of the number of observations, can also be specified (to support, e.g., data
 loaders reading images from disk).
 
-## Hooks for adding functionality
+## Hooks adding algorithm-generic functonality
 
-A key to enabling toolboxes to enhance LearnAPI.jl algorithm functionality is the
-implementation of two key additional methods, beyond the usual `fit` and
-`predict`/`transform`. Given any training `data` consumed by `fit` (such as `data = (X,
-y)` in the example above) [`LearnAPI.features(algorithm, data)`](@ref input) tells us what
-part of `data` comprises *features*, which is something that can be passed onto to
-`predict` or `transform` (`X` in the example) while [`LearnAPI.target(algorithm,
-data)`](@ref), if implemented, tells us what part comprises the target (`y` in the
-example). By explicitly requiring such methods, we free algorithms to consume data in
-multiple forms, including optimised, algorithm-specific forms, as described above.
+Given any training `data` consumed by `fit` (such as `data = (X, y)` in the example above)
+[`LearnAPI.features(algorithm, data)`](@ref input) tells us what part of `data` comprises
+*features*, which is something that can be passed onto to `predict` or `transform` (`X` in
+the example) while [`LearnAPI.target(algorithm, data)`](@ref), if implemented, tells us
+what part comprises the target (`y` in the example). By explicitly requiring such methods,
+LearnAPI.jl frees algorithms to consume data in multiple forms, including optimised,
+algorithm-specific forms, as described above.
 
 ## Learning more
 
