@@ -44,10 +44,8 @@ LearnAPI.jl does not guarantee such signatures are actually implemented.
 $(DOC_DATA_INTERFACE(:fit))
 
 """
-fit(algorithm, data; kwargs...) =
-    fit(algorithm; kwargs...)
-fit(algorithm, data1, datas...; kwargs...) =
-    fit(algorithm, (data1, datas...); kwargs...)
+function fit end
+
 
 # # UPDATE AND COUSINS
 
@@ -88,7 +86,7 @@ Implementation is optional. The signature must include
 See also [`LearnAPI.clone`](@ref)
 
 """
-update(model, data1, datas...; kwargs...) = update(model, (data1, datas...); kwargs...)
+function update end
 
 """
     update_observations(model, new_data; verbosity=1, parameter_replacements...)
@@ -124,8 +122,7 @@ Implementation is optional. The signature must include
 See also [`LearnAPI.clone`](@ref).
 
 """
-update_observations(algorithm, data1, datas...; kwargs...) =
-    update_observations(algorithm, (data1, datas...); kwargs...)
+function update_observations end
 
 """
     update_features(model, new_data; verbosity=1, parameter_replacements...)
@@ -151,5 +148,4 @@ Implementation is optional. The signature must include
 See also [`LearnAPI.clone`](@ref).
 
 """
-update_features(algorithm, data1, datas...; kwargs...) =
-    update_features(algorithm, (data1, datas...); kwargs...)
+function update_features end

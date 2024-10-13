@@ -163,7 +163,7 @@ LearnAPI.strip(model::EnsembleFitted) = EnsembleFitted(
 # convenience method:
 LearnAPI.fit(algorithm::Ensemble, X, y, extras...; kwargs...) =
     fit(algorithm, (X, y, extras...); kwargs...)
-LearnAPI.update(algorithm::Ensemble, X, y, extras...; kwargs...) =
+LearnAPI.update(algorithm::EnsembleFitted, X, y, extras...; kwargs...) =
     update(algorithm, (X, y, extras...); kwargs...)
 
 

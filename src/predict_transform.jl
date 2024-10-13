@@ -166,8 +166,8 @@ $(DOC_MUTATION(:transform))
 $(DOC_DATA_INTERFACE(:transform))
 
 """
-transform(model, data1, data2, datas...; kwargs...) =
-    transform(model, (data1, data2, datas...); kwargs...) # automatic slurping
+function transform end
+
 
 """
     inverse_transform(model, data)
