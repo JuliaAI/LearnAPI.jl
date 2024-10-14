@@ -43,6 +43,8 @@ model = update(model; n=150)
 predict(model, Distribution(), X)
 ```
 
+See also [Classification](@ref) and [Regression](@ref).
+
 ### Tranformers
 
 A dimension-reducing transformer, `algorithm`  might be used in this way:
@@ -74,6 +76,8 @@ labels = predict(algorithm, X)
 LearnAPI.extras(model)
 ```
 
+See also [Static Algorithms](@ref)
+
 ### Density estimation
 
 In density estimation, `fit` consumes no features, only a target variable; `predict`,
@@ -81,7 +85,7 @@ which consumes no data, returns the learned density:
 
 ```julia
 model = fit(algorithm, y) # no features
-predict(model)            # shortcut for  `predict(model, Distribution())`
+predict(model)  # shortcut for  `predict(model, Distribution())`, or similar
 ```
 
 A one-liner will typically be implemented as well:
@@ -89,6 +93,9 @@ A one-liner will typically be implemented as well:
 ```julia
 predict(algorithm, y)
 ```
+
+See also [Density Estimation](@ref).
+
 
 ## Implementation guide
 

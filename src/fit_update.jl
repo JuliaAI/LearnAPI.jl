@@ -37,7 +37,7 @@ overloaded to return `true`.
 The signature must include `verbosity`.
 
 If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
-[`LearnAPI.target(data)`] must be overloaded to return it. If [`predict`](@ref) or
+[`LearnAPI.target(data)`](@ref) must be overloaded to return it. If [`predict`](@ref) or
 [`transform`](@ref) are implemented and consume data, then
 [`LearnAPI.features(data)`](@ref) must return something that can be passed as data to
 these methods. A fallback returns `first(data)` if `data` is a tuple, and `data`
