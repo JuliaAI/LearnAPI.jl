@@ -85,7 +85,7 @@ which consumes no data, returns the learned density:
 
 ```julia
 model = fit(algorithm, y) # no features
-predict(model)  # shortcut for  `predict(model, Distribution())`, or similar
+predict(model)  # shortcut for  `predict(model, SingleDistribution())`, or similar
 ```
 
 A one-liner will typically be implemented as well:
