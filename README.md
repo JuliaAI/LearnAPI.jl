@@ -13,10 +13,15 @@ New contributions welcome. See the [road map](ROADMAP.md).
 
 ## Code snippet
 
-Configure a learning algorithm, and inspect available functionality:
+Configure a learning algorithm:
 
 ```julia
 julia> algorithm = Ridge(lambda=0.1)
+```
+
+Inspect available functionality:
+
+```
 julia> LearnAPI.functions(algorithm)
 (:(LearnAPI.fit), :(LearnAPI.algorithm), :(LearnAPI.strip), :(LearnAPI.obs), 
 :(LearnAPI.features), :(LearnAPI.target), :(LearnAPI.predict), :(LearnAPI.coefficients))
