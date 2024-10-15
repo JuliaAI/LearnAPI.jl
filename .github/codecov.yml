@@ -6,4 +6,4 @@ coverage:
         removed_code_behavior: fully_covered_patch
     patch:
       default:
-        target: 80%coverage:
+        target: 80
