@@ -64,6 +64,11 @@ and probability density/mass functions if `kind_of_proxy = Distribution()`. List
 options with [`LearnAPI.kinds_of_proxy(algorithm)`](@ref), where `algorithm =
 LearnAPI.algorithm(model)`.
 
+```julia
+model = fit(algorithm, (X, y))
+predict(model, Point(), Xnew)
+```
+
 The shortcut `predict(model, data)` calls the first method with an algorithm-specific
 `kind_of_proxy`, namely the first element of [`LearnAPI.kinds_of_proxy(algorithm)`](@ref),
 which lists all supported target proxies.
@@ -72,16 +77,6 @@ The argument `model` is anything returned by a call of the form `fit(algorithm, 
 
 If `LearnAPI.features(LearnAPI.algorithm(model)) == nothing`, then argument `data` is
 omitted in both signatures. An example is density estimators.
-
-# Example
-
-In the following, `algorithm` is some supervised learning algorithm with
-training features `X`, training target `y`, and test features `Xnew`:
-
-```julia
-model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
-predict(model, Point(), Xnew)
-```
 
 See also [`fit`](@ref), [`transform`](@ref), [`inverse_transform`](@ref).
 

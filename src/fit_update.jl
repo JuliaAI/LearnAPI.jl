@@ -9,17 +9,18 @@ returning an object, `model`, on which other methods, such as [`predict`](@ref) 
 [`transform`](@ref), can be dispatched.  [`LearnAPI.functions(algorithm)`](@ref) returns a
 list of methods that can be applied to either `algorithm` or `model`.
 
-The second signature is provided by algorithms that do not generalize to new observations
-(called *static algorithms*). In that case, `transform(model, data)` or `predict(model,
-..., data)` carries out the actual algorithm execution, writing any byproducts of that
-operation to the mutable object `model` returned by `fit`.
-
 For example, a supervised classifier might have a workflow like this:
 
 ```julia
 model = fit(algorithm, (X, y))
 ŷ = predict(model, Xnew)
 ```
+
+The second signature, with `data` omitted, is provided by algorithms that do not
+generalize to new observations (called *static algorithms*). In that case,
+`transform(model, data)` or `predict(model, ..., data)` carries out the actual algorithm
+execution, writing any byproducts of that operation to the mutable object `model` returned
+by `fit`.
 
 Use `verbosity=0` for warnings only, and `-1` for silent training.
 
@@ -41,7 +42,7 @@ If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentat
 [`transform`](@ref) are implemented and consume data, then
 [`LearnAPI.features(data)`](@ref) must return something that can be passed as data to
 these methods. A fallback returns `first(data)` if `data` is a tuple, and `data`
-otherwise`.
+otherwise.
 
 The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
 two arguments. For convenience, for example, an algorithm is free to implement a slurping
@@ -63,16 +64,6 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 `update` call, but with the specified hyperparameter replacements, in the form `p1=value1,
 p2=value2, ...`.
 
-Provided that `data` is identical with the data presented in a preceding `fit` call *and*
-there is at most one hyperparameter replacement, as in the example below, execution is
-semantically equivalent to the call `fit(algorithm, data)`, where `algorithm` is
-`LearnAPI.algorithm(model)` with the specified replacements. In some cases (typically,
-when changing an iteration parameter) there may be a performance benefit to using `update`
-instead of retraining ab initio.
-
-If `data` differs from that in the preceding `fit` or `update` call, or there is more than
-one hyperparameter replacement, then behaviour is algorithm-specific.
-
 ```julia
 algorithm = MyForest(ntrees=100)
 
@@ -82,6 +73,16 @@ model = fit(algorithm, data)
 # add 50 more trees:
 model = update(model, data; ntrees=150)
 ```
+
+Provided that `data` is identical with the data presented in a preceding `fit` call *and*
+there is at most one hyperparameter replacement, as in the above example, execution is
+semantically equivalent to the call `fit(algorithm, data)`, where `algorithm` is
+`LearnAPI.algorithm(model)` with the specified replacements. In some cases (typically,
+when changing an iteration parameter) there may be a performance benefit to using `update`
+instead of retraining ab initio.
+
+If `data` differs from that in the preceding `fit` or `update` call, or there is more than
+one hyperparameter replacement, then behaviour is algorithm-specific.
 
 See also [`fit`](@ref), [`update_observations`](@ref), [`update_features`](@ref).
 
@@ -102,11 +103,6 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 `update` call given the new observations present in `new_data`. One may additionally
 specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
 
-When following the call `fit(algorithm, data)`, the `update` call is semantically
-equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
-*provided there are no hyperparameter replacements.* Behaviour is otherwise
-algorithm-specific.
-
 ```julia-repl
 algorithm = MyNeuralNetwork(epochs=10, learning_rate=0.01)
 
@@ -116,6 +112,11 @@ model = fit(algorithm, data)
 # train for two more epochs using new data and new learning rate:
 model = update_observations(model, new_data; epochs=2, learning_rate=0.1)
 ```
+
+When following the call `fit(algorithm, data)`, the `update` call is semantically
+equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
+*provided there are no hyperparameter replacements* (which rules out the example
+above). Behaviour is otherwise algorithm-specific.
 
 See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
