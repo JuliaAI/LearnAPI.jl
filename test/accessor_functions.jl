@@ -1,4 +1,6 @@
 using Test
 using LearnAPI
 
-@test strip("junk") == "junk"
+@test LearnAPI.strip("junk") == "junk"
+
+true

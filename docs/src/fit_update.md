@@ -45,7 +45,7 @@ predict(model, Distribution(), X)
 
 See also [Classification](@ref) and [Regression](@ref).
 
-### Tranformers
+### Transformers
 
 A dimension-reducing transformer, `algorithm`  might be used in this way:
 
