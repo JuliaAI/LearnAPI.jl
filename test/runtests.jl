@@ -5,6 +5,7 @@ test_files = [
     "traits.jl",
     "clone.jl",
     "accessor_functions.jl",
+    "target_features.jl",
     "patterns/regression.jl",
     "patterns/static_algorithms.jl",
     "patterns/ensembling.jl",
