@@ -3,25 +3,25 @@
 Methods for extracting parts of training data:
 
 ```julia
-LearnAPI.target(algorithm, data) -> <target variable>
-LearnAPI.weights(algorithm, data) -> <per-observation weights>
-LearnAPI.features(algorithm, data) -> <training "features", suitable input for `predict` or `transform`>
+LearnAPI.target(learner, data) -> <target variable>
+LearnAPI.weights(learner, data) -> <per-observation weights>
+LearnAPI.features(learner, data) -> <training "features", suitable input for `predict` or `transform`>
 ```
 
-Here `data` is something supported in a call of the form `fit(algorithm, data)`. 
+Here `data` is something supported in a call of the form `fit(learner, data)`. 
 
 # Typical workflow
 
 Not typically appearing in a general user's workflow but useful in meta-alagorithms, such
 as cross-validation (see the example in [`obs` and Data Interfaces](@ref data_interface)).
 
-Supposing `algorithm` is a supervised classifier predicting a one-dimensional vector
+Supposing `learner` is a supervised classifier predicting a one-dimensional vector
 target:
 
 ```julia
-model = fit(algorithm, data)
-X = LearnAPI.features(algorithm, data)
-y = LearnAPI.target(algorithm, data)
+model = fit(learner, data)
+X = LearnAPI.features(learner, data)
+y = LearnAPI.target(learner, data)
 ŷ = predict(model, Point(), X)
 training_loss = sum(ŷ .!= y)
 ```

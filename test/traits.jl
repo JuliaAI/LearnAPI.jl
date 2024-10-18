@@ -1,18 +1,18 @@
 using Test
 using LearnAPI
 
-# A MINIMUM IMPLEMENTATION OF AN ALGORITHM
+# A MINIMUM IMPLEMENTATION OF A LEARNER
 
 # does nothing useful
-struct SmallAlgorithm end
-LearnAPI.fit(algorithm::SmallAlgorithm, data; verbosity=1) = algorithm
-LearnAPI.algorithm(model::SmallAlgorithm) = model
+struct SmallLearner end
+LearnAPI.fit(learner::SmallLearner, data; verbosity=1) = learner
+LearnAPI.learner(model::SmallLearner) = model
 @trait(
-    SmallAlgorithm,
-    constructor = SmallAlgorithm,
+    SmallLearner,
+    constructor = SmallLearner,
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -28,9 +28,9 @@ LearnAPI.algorithm(model::SmallAlgorithm) = model
 
 # OVERLOADABLE TRAITS
 
-small = SmallAlgorithm()
-@test LearnAPI.constructor(small) == SmallAlgorithm
-@test :(LearnAPI.algorithm) in LearnAPI.functions(small)
+small = SmallLearner()
+@test LearnAPI.constructor(small) == SmallLearner
+@test :(LearnAPI.learner) in LearnAPI.functions(small)
 @test isempty(LearnAPI.kinds_of_proxy(small))
 @test isempty(LearnAPI.tags(small))
 @test !LearnAPI.is_pure_julia(small)
@@ -39,7 +39,7 @@ small = SmallAlgorithm()
 @test LearnAPI.doc_url(small) == "unknown"
 @test LearnAPI.load_path(small) == "unknown"
 @test !LearnAPI.is_composite(small)
-@test LearnAPI.human_name(small) == "small algorithm"
+@test LearnAPI.human_name(small) == "small learner"
 @test isnothing(LearnAPI.iteration_parameter(small))
 @test LearnAPI.data_interface(small) == LearnAPI.RandomAccess()
 @test !(6 isa LearnAPI.fit_observation_scitype(small))
@@ -48,7 +48,7 @@ small = SmallAlgorithm()
 
 # DERIVED TRAITS
 
-@test LearnAPI.is_algorithm(small)
+@test LearnAPI.is_learner(small)
 @test !LearnAPI.target(small)
 @test !LearnAPI.weights(small)
 

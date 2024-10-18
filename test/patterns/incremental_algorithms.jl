@@ -15,7 +15,7 @@ import Distributions
 """
     NormalEstimator()
 
-Instantiate an algorithm for finding the maximum likelihood normal distribution fitting
+Instantiate a learner for finding the maximum likelihood normal distribution fitting
 some real univariate data `y`. Estimates can be updated with new data.
 
 ```julia
@@ -46,7 +46,7 @@ struct NormalEstimatorFitted{T}
     n::Int
 end
 
-LearnAPI.algorithm(::NormalEstimatorFitted) = NormalEstimator()
+LearnAPI.learner(::NormalEstimatorFitted) = NormalEstimator()
 
 function LearnAPI.fit(::NormalEstimator, y)
     n = length(y)
@@ -94,7 +94,7 @@ LearnAPI.extras(model::NormalEstimatorFitted) = (μ=model.ȳ, σ=sqrt(model.ss/
     human_name = "normal distribution estimator",
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -111,8 +111,8 @@ LearnAPI.extras(model::NormalEstimatorFitted) = (μ=model.ȳ, σ=sqrt(model.ss/
     rng = StableRNG(123)
     y = rand(rng, 50);
     ynew = rand(rng, 10);
-    algorithm = NormalEstimator()
-    model = fit(algorithm, y)
+    learner = NormalEstimator()
+    model = fit(learner, y)
     d = predict(model)
     μ, σ = Distributions.params(d)
     @test μ ≈ mean(y)
@@ -122,14 +122,14 @@ LearnAPI.extras(model::NormalEstimatorFitted) = (μ=model.ȳ, σ=sqrt(model.ss/
     @test LearnAPI.extras(model) == (; μ, σ)
 
     # one-liner:
-    @test predict(algorithm, y) == d
-    @test predict(algorithm, Point(), y) ≈ μ
-    @test predict(algorithm, ConfidenceInterval(), y)[1] ≈ quantile(d, 0.025)
+    @test predict(learner, y) == d
+    @test predict(learner, Point(), y) ≈ μ
+    @test predict(learner, ConfidenceInterval(), y)[1] ≈ quantile(d, 0.025)
 
     # updating:
     model = update_observations(model, ynew)
     μ2, σ2 = LearnAPI.extras(model)
-    μ3, σ3 = LearnAPI.extras(fit(algorithm, vcat(y, ynew))) # training ab initio
+    μ3, σ3 = LearnAPI.extras(fit(learner, vcat(y, ynew))) # training ab initio
     @test μ2 ≈ μ3
     @test σ2 ≈ σ3
 end

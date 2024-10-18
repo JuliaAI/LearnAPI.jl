@@ -16,23 +16,23 @@ end
 Selector(; names=Symbol[]) =  Selector(names) # LearnAPI.constructor defined later
 
 # `fit` consumes no observational data, does no "learning", and just returns a thinly
-# wrapped `algorithm` (to distinguish it from the algorithm in dispatch):
-LearnAPI.fit(algorithm::Selector; verbosity=1) = Ref(algorithm)
-LearnAPI.algorithm(model) = model[]
+# wrapped `learner` (to distinguish it from the learner in dispatch):
+LearnAPI.fit(learner::Selector; verbosity=1) = Ref(learner)
+LearnAPI.learner(model) = model[]
 
 function LearnAPI.transform(model::Base.RefValue{Selector}, X)
-    algorithm = LearnAPI.algorithm(model)
+    learner = LearnAPI.learner(model)
     table = Tables.columntable(X)
     names = Tables.columnnames(table)
-    filtered_names = filter(in(algorithm.names), names)
+    filtered_names = filter(in(learner.names), names)
     filtered_columns = (Tables.getcolumn(table, name) for name in filtered_names)
     filtered_table = NamedTuple{filtered_names}((filtered_columns...,))
     return Tables.materializer(X)(filtered_table)
 end
 
 # fit and transform in one go:
-function LearnAPI.transform(algorithm::Selector, X)
-    model = fit(algorithm)
+function LearnAPI.transform(learner::Selector, X)
+    model = fit(learner)
     transform(model, X)
 end
 
@@ -44,7 +44,7 @@ end
     is_static = true,
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.transform),
@@ -52,14 +52,14 @@ end
 )
 
 @testset "test a static transformer" begin
-    algorithm = Selector(names=[:x, :w])
+    learner = Selector(names=[:x, :w])
     X = DataFrames.DataFrame(rand(3, 4), [:x, :y, :z, :w])
-    model = fit(algorithm) # no data arguments!
+    model = fit(learner) # no data arguments!
     # if provided, data is ignored:
-    @test LearnAPI.algorithm(model) == algorithm
+    @test LearnAPI.learner(model) == learner
     W = transform(model, X)
     @test W == DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
-    @test W == transform(algorithm, X)
+    @test W == transform(learner, X)
 end
 
 
@@ -74,21 +74,21 @@ end
 FancySelector(; names=Symbol[]) =  FancySelector(names) # LearnAPI.constructor defined later
 
 mutable struct FancySelectorFitted
-    algorithm::FancySelector
+    learner::FancySelector
     rejected::Vector{Symbol}
-    FancySelectorFitted(algorithm) = new(algorithm)
+    FancySelectorFitted(learner) = new(learner)
 end
-LearnAPI.algorithm(model::FancySelectorFitted) = model.algorithm
+LearnAPI.learner(model::FancySelectorFitted) = model.learner
 rejected(model::FancySelectorFitted) = model.rejected
 
-# Here we are wrapping `algorithm` with a place-holder for the `rejected` feature names.
-LearnAPI.fit(algorithm::FancySelector; verbosity=1) = FancySelectorFitted(algorithm)
+# Here we are wrapping `learner` with a place-holder for the `rejected` feature names.
+LearnAPI.fit(learner::FancySelector; verbosity=1) = FancySelectorFitted(learner)
 
 # output the filtered table and add `rejected` field to model (mutatated!)
 function LearnAPI.transform(model::FancySelectorFitted, X)
     table = Tables.columntable(X)
     names = Tables.columnnames(table)
-    keep = LearnAPI.algorithm(model).names
+    keep = LearnAPI.learner(model).names
     filtered_names = filter(in(keep), names)
     model.rejected = setdiff(names, filtered_names)
     filtered_columns = (Tables.getcolumn(table, name) for name in filtered_names)
@@ -97,8 +97,8 @@ function LearnAPI.transform(model::FancySelectorFitted, X)
 end
 
 # fit and transform in one step:
-function LearnAPI.transform(algorithm::FancySelector, X)
-    model = fit(algorithm)
+function LearnAPI.transform(learner::FancySelector, X)
+    model = fit(learner)
     transform(model, X)
 end
 
@@ -110,7 +110,7 @@ end
     tags = ("feature engineering",),
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.transform),
@@ -119,14 +119,14 @@ end
 )
 
 @testset "test a variation that reports byproducts" begin
-    algorithm = FancySelector(names=[:x, :w])
+    learner = FancySelector(names=[:x, :w])
     X = DataFrames.DataFrame(rand(3, 4), [:x, :y, :z, :w])
-    model = fit(algorithm) # no data arguments!
+    model = fit(learner) # no data arguments!
     @test !isdefined(model, :reject)
-    @test LearnAPI.algorithm(model) == algorithm
+    @test LearnAPI.learner(model) == learner
     filtered =  DataFrames.DataFrame(Tables.matrix(X)[:,[1,4]], [:x, :w])
     @test transform(model, X) == filtered
-    @test transform(algorithm, X) == filtered
+    @test transform(learner, X) == filtered
     @test rejected(model) == [:y, :z]
 end
 

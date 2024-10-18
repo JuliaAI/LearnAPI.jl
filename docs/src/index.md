@@ -63,9 +63,9 @@ LearnAPI.feature_importances(model)
 small_model = LearnAPI.strip(model)
 serialize("my_random_forest.jls", small_model)
 
-# Recover saved model and algorithm configuration:
+# Recover saved model and algorithm configuration ("learner"):
 recovered_model = deserialize("my_random_forest.jls")
-@assert LearnAPI.algorithm(recovered_model) == forest
+@assert LearnAPI.learner(recovered_model) == forest
 @assert predict(recovered_model, Point(), Xnew) == ŷ
 ```
 
@@ -73,7 +73,7 @@ recovered_model = deserialize("my_random_forest.jls")
 dispatch based on the [kind of target proxy](@ref proxy), a key LearnAPI.jl concept.
 LearnAPI.jl places more emphasis on the notion of target variables and target proxies than
 on the usual supervised/unsupervised learning dichotomy. From this point of view, a
-supervised algorithm is simply one in which a target variable exists, and happens to
+supervised learner is simply one in which a target variable exists, and happens to
 appear as an input to training but not to prediction.
 
 ## Data interfaces

@@ -1,10 +1,10 @@
 # [Accessor Functions](@id accessor_functions)
 
 The sole argument of an accessor function is the output, `model`, of
-[`fit`](@ref). Algorithms are free to implement any number of these, or none of them. Only
+[`fit`](@ref). Learners are free to implement any number of these, or none of them. Only
 `LearnAPI.strip` has a fallback, namely the identity.
 
-- [`LearnAPI.algorithm(model)`](@ref)
+- [`LearnAPI.learner(model)`](@ref)
 - [`LearnAPI.extras(model)`](@ref)
 - [`LearnAPI.strip(model)`](@ref)
 - [`LearnAPI.coefficients(model)`](@ref)
@@ -18,12 +18,12 @@ The sole argument of an accessor function is the output, `model`, of
 - [`LearnAPI.training_scores(model)`](@ref)
 - [`LearnAPI.components(model)`](@ref)
 
-Algorithm-specific accessor functions may also be implemented. The names of all accessor
-functions are included in the list returned by [`LearnAPI.functions(algorithm)`](@ref).
+Learner-specific accessor functions may also be implemented. The names of all accessor
+functions are included in the list returned by [`LearnAPI.functions(learner)`](@ref).
 
 ## Implementation guide
 
-All new implementations must implement [`LearnAPI.algorithm`](@ref). While, all others are
+All new implementations must implement [`LearnAPI.learner`](@ref). While, all others are
 optional, any implemented accessor functions must be added to the list returned by
 [`LearnAPI.functions`](@ref).
 
@@ -31,7 +31,7 @@ optional, any implemented accessor functions must be added to the list returned 
 ## Reference
 
 ```@docs
-LearnAPI.algorithm
+LearnAPI.learner
 LearnAPI.extras
 LearnAPI.strip
 LearnAPI.coefficients

@@ -99,11 +99,11 @@ struct JointLogDistribution <: Joint end
 """
     Single <: KindOfProxy
 
-Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). It applies only to algorithms for
+Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). It applies only to learners for
 which `predict` has no data argument, i.e., is of the form `predict(model,
 kind_of_proxy)`. An example is an algorithm learning a probability distribution from
 samples, and we regard the samples as drawn from the "target" variable. If in this case,
-`kind_of_proxy` is an instance of `LearnAPI.Single` then, `predict(algorithm)` returns a
+`kind_of_proxy` is an instance of `LearnAPI.Single` then, `predict(learner)` returns a
 single object representing a probability distribution.
 
 | type `T`                         | form of output of `predict(model, ::T)`                                |
@@ -146,14 +146,14 @@ const DOC_HOW_TO_LIST_PROXIES =
     LearnAPI.KindOfProxy
 
 Abstract type whose concrete subtypes `T` each represent a different kind of proxy for
-some target variable, associated with some algorithm. Instances `T()` are used to request
+some target variable, associated with some learner. Instances `T()` are used to request
 the form of target predictions in [`predict`](@ref) calls.
 
 See LearnAPI.jl documentation for an explanation of "targets" and "target proxies".
 
 For example, `Distribution` is a concrete subtype of `LearnAPI.KindOfProxy` and a call
 like `predict(model, Distribution(), Xnew)` returns a data object whose observations are
-probability density/mass functions, assuming `algorithm` supports predictions of that
+probability density/mass functions, assuming `learner` supports predictions of that
 form.
 
 $DOC_HOW_TO_LIST_PROXIES
@@ -180,15 +180,15 @@ All arrays implement `RandomAccess`, with the last index being the observation i
 (observations-as-columns in matrices).
 
 A Tables.jl compatible table `data` implements `RandomAccess` if `Tables.istable(data)` is
-true and if `data` implements `DataAPI.nrows`. This includes many tables, and in
+true and if `data` implements `DataAPI.nrow`. This includes many tables, and in
 particular, `DataFrame`s. Tables that are also tuples are explicitly excluded.
 
 Any tuple of objects implementing `RandomAccess` also implements `RandomAccess`.
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `RandomAccess()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `RandomAccess()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
 `RandomAccess` interface, and the same holds for `obs(model, ...)`, whenever
-`LearnAPI.algorithm(model) == algorithm`.
+`LearnAPI.learner(model) == learner`.
 
 # Implementing `RandomAccess` for new data types
 
@@ -211,10 +211,10 @@ it implements Julia's `iterate` interface, including `Base.length`, and if
 
 - `data isa MLUtils.DataLoader`, which includes output from `MLUtils.eachobs`.
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `FiniteIterable()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `FiniteIterable()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
 `FiniteIterable` interface, and the same holds for `obs(model, ...)`, whenever
-`LearnAPI.algorithm(model) == algorithm`.
+`LearnAPI.learner(model) == learner`.
 
 See also [`LearnAPI.RandomAccess`](@ref), [`LearnAPI.Iterable`](@ref).
 """
@@ -227,10 +227,10 @@ A data interface type. We say that `data` implements the `Iterable` interface if
 implements Julia's basic `iterate` interface. (Such objects may not implement
 `MLUtils.numobs` or `Base.length`.)
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `Iterable()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing `Iterable`,
-and the same holds for `obs(model, ...)`, whenever `LearnAPI.algorithm(model) ==
-algorithm`.
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `Iterable()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing `Iterable`,
+and the same holds for `obs(model, ...)`, whenever `LearnAPI.learner(model) ==
+learner`.
 
 See also [`LearnAPI.FiniteIterable`](@ref), [`LearnAPI.RandomAccess`](@ref).
 

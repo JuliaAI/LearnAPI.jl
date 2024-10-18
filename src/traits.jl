@@ -1,17 +1,17 @@
 # There are two types of traits - ordinary traits that an implementation overloads to make
-# promises of algorithm behavior, and derived traits, which are never overloaded.
+# promises of learner behavior, and derived traits, which are never overloaded.
 
 const DOC_UNKNOWN =
-    "Returns `\"unknown\"` if the algorithm implementation has "*
+    "Returns `\"unknown\"` if the learner implementation has "*
     "not overloaded the trait. "
-const DOC_ON_TYPE = "The value of the trait must depend only on the type of `algorithm`. "
+const DOC_ON_TYPE = "The value of the trait must depend only on the type of `learner`. "
 
 const DOC_EXPLAIN_EACHOBS =
     """
 
     Here, "for each `o` in `observations`" is understood in the sense of
-    [`LearnAPI.data_interface(algorithm)`](@ref). For example, if
-    `LearnAPI.data_interface(algorithm) == Base.HasLength()`, then this means "for `o` in
+    [`LearnAPI.data_interface(learner)`](@ref). For example, if
+    `LearnAPI.data_interface(learner) == Base.HasLength()`, then this means "for `o` in
     `MLUtils.eachobs(observations)`".
 
     """
@@ -19,16 +19,16 @@ const DOC_EXPLAIN_EACHOBS =
 # # OVERLOADABLE TRAITS
 
 """
-    Learn.API.constructor(algorithm)
+    Learn.API.constructor(learner)
 
-Return a keyword constructor that can be used to clone `algorithm`:
+Return a keyword constructor that can be used to clone `learner`:
 
 ```julia-repl
-julia> algorithm.lambda
+julia> learner.lambda
 0.1
-julia> C = LearnAPI.constructor(algorithm)
-julia> algorithm2 = C(lambda=0.2)
-julia> algorithm2.lambda
+julia> C = LearnAPI.constructor(learner)
+julia> learner2 = C(lambda=0.2)
+julia> learner2.lambda
 0.2
 ```
 
@@ -36,21 +36,21 @@ julia> algorithm2.lambda
 
 All new implementations must overload this trait.
 
-Attach public LearnAPI.jl-related documentation for an algorithm to the constructor, not
-the algorithm struct.
+Attach public LearnAPI.jl-related documentation for learner to the constructor, not
+the learner struct.
 
-It must be possible to recover an algorithm from the constructor returned as follows:
+It must be possible to recover learner from the constructor returned as follows:
 
 ```julia
-properties = propertynames(algorithm)
-named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), properties))
-@assert algorithm == LearnAPI.constructor(algorithm)(; named_properties...)
+properties = propertynames(learner)
+named_properties = NamedTuple{properties}(getproperty.(Ref(learner), properties))
+@assert learner == LearnAPI.constructor(learner)(; named_properties...)
 ```
 
-which can be tested with `@assert LearnAPI.clone(algorithm) == algorithm`.
+which can be tested with `@assert LearnAPI.clone(learner) == learner`.
 
 The keyword constructor provided by `LearnAPI.constructor` must provide default values for
-all properties, with the exception of those that can take other LearnAPI.jl algorithms as
+all properties, with the exception of those that can take other LearnAPI.jl learners as
 values. These can be provided with the default `nothing`, with the constructor throwing an
 error if the default value persists.
 
@@ -58,17 +58,17 @@ error if the default value persists.
 function constructor end
 
 """
-    LearnAPI.functions(algorithm)
+    LearnAPI.functions(learner)
 
 Return a tuple of expressions representing functions that can be meaningfully applied
-with `algorithm`, or an associated model (object returned by `fit(algorithm, ...)`, as the
-first argument. Algorithm traits (methods for which `algorithm` is the *only* argument)
+with `learner`, or an associated model (object returned by `fit(learner, ...)`, as the
+first argument. Learner traits (methods for which `learner` is the *only* argument)
 are excluded.
 
 The returned tuple may include expressions like `:(DecisionTree.print_tree)`, which
 reference functions not owned by LearnAPI.jl.
 
-The understanding is that `algorithm` is a LearnAPI-compliant object whenever the return
+The understanding is that `learner` is a LearnAPI-compliant object whenever the return
 value is non-empty.
 
 # Extended help
@@ -81,7 +81,7 @@ return value:
 | expression                        | implementation compulsory? | include in returned tuple?         |
 |-----------------------------------|----------------------------|------------------------------------|
 | `:(LearnAPI.fit)`                 | yes                        | yes                                |
-| `:(LearnAPI.algorithm)`           | yes                        | yes                                |
+| `:(LearnAPI.learner)`           | yes                        | yes                                |
 | `:(LearnAPI.strip)`               | no                         | yes                                |
 | `:(LearnAPI.obs)`                 | no                         | yes                                |
 | `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
@@ -96,13 +96,13 @@ return value:
 | < accessor functions>             | no                         | only if implemented                |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
-algorithm-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
+learner-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
 (`LearnAPI.strip` is always included).
 
 """
 functions() = (
     :(LearnAPI.fit),
-    :(LearnAPI.algorithm),
+    :(LearnAPI.learner),
     :(LearnAPI.strip),
     :(LearnAPI.obs),
     :(LearnAPI.features),
@@ -117,9 +117,9 @@ functions() = (
 )
 
 """
-    LearnAPI.kinds_of_proxy(algorithm)
+    LearnAPI.kinds_of_proxy(learner)
 
-Returns a tuple of all instances, `kind`, for which for which `predict(algorithm, kind,
+Returns a tuple of all instances, `kind`, for which for which `predict(learner, kind,
 data...)` has a guaranteed implementation. Each such `kind` subtypes
 [`LearnAPI.KindOfProxy`](@ref). Examples are `Point()` (for predicting actual
 target values) and `Distributions()` (for predicting probability mass/density functions).
@@ -143,13 +143,13 @@ Suppose, for example, we have the following implementation of a supervised learn
 returning only probabilistic predictions:
 
 ```julia
-LearnAPI.predict(algorithm::MyNewAlgorithmType, LearnAPI.Distribution(), Xnew) = ...
+LearnAPI.predict(learner::MyNewLearnerType, LearnAPI.Distribution(), Xnew) = ...
 ```
 
 Then we can declare
 
 ```julia
-@trait MyNewAlgorithmType kinds_of_proxy = (LearnaAPI.Distribution(),)
+@trait MyNewLearnerType kinds_of_proxy = (LearnaAPI.Distribution(),)
 ```
 
 LearnAPI.jl provides the fallback for `predict(model, data)`.
@@ -166,7 +166,7 @@ tags() = [
     "classification",
     "clustering",
     "gradient descent",
-    "iterative algorithms",
+    "iterative learners",
     "incremental algorithms",
     "feature engineering",
     "dimension reduction",
@@ -189,9 +189,9 @@ tags() = [
 ]
 
 """
-    LearnAPI.tags(algorithm)
+    LearnAPI.tags(learner)
 
-Lists one or more suggestive algorithm tags. Do `LearnAPI.tags()` to list
+Lists one or more suggestive learner tags. Do `LearnAPI.tags()` to list
 all possible.
 
 !!! warning
@@ -206,9 +206,9 @@ This trait should return a tuple of strings, as in `("classifier", "text analysi
 tags(::Any) = ()
 
 """
-    LearnAPI.is_pure_julia(algorithm)
+    LearnAPI.is_pure_julia(learner)
 
-Returns `true` if training `algorithm` requires evaluation of pure Julia code only.
+Returns `true` if training `learner` requires evaluation of pure Julia code only.
 
 # New implementations
 
@@ -218,10 +218,10 @@ The fallback is `false`.
 is_pure_julia(::Any) = false
 
 """
-    LearnAPI.pkg_name(algorithm)
+    LearnAPI.pkg_name(learner)
 
 Return the name of the package module which supplies the core training algorithm for
-`algorithm`.  This is not necessarily the package providing the LearnAPI
+`learner`.  This is not necessarily the package providing the LearnAPI
 interface.
 
 $DOC_UNKNOWN
@@ -234,18 +234,18 @@ Must return a string, as in `"DecisionTree"`.
 pkg_name(::Any) = "unknown"
 
 """
-    LearnAPI.pkg_license(algorithm)
+    LearnAPI.pkg_license(learner)
 
 Return the name of the software license, such as `"MIT"`, applying to the package where the
-core algorithm for `algorithm` is implemented.
+core algorithm for `learner` is implemented.
 
 """
 pkg_license(::Any) = "unknown"
 
 """
-    LearnAPI.doc_url(algorithm)
+    LearnAPI.doc_url(learner)
 
-Return a url where the core algorithm for `algorithm` is documented.
+Return a url where the core algorithm for `learner` is documented.
 
 $DOC_UNKNOWN
 
@@ -257,11 +257,11 @@ Must return a string, such as `"https://en.wikipedia.org/wiki/Decision_tree_lear
 doc_url(::Any) = "unknown"
 
 """
-    LearnAPI.load_path(algorithm)
+    LearnAPI.load_path(learner)
 
-Return a string indicating where in code the definition of the algorithm's constructor can
+Return a string indicating where in code the definition of the learner's constructor can
 be found, beginning with the name of the package module defining it. By "constructor" we
-mean the return value of [`LearnAPI.constructor(algorithm)`](@ref).
+mean the return value of [`LearnAPI.constructor(learner)`](@ref).
 
 # Implementation
 
@@ -271,7 +271,7 @@ following julia code will not error:
 ```julia
 import FastTrees
 import LearnAPI
-@assert FastTrees.LearnAPI.DecisionTreeClassifier == LearnAPI.constructor(algorithm)
+@assert FastTrees.LearnAPI.DecisionTreeClassifier == LearnAPI.constructor(learner)
 ```
 
 $DOC_UNKNOWN
@@ -282,18 +282,18 @@ load_path(::Any) = "unknown"
 
 
 """
-    LearnAPI.is_composite(algorithm)
+    LearnAPI.is_composite(learner)
 
-Returns `true` if one or more properties (fields) of `algorithm` may themselves be
-algorithms, and `false` otherwise.
+Returns `true` if one or more properties (fields) of `learner` may themselves be
+learners, and `false` otherwise.
 
 See also [`LearnAPI.components`](@ref).
 
 # New implementations
 
-This trait should be overloaded if one or more properties (fields) of `algorithm` may take
-algorithm values. Fallback return value is `false`. The keyword constructor for such an
-algorithm need not prescribe defaults for algorithm-valued properties. Implementation of
+This trait should be overloaded if one or more properties (fields) of `learner` may take
+learner values. Fallback return value is `false`. The keyword constructor for such an
+learner need not prescribe defaults for learner-valued properties. Implementation of
 the accessor function [`LearnAPI.components`](@ref) is recommended.
 
 $DOC_ON_TYPE
@@ -303,9 +303,9 @@ $DOC_ON_TYPE
 is_composite(::Any) = false
 
 """
-    LearnAPI.human_name(algorithm)
+    LearnAPI.human_name(learner)
 
-Return a human-readable string representation of `typeof(algorithm)`. Primarily intended
+Return a human-readable string representation of `typeof(learner)`. Primarily intended
 for auto-generation of documentation.
 
 # New implementations
@@ -316,14 +316,14 @@ to return `"K-nearest neighbors regressor"`. Ideally, this is a "concrete" noun 
 `"ridge regressor"` rather than an "abstract" noun like `"ridge regression"`.
 
 """
-human_name(algorithm) = snakecase(name(algorithm), delim=' ') # `name` defined below
+human_name(learner) = snakecase(name(learner), delim=' ') # `name` defined below
 
 """
-    LearnAPI.data_interface(algorithm)
+    LearnAPI.data_interface(learner)
 
-Return the data interface supported by `algorithm` for accessing individual observations
-in representations of input data returned by [`obs(algorithm, data)`](@ref) or
-[`obs(model, data)`](@ref), whenever `algorithm == LearnAPI.algorithm(model)`. Here `data`
+Return the data interface supported by `learner` for accessing individual observations
+in representations of input data returned by [`obs(learner, data)`](@ref) or
+[`obs(model, data)`](@ref), whenever `learner == LearnAPI.learner(model)`. Here `data`
 is `fit`, `predict`, or `transform`-consumable data.
 
 Possible return values are [`LearnAPI.RandomAccess`](@ref),
@@ -340,17 +340,17 @@ tables, and tuples of these. See the doc-string for details.
 data_interface(::Any) = LearnAPI.RandomAccess()
 
 """
-    LearnAPI.is_static(algorithm)
+    LearnAPI.is_static(learner)
 
 Returns `true` if [`fit`](@ref) is called with no data arguments, as in
-`fit(algorithm)`. That is, `algorithm` does not generalize to new data, and data is only
+`fit(learner)`. That is, `learner` does not generalize to new data, and data is only
 provided at the `predict` or `transform` step.
 
 For example, some clustering algorithms are applied with this workflow, to assign labels
 to the observations in `X`:
 
 ```julia
-model = fit(algorithm) # no training data
+model = fit(learner) # no training data
 labels = predict(model, X) # may mutate `model`!
 
 # extract some byproducts of the clustering algorithm (e.g., outliers):
@@ -366,9 +366,9 @@ arguments. See more at [`fit`](@ref).
 is_static(::Any) = false
 
 """
-    LearnAPI.iteration_parameter(algorithm)
+    LearnAPI.iteration_parameter(learner)
 
-The name of the iteration parameter of `algorithm`, or `nothing` if the algorithm is not
+The name of the iteration parameter of `learner`, or `nothing` if the algorithm is not
 iterative.
 
 # New implementations
@@ -380,12 +380,12 @@ iteration_parameter(::Any) = nothing
 
 
 """
-    LearnAPI.fit_observation_scitype(algorithm)
+    LearnAPI.fit_observation_scitype(learner)
 
 Return an upper bound `S` on the scitype of individual observations guaranteed to work
-when calling `fit`: if `observations = obs(algorithm, data)` and
+when calling `fit`: if `observations = obs(learner, data)` and
 `ScientificTypes.scitype(o) <:S` for each `o` in `observations`, then the call
-`fit(algorithm, data)` is supported.
+`fit(learner, data)` is supported.
 
 $DOC_EXPLAIN_EACHOBS
 
@@ -399,14 +399,14 @@ Optional. The fallback return value is `Union{}`.
 fit_observation_scitype(::Any) = Union{}
 
 """
-    LearnAPI.target_observation_scitype(algorithm)
+    LearnAPI.target_observation_scitype(learner)
 
 Return an upper bound `S` on the scitype of each observation of an applicable target
 variable. Specifically:
 
-- If `:(LearnAPI.target) in LearnAPI.functions(algorithm)` (i.e., `fit` consumes target
-  variables) then "target" means anything returned by `LearnAPI.target(algorithm, data)`,
-  where `data` is an admissible argument in the call `fit(algorithm, data)`.
+- If `:(LearnAPI.target) in LearnAPI.functions(learner)` (i.e., `fit` consumes target
+  variables) then "target" means anything returned by `LearnAPI.target(learner, data)`,
+  where `data` is an admissible argument in the call `fit(learner, data)`.
 
 - `S` will always be an upper bound on the scitype of (point) observations that could be
   conceivably extracted from the output of [`predict`](@ref).
@@ -414,7 +414,7 @@ variable. Specifically:
 To illustate the second case, suppose we have
 
 ```julia
-model = fit(algorithm, data)
+model = fit(learner, data)
 ŷ = predict(model, Sampleable(), data_new)
 ```
 
@@ -433,8 +433,8 @@ target_observation_scitype(::Any) = Any
 
 # # DERIVED TRAITS
 
-name(algorithm) = split(string(constructor(algorithm)), ".") |> last
-is_algorithm(algorithm) = !isempty(functions(algorithm))
-preferred_kind_of_proxy(algorithm) = first(kinds_of_proxy(algorithm))
-target(algorithm) = :(LearnAPI.target) in functions(algorithm)
-weights(algorithm) = :(LearnAPI.weights) in functions(algorithm)
+name(learner) = split(string(constructor(learner)), ".") |> last
+is_learner(learner) = !isempty(functions(learner))
+preferred_kind_of_proxy(learner) = first(kinds_of_proxy(learner))
+target(learner) = :(LearnAPI.target) in functions(learner)
+weights(learner) = :(LearnAPI.weights) in functions(learner)

@@ -9,32 +9,32 @@
 const DOC_STATIC =
     """
 
-    For "static" algorithms (those without training `data`) it may be necessary to first
+    For "static" learners (those without training `data`) it may be necessary to first
     call `transform` or `predict` on `model`.
 
     """
 
 """
-    LearnAPI.algorithm(model)
-    LearnAPI.algorithm(LearnAPI.stripd_model)
+    LearnAPI.learner(model)
+    LearnAPI.learner(LearnAPI.stripd_model)
 
-Recover the algorithm used to train `model` or the output of [`LearnAPI.strip(model)`](@ref).
+Recover the learner used to train `model` or the output of [`LearnAPI.strip(model)`](@ref).
 
-In other words, if `model = fit(algorithm, data...)`, for some `algorithm` and `data`,
+In other words, if `model = fit(learner, data...)`, for some `learner` and `data`,
 then
 
 ```julia
-LearnAPI.algorithm(model) == algorithm == LearnAPI.algorithm(LearnAPI.strip(model))
+LearnAPI.learner(model) == learner == LearnAPI.learner(LearnAPI.strip(model))
 ```
 is `true`.
 
 # New implementations
 
-Implementation is compulsory for new algorithm types. The behaviour described above is the
-only contract. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.algorithm)"))
+Implementation is compulsory for new learner types. The behaviour described above is the
+only contract. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.learner)"))
 
 """
-function algorithm end
+function learner end
 
 """
     LearnAPI.strip(model; options...)
@@ -44,16 +44,16 @@ Return a version of `model` that will generally have a smaller memory allocation
 [`fit`](@ref). Accessor functions that can be called on `model` may not work on
 `LearnAPI.strip(model)`, but [`predict`](@ref), [`transform`](@ref) and
 [`inverse_transform`](@ref) will work, if implemented. Check
-`LearnAPI.functions(LearnAPI.algorithm(model))` to view see what the original `model`
+`LearnAPI.functions(LearnAPI.learner(model))` to view see what the original `model`
 implements.
 
-Specific algorithms may provide keyword `options` to control how much of the original
-functionality is preserved by `LearnAPI.strip`.
+Implementations may provide learner-specific keyword `options` to control how much of the
+original functionality is preserved by `LearnAPI.strip`.
 
 # Typical workflow
 
 ```julia
-model = fit(algorithm, (X, y)) # or `fit(algorithm, X, y)`
+model = fit(learner, (X, y)) # or `fit(learner, X, y)`
 ŷ = predict(model, Point(), Xnew)
 
 small_model = LearnAPI.strip(model)
@@ -67,7 +67,7 @@ recovered_model = deserialize("my_random_forest.jls")
 
 # New implementations
 
-Overloading `LearnAPI.strip` for new algorithms is optional. The fallback is the
+Overloading `LearnAPI.strip` for new learners is optional. The fallback is the
 identity.
 
 New implementations must enforce the following identities, whenever the right-hand side is
@@ -94,15 +94,15 @@ LearnAPI.strip(model) = model
 """
     LearnAPI.feature_importances(model)
 
-Return the algorithm-specific feature importances of a `model` output by
-[`fit`](@ref)`(algorithm, ...)` for some `algorithm`.  The value returned has the form of
+Return the learner-specific feature importances of a `model` output by
+[`fit`](@ref)`(learner, ...)` for some `learner`.  The value returned has the form of
 an abstract vector of `feature::Symbol => importance::Real` pairs (e.g `[:gender => 0.23,
 :height => 0.7, :weight => 0.1]`).
 
-The `algorithm` supports feature importances if `:(LearnAPI.feature_importances) in
-LearnAPI.functions(algorithm)`.
+The `learner` supports feature importances if `:(LearnAPI.feature_importances) in
+LearnAPI.functions(learner)`.
 
-If an algorithm is sometimes unable to report feature importances then
+If a learner is sometimes unable to report feature importances then
 `LearnAPI.feature_importances` will return all importances as 0.0, as in `[:gender => 0.0,
 :height => 0.0, :weight => 0.0]`.
 
@@ -124,7 +124,7 @@ an abstract vector of `feature_or_class::Symbol => coefficient::Real` pairs (e.g
 `feature::Symbol => coefficients::AbstractVector{<:Real}` pairs.
 
 The `model` reports coefficients if `:(LearnAPI.coefficients) in
-LearnAPI.functions(Learn.algorithm(model))`.
+LearnAPI.functions(Learn.learner(model))`.
 
 See also [`LearnAPI.intercept`](@ref).
 
@@ -144,7 +144,7 @@ For a linear model, return the learned intercept.  The value returned is `Real` 
 target) or an `AbstractVector{<:Real}` (multi-target).
 
 The `model` reports intercept if `:(LearnAPI.intercept) in
-LearnAPI.functions(Learn.algorithm(model))`.
+LearnAPI.functions(Learn.learner(model))`.
 
 See also [`LearnAPI.coefficients`](@ref).
 
@@ -200,8 +200,8 @@ function trees end
 """
     LearnAPI.training_losses(model)
 
-Return the training losses obtained when running `model = fit(algorithm, ...)` for some
-`algorithm`.
+Return the training losses obtained when running `model = fit(learner, ...)` for some
+`learner`.
 
 See also [`fit`](@ref).
 
@@ -218,8 +218,8 @@ function training_losses end
 """
     LearnAPI.training_predictions(model)
 
-Return internally computed training predictions when running `model = fit(algorithm, ...)`
-for some `algorithm`.
+Return internally computed training predictions when running `model = fit(learner, ...)`
+for some `learner`.
 
 See also [`fit`](@ref).
 
@@ -236,14 +236,14 @@ function training_predictions end
 """
     LearnAPI.training_scores(model)
 
-Return the training scores obtained when running `model = fit(algorithm, ...)` for some
-`algorithm`.
+Return the training scores obtained when running `model = fit(learner, ...)` for some
+`learner`.
 
 See also [`fit`](@ref).
 
 # New implementations
 
-Implement for algorithms, such as outlier detection algorithms, which associate a score
+Implement for learners, such as outlier detection algorithms, which associate a score
 with each observation during training, where these scores are of interest in later
 processes (e.g, in defining normalized scores for new data).
 
@@ -257,11 +257,11 @@ function training_scores end
 
 For a composite `model`, return the component models (`fit` outputs). These will be in the
 form of a vector of named pairs, `property_name::Symbol => component_model`. Here
-`property_name` is the name of some algorithm-valued property (hyper-parameter) of
-`algorithm = LearnAPI.algorithm(model)`.
+`property_name` is the name of some learner-valued property (hyper-parameter) of
+`learner = LearnAPI.learner(model)`.
 
-A composite model is one for which the corresponding `algorithm` includes one or more
-algorithm-valued properties, and for which `LearnAPI.is_composite(algorithm)` is `true`.
+A composite model is one for which the corresponding `learner` includes one or more
+learner-valued properties, and for which `LearnAPI.is_composite(learner)` is `true`.
 
 See also [`is_composite`](@ref).
 
@@ -277,8 +277,8 @@ function components end
 """
     LearnAPI.training_labels(model)
 
-Return the training labels obtained when running `model = fit(algorithm, ...)` for some
-`algorithm`.
+Return the training labels obtained when running `model = fit(learner, ...)` for some
+`learner`.
 
 See also [`fit`](@ref).
 
@@ -292,7 +292,7 @@ function training_labels end
 
 # :extras intentionally excluded:
 const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
-    algorithm,
+    learner,
     coefficients,
     intercept,
     tree,
@@ -316,8 +316,8 @@ const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS_LIST = join(
  """
     LearnAPI.extras(model)
 
-Return miscellaneous byproducts of an algorithm's computation, from the object `model`
-returned by a call of the form `fit(algorithm, data)`.
+Return miscellaneous byproducts of a learning algorithm's execution, from the
+object `model` returned by a call of the form `fit(learner, data)`.
 
 $DOC_STATIC
 

@@ -1,22 +1,23 @@
 # # FIT
 
 """
-    fit(algorithm, data; verbosity=1)
-    fit(algorithm; verbosity=1)
+    fit(learner, data; verbosity=1)
+    fit(learner; verbosity=1)
 
-Execute the algorithm with configuration `algorithm` using the provided training `data`,
-returning an object, `model`, on which other methods, such as [`predict`](@ref) or
-[`transform`](@ref), can be dispatched.  [`LearnAPI.functions(algorithm)`](@ref) returns a
-list of methods that can be applied to either `algorithm` or `model`.
+Execute the machine learning or statistical algorithm with configuration `learner` using
+the provided training `data`, returning an object, `model`, on which other methods, such
+as [`predict`](@ref) or [`transform`](@ref), can be dispatched.
+[`LearnAPI.functions(learner)`](@ref) returns a list of methods that can be applied to
+either `learner` or `model`.
 
 For example, a supervised classifier might have a workflow like this:
 
 ```julia
-model = fit(algorithm, (X, y))
+model = fit(learner, (X, y))
 ŷ = predict(model, Xnew)
 ```
 
-The second signature, with `data` omitted, is provided by algorithms that do not
+The second signature, with `data` omitted, is provided by learners that do not
 generalize to new observations (called *static algorithms*). In that case,
 `transform(model, data)` or `predict(model, ..., data)` carries out the actual algorithm
 execution, writing any byproducts of that operation to the mutable object `model` returned
@@ -31,7 +32,7 @@ See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
 
 # New implementations
 
-Implementation of exactly one of the signatures is compulsory. If `fit(algorithm;
+Implementation of exactly one of the signatures is compulsory. If `fit(learner;
 verbosity=1)` is implemented, then the trait [`LearnAPI.is_static`](@ref) must be
 overloaded to return `true`.
 
@@ -45,9 +46,9 @@ these methods. A fallback returns `first(data)` if `data` is a tuple, and `data`
 otherwise.
 
 The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
-two arguments. For convenience, for example, an algorithm is free to implement a slurping
-signature, such as `fit(algorithm, X, y, extras...) = fit(algorithm, (X, y, extras...))` but
-LearnAPI.jl does not guarantee such signatures are actually implemented.
+two arguments. For convenience, for example, an implementation is free to implement a
+slurping signature, such as `fit(learner, X, y, extras...) = fit(learner, (X, y,
+extras...))` but LearnAPI.jl does not guarantee such signatures are actually implemented.
 
 $(DOC_DATA_INTERFACE(:fit))
 
@@ -65,10 +66,10 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 p2=value2, ...`.
 
 ```julia
-algorithm = MyForest(ntrees=100)
+learner = MyForest(ntrees=100)
 
 # train with 100 trees:
-model = fit(algorithm, data)
+model = fit(learner, data)
 
 # add 50 more trees:
 model = update(model, data; ntrees=150)
@@ -76,13 +77,13 @@ model = update(model, data; ntrees=150)
 
 Provided that `data` is identical with the data presented in a preceding `fit` call *and*
 there is at most one hyperparameter replacement, as in the above example, execution is
-semantically equivalent to the call `fit(algorithm, data)`, where `algorithm` is
-`LearnAPI.algorithm(model)` with the specified replacements. In some cases (typically,
+semantically equivalent to the call `fit(learner, data)`, where `learner` is
+`LearnAPI.learner(model)` with the specified replacements. In some cases (typically,
 when changing an iteration parameter) there may be a performance benefit to using `update`
 instead of retraining ab initio.
 
 If `data` differs from that in the preceding `fit` or `update` call, or there is more than
-one hyperparameter replacement, then behaviour is algorithm-specific.
+one hyperparameter replacement, then behaviour is learner-specific.
 
 See also [`fit`](@ref), [`update_observations`](@ref), [`update_features`](@ref).
 
@@ -104,19 +105,19 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
 
 ```julia-repl
-algorithm = MyNeuralNetwork(epochs=10, learning_rate=0.01)
+learner = MyNeuralNetwork(epochs=10, learning_rate=0.01)
 
 # train for ten epochs:
-model = fit(algorithm, data)
+model = fit(learner, data)
 
 # train for two more epochs using new data and new learning rate:
 model = update_observations(model, new_data; epochs=2, learning_rate=0.1)
 ```
 
-When following the call `fit(algorithm, data)`, the `update` call is semantically
+When following the call `fit(learner, data)`, the `update` call is semantically
 equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
 *provided there are no hyperparameter replacements* (which rules out the example
-above). Behaviour is otherwise algorithm-specific.
+above). Behaviour is otherwise learner-specific.
 
 See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
@@ -139,10 +140,10 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 `update` call given the new features encapsulated in `new_data`. One may additionally
 specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
 
-When following the call `fit(algorithm, data)`, the `update` call is semantically
+When following the call `fit(learner, data)`, the `update` call is semantically
 equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
 *provided there are no hyperparameter replacements.* Behaviour is otherwise
-algorithm-specific.
+learner-specific.
 
 See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 

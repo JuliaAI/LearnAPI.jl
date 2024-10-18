@@ -9,9 +9,9 @@ function name_value_pair(ex)
 end
 
 """
-    @trait(TypeEx, trait1=value1, trait2=value2, ...)
+    @trait(LearnerType, trait1=value1, trait2=value2, ...)
 
-Overload a number of traits for algorithms of type `TypeEx`. For example, the code
+Overload a number of traits for learners of type `LearnerType`. For example, the code
 
 ```julia
 @trait(
@@ -29,13 +29,13 @@ LearnAPI.doc_url(::RidgeRegressor) = "https://some.cool.documentation",
 ```
 
 """
-macro trait(algorithm_ex, exs...)
+macro trait(learner_ex, exs...)
     program = quote end
     for ex in exs
         trait_ex, value_ex = name_value_pair(ex)
         push!(
             program.args,
-            :($LearnAPI.$trait_ex(::$algorithm_ex) = $value_ex),
+            :($LearnAPI.$trait_ex(::$learner_ex) = $value_ex),
         )
     end
     return esc(program)
