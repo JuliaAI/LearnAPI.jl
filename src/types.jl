@@ -53,27 +53,35 @@ expectiles at 50% will provide `Point` instead.
 """
 abstract type IID <: KindOfProxy end
 
-struct Point <: IID end
-struct Sampleable <: IID end
-struct Distribution <: IID end
-struct LogDistribution <: IID end
-struct Probability <: IID end
-struct LogProbability <: IID end
-struct Parametric <: IID end
-struct LabelAmbiguous <: IID end
-struct LabelAmbiguousSampleable <: IID end
-struct LabelAmbiguousDistribution <: IID end
-struct LabelAmbiguousFuzzy <: IID end
-struct ConfidenceInterval <: IID end
-struct Fuzzy <: IID end
-struct ProbabilisticFuzzy <: IID end
-struct SurvivalFunction <: IID end
-struct SurvivalDistribution <: IID end
-struct HazardFunction <: IID end
-struct OutlierScore <: IID end
-struct Continuous <: IID end
-struct Quantile <: IID end
-struct Expectile <: IID end
+const IID_SYMBOLS = [
+    :Point,
+    :Sampleable,
+    :Distribution,
+    :LogDistribution,
+    :Probability,
+    :LogProbability,
+    :Parametric,
+    :LabelAmbiguous,
+    :LabelAmbiguousSampleable,
+    :LabelAmbiguousDistribution,
+    :LabelAmbiguousFuzzy,
+    :ConfidenceInterval,
+    :Fuzzy,
+    :ProbabilisticFuzzy,
+    :SurvivalFunction,
+    :SurvivalDistribution,
+    :HazardFunction,
+    :OutlierScore,
+    :Continuous,
+    :Quantile,
+    :Expectile,
+]
+
+for S in IID_SYMBOLS
+    quote
+        struct $S <: IID end
+    end |> eval
+end
 
 
 """
@@ -92,18 +100,27 @@ space ``Y^n``, where ``Y`` is the space from which the target variable takes its
 
 """
 abstract type Joint <: KindOfProxy end
-struct JointSampleable <: Joint end
-struct JointDistribution <: Joint end
-struct JointLogDistribution <: Joint end
+
+const JOINT_SYMBOLS = [
+    :JointSampleable,
+    :JointDistribution,
+    :JointLogDistribution,
+]
+
+for S in JOINT_SYMBOLS
+    quote
+        struct $S <: Joint end
+    end |> eval
+end
 
 """
     Single <: KindOfProxy
 
-Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). It applies only to algorithms for
+Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). It applies only to learners for
 which `predict` has no data argument, i.e., is of the form `predict(model,
 kind_of_proxy)`. An example is an algorithm learning a probability distribution from
 samples, and we regard the samples as drawn from the "target" variable. If in this case,
-`kind_of_proxy` is an instance of `LearnAPI.Single` then, `predict(algorithm)` returns a
+`kind_of_proxy` is an instance of `LearnAPI.Single` then, `predict(learner)` returns a
 single object representing a probability distribution.
 
 | type `T`                         | form of output of `predict(model, ::T)`                                |
@@ -114,49 +131,54 @@ single object representing a probability distribution.
 
 """
 abstract type Single <: KindOfProxy end
-struct SingleSampeable <: Single end
-struct SingleDistribution <: Single end
-struct SingleLogDistribution <: Single end
 
-const CONCRETE_TARGET_PROXY_TYPES = [
-    subtypes(IID)...,
-    subtypes(Single)...,
-    subtypes(Joint)...,
+const SINGLE_SYMBOLS = [
+    :SingleSampeable,
+    :SingleDistribution,
+    :SingleLogDistribution,
 ]
 
-const CONCRETE_TARGET_PROXY_TYPES_SYMBOLS = map(CONCRETE_TARGET_PROXY_TYPES) do T
-    Symbol(last(split(string(T), '.')))
+for S in SINGLE_SYMBOLS
+    quote
+        struct $S <: Single end
+    end |> eval
 end
 
-const CONCRETE_TARGET_PROXY_TYPES_LIST = join(
-    map(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS) do s
-        "`$s()`"
-    end,
-    ", ",
-    " and ",
-)
-
-const DOC_HOW_TO_LIST_PROXIES =
-    "The instances of [`LearnAPI.KindOfProxy`](@ref) are: "*
-    "$(LearnAPI.CONCRETE_TARGET_PROXY_TYPES_LIST). "
-
+const CONCRETE_TARGET_PROXY_SYMBOLS = [
+    IID_SYMBOLS...,
+    SINGLE_SYMBOLS...,
+    JOINT_SYMBOLS...,
+]
 
 """
 
     LearnAPI.KindOfProxy
 
 Abstract type whose concrete subtypes `T` each represent a different kind of proxy for
-some target variable, associated with some algorithm. Instances `T()` are used to request
+some target variable, associated with some learner. Instances `T()` are used to request
 the form of target predictions in [`predict`](@ref) calls.
 
 See LearnAPI.jl documentation for an explanation of "targets" and "target proxies".
 
-For example, `Distribution` is a concrete subtype of `LearnAPI.KindOfProxy` and a call
-like `predict(model, Distribution(), Xnew)` returns a data object whose observations are
-probability density/mass functions, assuming `algorithm` supports predictions of that
-form.
+For example, `Distribution` is a concrete subtype of `IID <: LearnAPI.KindOfProxy` and a
+call like `predict(model, Distribution(), Xnew)` returns a data object whose observations
+are probability density/mass functions, assuming `learner = LearnAPI.learner(model)`
+supports predictions of that form, which is true if `Distribution() in`
+[`LearnAPI.kinds_of_proxy(learner)`](@ref).
 
-$DOC_HOW_TO_LIST_PROXIES
+Proxy types are grouped under three abstract subtypes:
+
+- [`LearnAPI.IID`](@ref): The main type, for proxies consisting of uncorrelated individual
+  components, one for each input observation
+
+- [`LearnAPI.Joint`](@ref): For learners that predict a single probabilistic structure
+  encapsulating correlations between target predictions for different input observations
+
+- [`LearnAPI.Single`](@ref): For learners, such as density estimators, that are trained on
+  a target variable only (no features); `predict` consumes no data and the returned target
+  proxy is a single probabilistic structure.
+
+For lists of all concrete instances, refer to documentation for the relevant subtype.
 
 """
 KindOfProxy
@@ -180,15 +202,15 @@ All arrays implement `RandomAccess`, with the last index being the observation i
 (observations-as-columns in matrices).
 
 A Tables.jl compatible table `data` implements `RandomAccess` if `Tables.istable(data)` is
-true and if `data` implements `DataAPI.nrows`. This includes many tables, and in
+true and if `data` implements `DataAPI.nrow`. This includes many tables, and in
 particular, `DataFrame`s. Tables that are also tuples are explicitly excluded.
 
 Any tuple of objects implementing `RandomAccess` also implements `RandomAccess`.
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `RandomAccess()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `RandomAccess()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
 `RandomAccess` interface, and the same holds for `obs(model, ...)`, whenever
-`LearnAPI.algorithm(model) == algorithm`.
+`LearnAPI.learner(model) == learner`.
 
 # Implementing `RandomAccess` for new data types
 
@@ -211,10 +233,10 @@ it implements Julia's `iterate` interface, including `Base.length`, and if
 
 - `data isa MLUtils.DataLoader`, which includes output from `MLUtils.eachobs`.
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `FiniteIterable()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing the
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `FiniteIterable()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
 `FiniteIterable` interface, and the same holds for `obs(model, ...)`, whenever
-`LearnAPI.algorithm(model) == algorithm`.
+`LearnAPI.learner(model) == learner`.
 
 See also [`LearnAPI.RandomAccess`](@ref), [`LearnAPI.Iterable`](@ref).
 """
@@ -227,10 +249,10 @@ A data interface type. We say that `data` implements the `Iterable` interface if
 implements Julia's basic `iterate` interface. (Such objects may not implement
 `MLUtils.numobs` or `Base.length`.)
 
-If [`LearnAPI.data_interface(algorithm)`](@ref) takes the value `Iterable()`, then
-[`obs`](@ref)`(algorithm, ...)` is guaranteed to return objects implementing `Iterable`,
-and the same holds for `obs(model, ...)`, whenever `LearnAPI.algorithm(model) ==
-algorithm`.
+If [`LearnAPI.data_interface(learner)`](@ref) takes the value `Iterable()`, then
+[`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing `Iterable`,
+and the same holds for `obs(model, ...)`, whenever `LearnAPI.learner(model) ==
+learner`.
 
 See also [`LearnAPI.FiniteIterable`](@ref), [`LearnAPI.RandomAccess`](@ref).
 

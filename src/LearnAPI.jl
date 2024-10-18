@@ -1,7 +1,5 @@
 module LearnAPI
 
-import InteractiveUtils.subtypes
-
 include("tools.jl")
 include("types.jl")
 include("predict_transform.jl")
@@ -16,7 +14,7 @@ export @trait
 export fit, update, update_observations, update_features
 export predict, transform, inverse_transform, obs
 
-for name in Symbol.(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS)
+for name in CONCRETE_TARGET_PROXY_SYMBOLS
     @eval export $name
 end
 

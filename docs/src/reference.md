@@ -2,7 +2,7 @@
 
 Here we give the definitive specification of the LearnAPI.jl interface. For informal
 guides see [Anatomy of an Implementation](@ref) and [Common Implementation
-Patterns](@ref).
+Patterns](@ref patterns).
 
 
 ## [Important terms and concepts](@id scope)
@@ -16,7 +16,7 @@ ML/statistical algorithms are typically applied in conjunction with resampling o
 *observations*, as in
 [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)). In this
 document *data* will always refer to objects encapsulating an ordered sequence of
-individual observations. If an algorithm is trained using multiple data objects, it is
+individual observations. If a learner is trained using multiple data objects, it is
 undertood that individual objects share the same number of observations, and that
 resampling of one component implies synchronized resampling of the others.
 
@@ -29,9 +29,9 @@ see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
 !!! note
 
-	In the MLUtils.jl
-	convention, observations in tables are the rows but observations in a matrix are the
-	columns.
+    In the MLUtils.jl
+    convention, observations in tables are the rows but observations in a matrix are the
+    columns.
 
 ### [Hyperparameters](@id hyperparameters)
 
@@ -70,67 +70,69 @@ dispatch. These are also used to distinguish performance metrics provided by the
 [StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
-### [Algorithms](@id algorithms)
+### [Learners](@id learners)
 
-An object implementing the LearnAPI.jl interface is called an *algorithm*, although it is
-more accurately "the configuration of some algorithm".¹ An algorithm encapsulates a
-particular set of user-specified [hyperparameters](@ref) as the object's *properties*
-(which conceivably differ from its fields). It does not store learned parameters.
+An object implementing the LearnAPI.jl interface is called a *learner*, although it is
+more accurately "the configuration of some machine learning or statistical algorithm".¹ A
+learner encapsulates a particular set of user-specified [hyperparameters](@ref) as the
+object's *properties* (which conceivably differ from its fields). It does not store
+learned parameters.
 
 Informally, we will sometimes use the word "model" to refer to the output of
-`fit(algorithm, ...)` (see below), something which typically does store learned
+`fit(learner, ...)` (see below), something which typically does *store* learned
 parameters.
 
-For `algorithm` to be a valid LearnAPI.jl algorithm,
-[`LearnAPI.constructor(algorithm)`](@ref) must be defined and return a keyword constructor
-enabling recovery of `algorithm` from its properties:
+For `learner` to be a valid LearnAPI.jl learner,
+[`LearnAPI.constructor(learner)`](@ref) must be defined and return a keyword constructor
+enabling recovery of `learner` from its properties:
 
 ```julia
-properties = propertynames(algorithm)
-named_properties = NamedTuple{properties}(getproperty.(Ref(algorithm), properties))
-@assert algorithm == LearnAPI.constructor(algorithm)(; named_properties...)
+properties = propertynames(learner)
+named_properties = NamedTuple{properties}(getproperty.(Ref(learner), properties))
+@assert learner == LearnAPI.constructor(learner)(; named_properties...)
 ```
 
-which can be tested with `@assert `[`LearnAPI.clone(algorithm)`](@ref)` == algorithm`.
+which can be tested with `@assert `[`LearnAPI.clone(learner)`](@ref)` == learner`.
 
-Note that if if `algorithm` is an instance of a *mutable* struct, this requirement
+Note that if if `learner` is an instance of a *mutable* struct, this requirement
 generally requires overloading `Base.==` for the struct.
 
-No LearnAPI.jl method is permitted to mutate an algorithm. In particular, one should make
+No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
 deep copies of RNG hyperparameters before using them in a new implementation of
 [`fit`](@ref).
 
-#### Composite algorithms (wrappers)
+#### Composite learners (wrappers)
 
-A *composite algorithm* is one with at least one property that can take other algorithms
-as values; for such algorithms [`LearnAPI.is_composite`](@ref)`(algorithm)` must be `true`
+A *composite learner* is one with at least one property that can take other learners as
+values; for such learners [`LearnAPI.is_composite`](@ref)`(learner)` must be `true`
 (fallback is `false`). Generally, the keyword constructor provided by
 [`LearnAPI.constructor`](@ref) must provide default values for all properties that are not
-algorithm-valued. Instead, these algorithm-valued properties can have a `nothing` default,
-with the constructor throwing an error if the default value persists.
+learner-valued. Instead, these learner-valued properties can have a `nothing` default,
+with the constructor throwing an error if the the constructor call does not explicitly
+specify a new value.
 
-Any object `algorithm` for which [`LearnAPI.functions`](@ref)`(algorithm)` is non-empty is
+Any object `learner` for which [`LearnAPI.functions(learner)`](@ref) is non-empty is
 understood to have a valid implementation of the LearnAPI.jl interface.
 
 #### Example
 
-Any instance of `GradientRidgeRegressor` defined below is a valid algorithm.
+Any instance of `GradientRidgeRegressor` defined below is a valid learner.
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}
-	learning_rate::T
-	epochs::Int
-	l2_regularization::T
+    learning_rate::T
+    epochs::Int
+    l2_regularization::T
 end
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
-	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+    GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
 ## Documentation
 
-Attach public LearnAPI.jl-related documentation for an algorithm to it's *constructor*,
-rather than to the struct defining its type. In this way, an algorithm can implement
+Attach public LearnAPI.jl-related documentation for a learner to it's *constructor*,
+rather than to the struct defining its type. In this way, a learner can implement
 multiple interfaces, in addition to the LearnAPI interface, with separate document strings
 for each.
 
@@ -138,20 +140,20 @@ for each.
 
 !!! note "Compulsory methods"
 
-	All new algorithm types must implement [`fit`](@ref),
-	[`LearnAPI.algorithm`](@ref), [`LearnAPI.constructor`](@ref) and
-	[`LearnAPI.functions`](@ref).
+    All new learner types must implement [`fit`](@ref),
+    [`LearnAPI.learner`](@ref), [`LearnAPI.constructor`](@ref) and
+    [`LearnAPI.functions`](@ref).
 
-Most algorithms will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
-bare minimum implementation, see the implementation of `SmallAlgorithm`
+Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
+bare minimum implementation, see the implementation of `SmallLearner`
 [here](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/traits.jl).
 
 ### List of methods
 
-- [`fit`](@ref fit): for training or updating algorithms that generalize to new data. Or,
-  for non-generalizing algorithms (see [here](@ref static_algorithms) and [Static
-  Algorithms](@ref)), for wrapping `algorithm` in a mutable struct that can be mutated by
-  `predict`/`transform` to record byproducts of those operations.
+- [`fit`](@ref fit): for (i) training or updating learners that generalize to new data; or
+  (ii) wrapping `learner` in an object that is possibly mutated by `predict`/`transform`,
+  to record byproducts of those operations, in the special case of *non-generalizing*
+  learners (called here [static algorithms](@ref static_algorithms))
 
 - [`update`](@ref fit): for updating learning outcomes after hyperparameter changes, such
   as increasing an iteration parameter.
@@ -173,18 +175,18 @@ bare minimum implementation, see the implementation of `SmallAlgorithm`
   defined.
 
 - [`obs`](@ref data_interface): method for exposing to the user
-  algorithm-specific representations of data, which are additionally guaranteed to
+  learner-specific representations of data, which are additionally guaranteed to
   implement the observation access API specified by
-  [`LearnAPI.data_interface(algorithm)`](@ref).
+  [`LearnAPI.data_interface(learner)`](@ref).
 
 - [Accessor functions](@ref accessor_functions): these include functions like
   `LearnAPI.feature_importances` and `LearnAPI.training_losses`, for extracting, from
-  training outcomes, information common to many algorithms. This includes
+  training outcomes, information common to many learners. This includes
   [`LearnAPI.strip(model)`](@ref) for replacing a learning outcome `model` with a
   serializable version that can still `predict` or `transform`.
 
-- [Algorithm traits](@ref traits): methods that promise specific algorithm behavior or
-  record general information about the algorithm. Only [`LearnAPI.constructor`](@ref) and
+- [Learner traits](@ref traits): methods that promise specific learner behavior or
+  record general information about the learner. Only [`LearnAPI.constructor`](@ref) and
   [`LearnAPI.functions`](@ref) are universally compulsory.
 
 
@@ -197,8 +199,8 @@ LearnAPI.@trait
 
 ---
 
-¹ We acknowledge users may not like this terminology, and may know "algorithm" by some
-other name, such as "strategy", "options", "hyperparameter set", "configuration", or
-"model". Consensus on this point is difficult; see, e.g.,
+¹ We acknowledge users may not like this terminology, and may know "learner" by some other
+name, such as "strategy", "options", "hyperparameter set", "configuration", "algorithm",
+or "model". Consensus on this point is difficult; see, e.g.,
 [this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048/20)
 Julia Discourse discussion.

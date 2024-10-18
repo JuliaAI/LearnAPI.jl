@@ -21,7 +21,7 @@ end
 """
     Ridge(; lambda=0.1)
 
-Instantiate a ridge regression algorithm, with regularization of `lambda`.
+Instantiate a ridge regression learner, with regularization of `lambda`.
 
 """
 Ridge(; lambda=0.1) = Ridge(lambda) # LearnAPI.constructor defined later
@@ -33,12 +33,12 @@ struct RidgeFitObs{T,M<:AbstractMatrix{T}}
 end
 
 struct RidgeFitted{T,F}
-    algorithm::Ridge
+    learner::Ridge
     coefficients::Vector{T}
     feature_importances::F
 end
 
-LearnAPI.algorithm(model::RidgeFitted) = model.algorithm
+LearnAPI.learner(model::RidgeFitted) = model.learner
 
 Base.getindex(data::RidgeFitObs, I) =
     RidgeFitObs(data.A[:,I], data.names, data.y[I])
@@ -53,16 +53,16 @@ function LearnAPI.obs(::Ridge, data)
 end
 
 # for observations:
-function LearnAPI.fit(algorithm::Ridge, observations::RidgeFitObs; verbosity=1)
+function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
 
     # unpack hyperparameters and data:
-    lambda = algorithm.lambda
+    lambda = learner.lambda
     A = observations.A
     names = observations.names
     y = observations.y
 
-    # apply core algorithm:
-    coefficients = (A*A' + algorithm.lambda*I)\(A*y) # 1 x p matrix
+    # apply core learner:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
 
     # determine crude feature importances:
     feature_importances =
@@ -73,13 +73,13 @@ function LearnAPI.fit(algorithm::Ridge, observations::RidgeFitObs; verbosity=1)
     verbosity > 0 &&
         @info "Features in order of importance: $(first.(feature_importances))"
 
-    return RidgeFitted(algorithm, coefficients, feature_importances)
+    return RidgeFitted(learner, coefficients, feature_importances)
 
 end
 
 # for unprocessed `data = (X, y)`:
-LearnAPI.fit(algorithm::Ridge, data; kwargs...) =
-    fit(algorithm, obs(algorithm, data); kwargs...)
+LearnAPI.fit(learner::Ridge, data; kwargs...) =
+    fit(learner, obs(learner, data); kwargs...)
 
 # extracting stuff from training data:
 LearnAPI.target(::Ridge, data) = last(data)
@@ -101,7 +101,7 @@ LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
 LearnAPI.feature_importances(model::RidgeFitted) = model.feature_importances
 
 LearnAPI.strip(model::RidgeFitted) =
-    RidgeFitted(model.algorithm, model.coefficients, nothing)
+    RidgeFitted(model.learner, model.coefficients, nothing)
 
 @trait(
     Ridge,
@@ -110,7 +110,7 @@ LearnAPI.strip(model::RidgeFitted) =
     tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -121,8 +121,8 @@ LearnAPI.strip(model::RidgeFitted) =
 )
 
 # convenience method:
-LearnAPI.fit(algorithm::Ridge, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
+LearnAPI.fit(learner::Ridge, X, y; kwargs...) =
+    fit(learner, (X, y); kwargs...)
 
 
 # ## Tests
@@ -138,17 +138,17 @@ y = 2a - b + 3c + 0.05*rand(n)
 data = (X, y)
 
 @testset "test an implementation of ridge regression" begin
-    algorithm = Ridge(lambda=0.5)
-    @test :(LearnAPI.obs) in LearnAPI.functions(algorithm)
+    learner = Ridge(lambda=0.5)
+    @test :(LearnAPI.obs) in LearnAPI.functions(learner)
 
-    @test LearnAPI.target(algorithm, data) == y
-    @test LearnAPI.features(algorithm, data) == X
+    @test LearnAPI.target(learner, data) == y
+    @test LearnAPI.features(learner, data) == X
 
     # verbose fitting:
     @test_logs(
         (:info, r"Feature"),
         fit(
-            algorithm,
+            learner,
             Tables.subset(X, train),
             y[train];
             verbosity=1,
@@ -158,7 +158,7 @@ data = (X, y)
     # quiet fitting:
     model = @test_logs(
         fit(
-            algorithm,
+            learner,
             Tables.subset(X, train),
             y[train];
             verbosity=0,
@@ -169,12 +169,12 @@ data = (X, y)
     @test ŷ isa Vector{Float64}
     @test predict(model, Tables.subset(X, test)) == ŷ
 
-    fitobs = LearnAPI.obs(algorithm, data)
+    fitobs = LearnAPI.obs(learner, data)
     predictobs = LearnAPI.obs(model, X)
-    model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
-    @test LearnAPI.target(algorithm, fitobs) == y
+    model = fit(learner, MLUtils.getobs(fitobs, train); verbosity=0)
+    @test LearnAPI.target(learner, fitobs) == y
     @test predict(model, Point(), MLUtils.getobs(predictobs, test)) ≈ ŷ
-    @test predict(model, LearnAPI.features(algorithm, fitobs)) ≈ predict(model, X)
+    @test predict(model, LearnAPI.features(learner, fitobs)) ≈ predict(model, X)
 
     @test LearnAPI.feature_importances(model) isa Vector{<:Pair{Symbol}}
 
@@ -184,7 +184,7 @@ data = (X, y)
     serialize(filename, small_model)
 
     recovered_model = deserialize(filename)
-    @test LearnAPI.algorithm(recovered_model) == algorithm
+    @test LearnAPI.learner(recovered_model) == learner
     @test predict(
         recovered_model,
         Point(),
@@ -206,45 +206,45 @@ end
 """
     BabyRidge(; lambda=0.1)
 
-Instantiate a ridge regression algorithm, with regularization of `lambda`.
+Instantiate a ridge regression learner, with regularization of `lambda`.
 
 """
 BabyRidge(; lambda=0.1) = BabyRidge(lambda) # LearnAPI.constructor defined later
 
 struct BabyRidgeFitted{T,F}
-    algorithm::BabyRidge
+    learner::BabyRidge
     coefficients::Vector{T}
     feature_importances::F
 end
 
-function LearnAPI.fit(algorithm::BabyRidge, data; verbosity=1)
+function LearnAPI.fit(learner::BabyRidge, data; verbosity=1)
 
     X, y = data
 
-    lambda = algorithm.lambda
+    lambda = learner.lambda
     table = Tables.columntable(X)
     names = Tables.columnnames(table) |> collect
     A = Tables.matrix(table)'
 
-    # apply core algorithm:
-    coefficients = (A*A' + algorithm.lambda*I)\(A*y) # vector
+    # apply core learner:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # vector
 
     feature_importances = nothing
 
-    return BabyRidgeFitted(algorithm, coefficients, feature_importances)
+    return BabyRidgeFitted(learner, coefficients, feature_importances)
 
 end
 
 # extracting stuff from training data:
 LearnAPI.target(::BabyRidge, data) = last(data)
 
-LearnAPI.algorithm(model::BabyRidgeFitted) = model.algorithm
+LearnAPI.learner(model::BabyRidgeFitted) = model.learner
 
 LearnAPI.predict(model::BabyRidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 
 LearnAPI.strip(model::BabyRidgeFitted) =
-    BabyRidgeFitted(model.algorithm, model.coefficients, nothing)
+    BabyRidgeFitted(model.learner, model.coefficients, nothing)
 
 @trait(
     BabyRidge,
@@ -253,7 +253,7 @@ LearnAPI.strip(model::BabyRidgeFitted) =
     tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -264,27 +264,27 @@ LearnAPI.strip(model::BabyRidgeFitted) =
 )
 
 # convenience method:
-LearnAPI.fit(algorithm::BabyRidge, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
+LearnAPI.fit(learner::BabyRidge, X, y; kwargs...) =
+    fit(learner, (X, y); kwargs...)
 
 
 # ## Tests
 
 @testset "test a variation  which does not overload LearnAPI.obs" begin
-    algorithm = BabyRidge(lambda=0.5)
+    learner = BabyRidge(lambda=0.5)
 
-    model = fit(algorithm, Tables.subset(X, train), y[train]; verbosity=0)
+    model = fit(learner, Tables.subset(X, train), y[train]; verbosity=0)
     ŷ = predict(model, Point(), Tables.subset(X, test))
     @test ŷ isa Vector{Float64}
 
-    fitobs = obs(algorithm, data)
+    fitobs = obs(learner, data)
     predictobs = LearnAPI.obs(model, X)
-    model = fit(algorithm, MLUtils.getobs(fitobs, train); verbosity=0)
+    model = fit(learner, MLUtils.getobs(fitobs, train); verbosity=0)
     @test predict(model, Point(), MLUtils.getobs(predictobs, test)) == ŷ ==
         predict(model, MLUtils.getobs(predictobs, test))
-    @test LearnAPI.target(algorithm, data) == y
+    @test LearnAPI.target(learner, data) == y
     @test LearnAPI.predict(model, X) ≈
-        LearnAPI.predict(model, LearnAPI.features(algorithm, data))
+        LearnAPI.predict(model, LearnAPI.features(learner, data))
 end
 
 true

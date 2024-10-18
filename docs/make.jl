@@ -21,7 +21,7 @@ makedocs(
             "target/weights/features" => "target_weights_features.md",
             "obs" => "obs.md",
             "Accessor Functions" => "accessor_functions.md",
-            "Algorithm Traits" => "traits.md",
+            "Learner Traits" => "traits.md",
         ],
         "Common Implementation Patterns" => "common_implementation_patterns.md",
         "Testing an Implementation" => "testing_an_implementation.md",

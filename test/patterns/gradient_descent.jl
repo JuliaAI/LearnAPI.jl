@@ -22,12 +22,12 @@ import ComponentArrays
 # - `iteration_parameter`
 # - `training_losses`
 # - `obs` for pre-processing (non-tabular) classification training data
-# - `predict(algorithm, ::Distribution, Xnew)`
+# - `predict(learner, ::Distribution, Xnew)`
 
 # For simplicity, we use single-observation batches for gradient descent updates, and we
-# may dodge some standard optimizations.
+# may dodge some optimizations.
 
-# This is also an example of a probability-predicting classifier.
+# This is an example of a probability-predicting classifier.
 
 
 # ## Helpers
@@ -38,7 +38,7 @@ import ComponentArrays
 Return Brier (quadratic) loss.
 
 - `probs`: predicted probability vector
-- `hot`: corresponding ground truth observation, as a one-hot encoded bit vector
+- `hot`: corresponding ground truth observation, as a one-hot encoded `BitVector`
 
 """
 function brier_loss(probs, hot)
@@ -54,8 +54,8 @@ for the specified number of `epochs`.
 
 - `perceptron`: component array with components `weights` and `bias`
 - `optimiser`: optimiser from Optimiser.jl
-- `X`: feature matrix, of size (p, n)
-- `y_hot`: one-hot encoded target, of size (nclasses, n)
+- `X`: feature matrix, of size `(p, n)`
+- `y_hot`: one-hot encoded target, of size `(nclasses, n)`
 - `epochs`: number of epochs
 - `state`: optimiser state
 
@@ -83,7 +83,7 @@ end
 
 # ## Implementation
 
-# ### Algorithm
+# ### Learner
 
 # no docstring here - that goes with the constructor;
 # SOME FIELDS LEFT ABSTRACT FOR SIMPLICITY
@@ -98,7 +98,7 @@ end
 
 Instantiate a perceptron classifier.
 
-Train an instance, `algorithm`, by doing `model = fit(algorithm, X, y)`, where
+Train an instance, `learner`, by doing `model = fit(learner, X, y)`, where
 
 -  `X is a `Float32` matrix, with observations-as-columns
 -  `y` (target) is some one-dimensional `CategoricalArray`.
@@ -112,7 +112,7 @@ point predictions with `predict(model, Point(), Xnew)`.
 
 Return an updated model, with the weights and bias of the previously learned perceptron
 used as the starting state in new gradient descent updates. Adopt any specified
-hyperparameter `replacements` (properties of `LearnAPI.algorithm(model)`).
+hyperparameter `replacements` (properties of `LearnAPI.learner(model)`).
 
     update(model, newdata; epochs=n, replacements...)
 
@@ -120,8 +120,8 @@ If `Δepochs = n - perceptron.epochs` is non-negative, then return an updated mo
 the weights and bias of the previously learned perceptron used as the starting state in
 new gradient descent updates for `Δepochs` epochs, and using the provided `newdata`
 instead of the previous training data. Any other hyperparaameter `replacements` are also
-adopted. If `Δepochs` is negative or not specified, instead return `fit(algorithm,
-newdata)`, where `algorithm=LearnAPI.clone(algorithm; epochs=n, replacements....)`.
+adopted. If `Δepochs` is negative or not specified, instead return `fit(learner,
+newdata)`, where `learner=LearnAPI.clone(learner; epochs=n, replacements....)`.
 
 """
 PerceptronClassifier(; epochs=50, optimiser=Optimisers.Adam(), rng=Random.default_rng()) =
@@ -131,9 +131,9 @@ PerceptronClassifier(; epochs=50, optimiser=Optimisers.Adam(), rng=Random.defaul
 # ### Data interface
 
 # For raw training data:
-LearnAPI.target(algorithm::PerceptronClassifier, data::Tuple) = last(data)
+LearnAPI.target(learner::PerceptronClassifier, data::Tuple) = last(data)
 
-# For wrapping pre-processed training data (output of `obs(algorithm, data)`):
+# For wrapping pre-processed training data (output of `obs(learner, data)`):
 struct PerceptronClassifierObs
     X::Matrix{Float32}
     y_hot::BitMatrix  # one-hot encoded target
@@ -141,7 +141,7 @@ struct PerceptronClassifierObs
 end
 
 # For pre-processing the training data:
-function LearnAPI.obs(algorithm::PerceptronClassifier, data::Tuple)
+function LearnAPI.obs(learner::PerceptronClassifier, data::Tuple)
     X, y = data
     classes = CategoricalDistributions.classes(y)
     y_hot = classes .== permutedims(y) # one-hot encoding
@@ -157,12 +157,12 @@ Base.getindex(observations, I) = PerceptronClassifierObs(
 )
 
 LearnAPI.target(
-    algorithm::PerceptronClassifier,
+    learner::PerceptronClassifier,
     observations::PerceptronClassifierObs,
 ) = observations.y
 
 LearnAPI.features(
-    algorithm::PerceptronClassifier,
+    learner::PerceptronClassifier,
     observations::PerceptronClassifierObs,
 ) = observations.X
 
@@ -174,26 +174,26 @@ LearnAPI.features(
 
 # For wrapping outcomes of learning:
 struct PerceptronClassifierFitted
-    algorithm::PerceptronClassifier
+    learner::PerceptronClassifier
     perceptron  # component array storing weights and bias
     state       # optimiser state
     classes     # target classes
     losses
 end
 
-LearnAPI.algorithm(model::PerceptronClassifierFitted) = model.algorithm
+LearnAPI.learner(model::PerceptronClassifierFitted) = model.learner
 
-# `fit` for pre-processed data (output of `obs(algorithm, data)`):
+# `fit` for pre-processed data (output of `obs(learner, data)`):
 function LearnAPI.fit(
-    algorithm::PerceptronClassifier,
+    learner::PerceptronClassifier,
     observations::PerceptronClassifierObs;
     verbosity=1,
     )
 
     # unpack hyperparameters:
-    epochs = algorithm.epochs
-    optimiser = algorithm.optimiser
-    rng = deepcopy(algorithm.rng) # to prevent mutation of `algorithm`!
+    epochs = learner.epochs
+    optimiser = learner.optimiser
+    rng = deepcopy(learner.rng) # to prevent mutation of `learner`!
 
     # unpack data:
     X = observations.X
@@ -211,12 +211,12 @@ function LearnAPI.fit(
 
     perceptron, state, losses = corefit(perceptron, X, y_hot, epochs, state, verbosity)
 
-    return PerceptronClassifierFitted(algorithm, perceptron, state, classes, losses)
+    return PerceptronClassifierFitted(learner, perceptron, state, classes, losses)
 end
 
 # `fit` for unprocessed data:
-LearnAPI.fit(algorithm::PerceptronClassifier, data; kwargs...) =
-    fit(algorithm, obs(algorithm, data); kwargs...)
+LearnAPI.fit(learner::PerceptronClassifier, data; kwargs...) =
+    fit(learner, obs(learner, data); kwargs...)
 
 # see the `PerceptronClassifier` docstring for `update_observations` logic.
 function LearnAPI.update_observations(
@@ -234,21 +234,21 @@ function LearnAPI.update_observations(
 
     classes == model.classes || error("New training target has incompatible classes.")
 
-    algorithm_old = LearnAPI.algorithm(model)
-    algorithm = LearnAPI.clone(algorithm_old; replacements...)
+    learner_old = LearnAPI.learner(model)
+    learner = LearnAPI.clone(learner_old; replacements...)
 
     perceptron = model.perceptron
     state = model.state
     losses = model.losses
-    epochs = algorithm.epochs
+    epochs = learner.epochs
 
     perceptron, state, losses_new = corefit(perceptron, X, y_hot, epochs, state, verbosity)
     losses = vcat(losses, losses_new)
 
-    return PerceptronClassifierFitted(algorithm, perceptron, state, classes, losses)
+    return PerceptronClassifierFitted(learner, perceptron, state, classes, losses)
 end
 LearnAPI.update_observations(model::PerceptronClassifierFitted, data; kwargs...) =
-    update_observations(model, obs(LearnAPI.algorithm(model), data); kwargs...)
+    update_observations(model, obs(LearnAPI.learner(model), data); kwargs...)
 
 # see the `PerceptronClassifier` docstring for `update` logic.
 function LearnAPI.update(
@@ -266,25 +266,25 @@ function LearnAPI.update(
 
     classes == model.classes || error("New training target has incompatible classes.")
 
-    algorithm_old = LearnAPI.algorithm(model)
-    algorithm = LearnAPI.clone(algorithm_old; replacements...)
-    :epochs in keys(replacements) || return fit(algorithm, observations)
+    learner_old = LearnAPI.learner(model)
+    learner = LearnAPI.clone(learner_old; replacements...)
+    :epochs in keys(replacements) || return fit(learner, observations)
 
     perceptron = model.perceptron
     state = model.state
     losses = model.losses
 
-    epochs = algorithm.epochs
-    Δepochs = epochs - algorithm_old.epochs
-    epochs < 0 && return fit(model, algorithm)
+    epochs = learner.epochs
+    Δepochs = epochs - learner_old.epochs
+    epochs < 0 && return fit(model, learner)
 
     perceptron, state, losses_new = corefit(perceptron, X, y_hot, Δepochs, state, verbosity)
     losses = vcat(losses, losses_new)
 
-    return PerceptronClassifierFitted(algorithm, perceptron, state, classes, losses)
+    return PerceptronClassifierFitted(learner, perceptron, state, classes, losses)
 end
 LearnAPI.update(model::PerceptronClassifierFitted, data; kwargs...) =
-    update(model, obs(LearnAPI.algorithm(model), data); kwargs...)
+    update(model, obs(LearnAPI.learner(model), data); kwargs...)
 
 
 # ### Predict
@@ -315,7 +315,7 @@ LearnAPI.training_losses(model::PerceptronClassifierFitted) = model.losses
     tags = ("classification", "iterative algorithms", "incremental algorithms"),
     functions = (
         :(LearnAPI.fit),
-        :(LearnAPI.algorithm),
+        :(LearnAPI.learner),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -330,12 +330,12 @@ LearnAPI.training_losses(model::PerceptronClassifierFitted) = model.losses
 
 # ### Convenience methods
 
-LearnAPI.fit(algorithm::PerceptronClassifier, X, y; kwargs...) =
-    fit(algorithm, (X, y); kwargs...)
-LearnAPI.update_observations(algorithm::PerceptronClassifier, X, y; kwargs...) =
-    update_observations(algorithm, (X, y); kwargs...)
-LearnAPI.update(algorithm::PerceptronClassifier, X, y; kwargs...) =
-    update(algorithm, (X, y); kwargs...)
+LearnAPI.fit(learner::PerceptronClassifier, X, y; kwargs...) =
+    fit(learner, (X, y); kwargs...)
+LearnAPI.update_observations(learner::PerceptronClassifier, X, y; kwargs...) =
+    update_observations(learner, (X, y); kwargs...)
+LearnAPI.update(learner::PerceptronClassifier, X, y; kwargs...) =
+    update(learner, (X, y); kwargs...)
 
 
 # ## Tests
@@ -364,13 +364,13 @@ ytest = y[test];
 
 @testset "PerceptronClassfier" begin
     rng = StableRNG(123)
-    algorithm = PerceptronClassifier(; optimiser=Optimisers.Adam(0.01), epochs=40, rng)
-    @test LearnAPI.clone(algorithm) == algorithm
-    @test :(LearnAPI.update) in LearnAPI.functions(algorithm)
-    @test LearnAPI.target(algorithm, (X, y)) == y
-    @test LearnAPI.features(algorithm, (X, y)) == X
+    learner = PerceptronClassifier(; optimiser=Optimisers.Adam(0.01), epochs=40, rng)
+    @test LearnAPI.clone(learner) == learner
+    @test :(LearnAPI.update) in LearnAPI.functions(learner)
+    @test LearnAPI.target(learner, (X, y)) == y
+    @test LearnAPI.features(learner, (X, y)) == X
 
-    model40 = fit(algorithm, Xtrain, ytrain; verbosity=0)
+    model40 = fit(learner, Xtrain, ytrain; verbosity=0)
 
     # 40 epochs is sufficient for 90% accuracy in this case:
     @test sum(predict(model40, Point(), Xtest) .== ytest)/length(ytest) > 0.9
@@ -385,7 +385,7 @@ ytest = y[test];
     @test !(ŷ70 ≈ ŷ40)
 
     # compare with cold restart:
-    model = fit(LearnAPI.clone(algorithm; epochs=70), Xtrain, y[train]; verbosity=0);
+    model = fit(LearnAPI.clone(learner; epochs=70), Xtrain, y[train]; verbosity=0);
     @test ŷ70 ≈ predict(model, Xtest)
 
     # instead add 30 epochs using `update_observations` instead:

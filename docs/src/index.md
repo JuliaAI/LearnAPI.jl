@@ -11,13 +11,13 @@ A base Julia interface for machine learning and statistics </span>
 
 LearnAPI.jl is a lightweight, functional-style interface, providing a collection of
 [methods](@ref Methods), such as `fit` and `predict`, to be implemented by algorithms from
-machine learning and statistics. Its careful design ensures algorithms implementing
-LearnAPI.jl can buy into functionality, such as external performance estimates,
-hyperparameter optimization and model composition, provided by ML/statistics toolboxes and
-other packages. LearnAPI.jl includes a number of Julia [traits](@ref traits) for promising
-specific behavior.
+machine learning and statistics, some examples of which are listed [here](@ref
+patterns). A careful design ensures algorithms implementing LearnAPI.jl can buy into
+functionality, such as external performance estimates, hyperparameter optimization and
+model composition, provided by ML/statistics toolboxes and other packages. LearnAPI.jl
+includes a number of Julia [traits](@ref traits) for promising specific behavior.
 
-LearnAPI.jl's only dependency is the standard library `InteractiveUtils`. 
+LearnAPI.jl's has no package dependencies.
 
 ```@raw html
 &#128679;
@@ -63,9 +63,9 @@ LearnAPI.feature_importances(model)
 small_model = LearnAPI.strip(model)
 serialize("my_random_forest.jls", small_model)
 
-# Recover saved model and algorithm configuration:
+# Recover saved model and algorithm configuration ("learner"):
 recovered_model = deserialize("my_random_forest.jls")
-@assert LearnAPI.algorithm(recovered_model) == forest
+@assert LearnAPI.learner(recovered_model) == forest
 @assert predict(recovered_model, Point(), Xnew) == ŷ
 ```
 
@@ -73,7 +73,7 @@ recovered_model = deserialize("my_random_forest.jls")
 dispatch based on the [kind of target proxy](@ref proxy), a key LearnAPI.jl concept.
 LearnAPI.jl places more emphasis on the notion of target variables and target proxies than
 on the usual supervised/unsupervised learning dichotomy. From this point of view, a
-supervised algorithm is simply one in which a target variable exists, and happens to
+supervised learner is simply one in which a target variable exists, and happens to
 appear as an input to training but not to prediction.
 
 ## Data interfaces
@@ -99,7 +99,7 @@ loaders reading images from disk).
 
 - [Reference](@ref reference): official specification
 
-- [Common Implementation Patterns](@ref): implementation suggestions for common,
+- [Common Implementation Patterns](@ref patterns): implementation suggestions for common,
   informally defined, algorithm types
 
 - [Testing an Implementation](@ref)
