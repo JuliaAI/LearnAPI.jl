@@ -45,7 +45,7 @@ DOC_DATA_INTERFACE(method) =
     case then an implementation must either: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     [`LearnAPI.RandomAccess`](@ref); or (ii) overload the trait
-    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API. Refer to
+    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API. Refer tbo
     document strings for details.
 
     """
@@ -91,8 +91,10 @@ If there is no notion of a "target" variable in the LearnAPI.jl sense, or you ne
 operation with an inverse, implement [`transform`](@ref) instead.
 
 Implementation is optional. Only the first signature (with or without the `data` argument)
-is implemented, but each `kind_of_proxy` that gets an implementation must be added to the
-list returned by [`LearnAPI.kinds_of_proxy`](@ref).
+is implemented, but each `kind_of_proxy::`[`KindOfProxy`](@ref) that gets an
+implementation must be added to the list returned by
+[`LearnAPI.kinds_of_proxy(learner)`](@ref). List all available kinds of proxy by doing
+`LearnAPI.kinds_of_proxy()`.
 
 If `data` is not present in the implemented signature (eg., for density estimators) then
 [`LearnAPI.features(learner, data)`](@ref) must return `nothing`.

@@ -135,9 +135,8 @@ See also [`LearnAPI.predict`](@ref), [`LearnAPI.KindOfProxy`](@ref).
 
 Must be overloaded whenever `predict` is implemented.
 
-Elements of the returned tuple must be instances of types in the return value of
-`LearnAPI.kinds_of_proxy()`, i.e., one of the following, described further in LearnAPI.jl
-documentation: $CONCRETE_TARGET_PROXY_TYPES_LIST.
+Elements of the returned tuple must be instances of [`LearnAPI.KindOfProxy`](@ref). List
+all possibilities by running `LearnAPI.kinds_of_proxy()`.
 
 Suppose, for example, we have the following implementation of a supervised learner
 returning only probabilistic predictions:
@@ -158,7 +157,12 @@ For more on target variables and target proxies, refer to the LearnAPI documenta
 
 """
 kinds_of_proxy(::Any) = ()
-kinds_of_proxy() = CONCRETE_TARGET_PROXY_TYPES
+kinds_of_proxy() = map(CONCRETE_TARGET_PROXY_SYMBOLS) do ex
+    quote
+        $ex()
+    end |> eval
+end
+
 
 
 tags() = [

@@ -53,27 +53,35 @@ expectiles at 50% will provide `Point` instead.
 """
 abstract type IID <: KindOfProxy end
 
-struct Point <: IID end
-struct Sampleable <: IID end
-struct Distribution <: IID end
-struct LogDistribution <: IID end
-struct Probability <: IID end
-struct LogProbability <: IID end
-struct Parametric <: IID end
-struct LabelAmbiguous <: IID end
-struct LabelAmbiguousSampleable <: IID end
-struct LabelAmbiguousDistribution <: IID end
-struct LabelAmbiguousFuzzy <: IID end
-struct ConfidenceInterval <: IID end
-struct Fuzzy <: IID end
-struct ProbabilisticFuzzy <: IID end
-struct SurvivalFunction <: IID end
-struct SurvivalDistribution <: IID end
-struct HazardFunction <: IID end
-struct OutlierScore <: IID end
-struct Continuous <: IID end
-struct Quantile <: IID end
-struct Expectile <: IID end
+const IID_SYMBOLS = [
+    :Point,
+    :Sampleable,
+    :Distribution,
+    :LogDistribution,
+    :Probability,
+    :LogProbability,
+    :Parametric,
+    :LabelAmbiguous,
+    :LabelAmbiguousSampleable,
+    :LabelAmbiguousDistribution,
+    :LabelAmbiguousFuzzy,
+    :ConfidenceInterval,
+    :Fuzzy,
+    :ProbabilisticFuzzy,
+    :SurvivalFunction,
+    :SurvivalDistribution,
+    :HazardFunction,
+    :OutlierScore,
+    :Continuous,
+    :Quantile,
+    :Expectile,
+]
+
+for S in IID_SYMBOLS
+    quote
+        struct $S <: IID end
+    end |> eval
+end
 
 
 """
@@ -92,9 +100,18 @@ space ``Y^n``, where ``Y`` is the space from which the target variable takes its
 
 """
 abstract type Joint <: KindOfProxy end
-struct JointSampleable <: Joint end
-struct JointDistribution <: Joint end
-struct JointLogDistribution <: Joint end
+
+const JOINT_SYMBOLS = [
+    :JointSampleable,
+    :JointDistribution,
+    :JointLogDistribution,
+]
+
+for S in JOINT_SYMBOLS
+    quote
+        struct $S <: Joint end
+    end |> eval
+end
 
 """
     Single <: KindOfProxy
@@ -114,32 +131,24 @@ single object representing a probability distribution.
 
 """
 abstract type Single <: KindOfProxy end
-struct SingleSampeable <: Single end
-struct SingleDistribution <: Single end
-struct SingleLogDistribution <: Single end
 
-const CONCRETE_TARGET_PROXY_TYPES = [
-    subtypes(IID)...,
-    subtypes(Single)...,
-    subtypes(Joint)...,
+const SINGLE_SYMBOLS = [
+    :SingleSampeable,
+    :SingleDistribution,
+    :SingleLogDistribution,
 ]
 
-const CONCRETE_TARGET_PROXY_TYPES_SYMBOLS = map(CONCRETE_TARGET_PROXY_TYPES) do T
-    Symbol(last(split(string(T), '.')))
+for S in SINGLE_SYMBOLS
+    quote
+        struct $S <: Single end
+    end |> eval
 end
 
-const CONCRETE_TARGET_PROXY_TYPES_LIST = join(
-    map(CONCRETE_TARGET_PROXY_TYPES_SYMBOLS) do s
-        "`$s()`"
-    end,
-    ", ",
-    " and ",
-)
-
-const DOC_HOW_TO_LIST_PROXIES =
-    "The instances of [`LearnAPI.KindOfProxy`](@ref) are: "*
-    "$(LearnAPI.CONCRETE_TARGET_PROXY_TYPES_LIST). "
-
+const CONCRETE_TARGET_PROXY_SYMBOLS = [
+    IID_SYMBOLS...,
+    SINGLE_SYMBOLS...,
+    JOINT_SYMBOLS...,
+]
 
 """
 
@@ -151,12 +160,25 @@ the form of target predictions in [`predict`](@ref) calls.
 
 See LearnAPI.jl documentation for an explanation of "targets" and "target proxies".
 
-For example, `Distribution` is a concrete subtype of `LearnAPI.KindOfProxy` and a call
-like `predict(model, Distribution(), Xnew)` returns a data object whose observations are
-probability density/mass functions, assuming `learner` supports predictions of that
-form.
+For example, `Distribution` is a concrete subtype of `IID <: LearnAPI.KindOfProxy` and a
+call like `predict(model, Distribution(), Xnew)` returns a data object whose observations
+are probability density/mass functions, assuming `learner = LearnAPI.learner(model)`
+supports predictions of that form, which is true if `Distribution() in`
+[`LearnAPI.kinds_of_proxy(learner)`](@ref).
 
-$DOC_HOW_TO_LIST_PROXIES
+Proxy types are grouped under three abstract subtypes:
+
+- [`LearnAPI.IID`](@ref): The main type, for proxies consisting of uncorrelated individual
+  components, one for each input observation
+
+- [`LearnAPI.Joint`](@ref): For learners that predict a single probabilistic structure
+  encapsulating correlations between target predictions for different input observations
+
+- [`LearnAPI.Single`](@ref): For learners, such as density estimators, that are trained on
+  a target variable only (no features); `predict` consumes no data and the returned target
+  proxy is a single probabilistic structure.
+
+For lists of all concrete instances, refer to documentation for the relevant subtype.
 
 """
 KindOfProxy

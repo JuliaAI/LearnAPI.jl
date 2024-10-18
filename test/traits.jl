@@ -23,7 +23,7 @@ LearnAPI.learner(model::SmallLearner) = model
 # ZERO ARGUMENT METHODS
 
 @test :(LearnAPI.fit) in LearnAPI.functions()
-@test Point in LearnAPI.kinds_of_proxy()
+@test Point() in LearnAPI.kinds_of_proxy()
 @test "regression" in LearnAPI.tags()
 
 # OVERLOADABLE TRAITS
