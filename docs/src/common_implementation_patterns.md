@@ -1,4 +1,4 @@
-# Common Implementation Patterns
+# [Common Implementation Patterns](@id patterns)
 
 !!! important
 

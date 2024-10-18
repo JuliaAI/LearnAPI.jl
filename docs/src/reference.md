@@ -2,7 +2,7 @@
 
 Here we give the definitive specification of the LearnAPI.jl interface. For informal
 guides see [Anatomy of an Implementation](@ref) and [Common Implementation
-Patterns](@ref).
+Patterns](@ref patterns).
 
 
 ## [Important terms and concepts](@id scope)
