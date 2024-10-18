@@ -48,9 +48,11 @@ small = SmallLearner()
 
 # DERIVED TRAITS
 
+@trait SmallLearner kinds_of_proxy=(Point(),)
 @test LearnAPI.is_learner(small)
 @test !LearnAPI.target(small)
 @test !LearnAPI.weights(small)
+@test LearnAPI.preferred_kind_of_proxy(small) == Point()
 
 module FruitSalad
 import LearnAPI
