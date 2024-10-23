@@ -16,13 +16,13 @@ New contributions welcome. See the [road map](ROADMAP.md).
 Configure a machine learning algorithm:
 
 ```julia
-julia> learner = Ridge(lambda=0.1)
+julia> ridge = Ridge(lambda=0.1)
 ```
 
 Inspect available functionality:
 
 ```
-julia> LearnAPI.functions(learner)
+julia> LearnAPI.functions(ridge)
 (:(LearnAPI.fit), :(LearnAPI.learner), :(LearnAPI.strip), :(LearnAPI.obs), 
 :(LearnAPI.features), :(LearnAPI.target), :(LearnAPI.predict), :(LearnAPI.coefficients))
 ```
@@ -30,7 +30,7 @@ julia> LearnAPI.functions(learner)
 Train:
 
 ```julia
-julia> model = fit(learner, data)
+julia> model = fit(ridge, data)
 ```
 
 Predict:
