@@ -5,9 +5,17 @@ Return, for each form of `data` supported in a call of the form [`fit(learner,
 data)`](@ref), the target variable part of `data`. If `nothing` is returned, the
 `learner` does not see a target variable in training (is unsupervised).
 
-Refer to LearnAPI.jl documentation for the precise meaning of "target".
+# Extended help
 
-# New implementations
+## What is a target variable?
+
+Examples of target variables are house prices in realestate pricing estimates, the
+"spam"/"not spam" labels in an email spam filtering task, "outlier"/"inlier" labels in
+outlier detection, cluster labels in clustering problems, and censored survival times in
+survival analysis. For more on targets and target proxies, see the "Reference" section of
+the LearnAPI.jl documentation.
+
+## New implementations
 
 A fallback returns `nothing`. Must be implemented if `fit` consumes data including a
 target variable.
