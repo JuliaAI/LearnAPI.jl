@@ -16,9 +16,10 @@ const DOC_STATIC =
 
 """
     LearnAPI.learner(model)
-    LearnAPI.learner(LearnAPI.stripd_model)
+    LearnAPI.learner(stripped_model)
 
-Recover the learner used to train `model` or the output of [`LearnAPI.strip(model)`](@ref).
+Recover the learner used to train `model` or the output, `stripped_model`, of
+[`LearnAPI.strip(model)`](@ref).
 
 In other words, if `model = fit(learner, data...)`, for some `learner` and `data`,
 then
