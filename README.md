@@ -13,24 +13,24 @@ New contributions welcome. See the [road map](ROADMAP.md).
 
 ## Code snippet
 
-Configure a learning algorithm:
+Configure a machine learning algorithm:
 
 ```julia
-julia> algorithm = Ridge(lambda=0.1)
+julia> learner = Ridge(lambda=0.1)
 ```
 
 Inspect available functionality:
 
 ```
-julia> LearnAPI.functions(algorithm)
-(:(LearnAPI.fit), :(LearnAPI.algorithm), :(LearnAPI.strip), :(LearnAPI.obs), 
+julia> LearnAPI.functions(learner)
+(:(LearnAPI.fit), :(LearnAPI.learner), :(LearnAPI.strip), :(LearnAPI.obs), 
 :(LearnAPI.features), :(LearnAPI.target), :(LearnAPI.predict), :(LearnAPI.coefficients))
 ```
 
 Train:
 
 ```julia
-julia> model = fit(algorithm, data)
+julia> model = fit(learner, data)
 ```
 
 Predict:
