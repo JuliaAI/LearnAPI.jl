@@ -32,7 +32,8 @@ is `true`.
 # New implementations
 
 Implementation is compulsory for new learner types. The behaviour described above is the
-only contract. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.learner)"))
+only contract. You must include `:(LearnAPI.learner)` in the return value of
+[`LearnAPI.functions(learner)`](@ref).
 
 """
 function learner end
