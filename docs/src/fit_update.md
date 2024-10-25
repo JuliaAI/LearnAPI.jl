@@ -45,7 +45,7 @@ See also [Classification](@ref) and [Regression](@ref).
 
 ### Transformers
 
-A dimension-reducing transformer, `learner`  might be used in this way:
+A dimension-reducing transformer, `learner`,  might be used in this way:
 
 ```julia
 model = fit(learner, X)
