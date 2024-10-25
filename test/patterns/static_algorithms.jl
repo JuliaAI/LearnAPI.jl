@@ -1,5 +1,4 @@
 using LearnAPI
-using LinearAlgebra
 using Tables
 import MLUtils
 import DataFrames
@@ -71,7 +70,22 @@ end
 struct FancySelector
     names::Vector{Symbol}
 end
-FancySelector(; names=Symbol[]) =  FancySelector(names) # LearnAPI.constructor defined later
+
+"""
+    FancySelector(; names=Symbol[])
+
+Instantiate a feature selector that exposes the names of rejected features.
+
+```julia
+learner = FancySelector(names=[:x, :w])
+X = DataFrames.DataFrame(rand(3, 4), [:x, :y, :z, :w])
+model = fit(learner) # no data arguments!
+transform(model, X)  # mutates `model`
+@assert rejected(model) == [:y, :z]
+```
+
+"""
+FancySelector(; names=Symbol[]) =  FancySelector(names)
 
 mutable struct FancySelectorFitted
     learner::FancySelector

@@ -115,6 +115,7 @@ functions() = (
     :(LearnAPI.transform),
     :(LearnAPI.inverse_transform),
 )
+functions(::Any) = ()
 
 """
     LearnAPI.kinds_of_proxy(learner)
