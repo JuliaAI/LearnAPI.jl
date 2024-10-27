@@ -4,6 +4,8 @@ test_files = [
     "tools.jl",
     "traits.jl",
     "clone.jl",
+    "predict_transform.jl",
+    "obs.jl",
     "accessor_functions.jl",
     "target_features.jl",
     # "patterns/regression.jl",
