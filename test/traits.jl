@@ -71,3 +71,5 @@ import .FruitSalad
 @testset "name" begin
     @test LearnAPI.name(FruitSalad.RedApple(1)) == "RedApple"
 end
+
+true
