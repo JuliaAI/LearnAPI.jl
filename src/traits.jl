@@ -164,8 +164,6 @@ kinds_of_proxy() = map(CONCRETE_TARGET_PROXY_SYMBOLS) do ex
     end |> eval
 end
 
-
-
 tags() = [
     "regression",
     "classification",
