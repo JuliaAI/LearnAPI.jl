@@ -171,7 +171,7 @@ tags() = [
     "classification",
     "clustering",
     "gradient descent",
-    "iterative learners",
+    "iterative algorithms",
     "incremental algorithms",
     "feature engineering",
     "dimension reduction",
