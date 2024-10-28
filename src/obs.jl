@@ -55,7 +55,7 @@ fit(learner, observations)` is equivalent to `model = fit(learner, data)`, whene
 `observations = obs(learner, data)`. For each supported form of `data` in calls
 `predict(model, ..., data)` and `transform(model, data)`, where implemented, the calls
 `predict(model, ..., observations)` and `transform(model, observations)` are supported
-alternatives, whenever `observations = obs(model, data)`.
+alternatives with the same return value, whenever `observations = obs(model, data)`.
 
 The fallback for `obs` is `obs(model_or_learner, data) = data`, and the fallback for
 `LearnAPI.data_interface(learner)` is `LearnAPI.RandomAccess()`. For details refer to
