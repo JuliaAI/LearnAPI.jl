@@ -176,7 +176,7 @@ tags() = [
     "missing value imputation",
     "transformers",
     "static algorithms",
-    "ensemble algorithms",
+    "ensembling",
     "time series forecasting",
     "time series classification",
     "survival analysis",
