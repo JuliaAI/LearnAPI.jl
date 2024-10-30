@@ -54,8 +54,19 @@ For each supported form of `data` in `fit(learner, data)`, it must be true that 
 fit(learner, observations)` is equivalent to `model = fit(learner, data)`, whenever
 `observations = obs(learner, data)`. For each supported form of `data` in calls
 `predict(model, ..., data)` and `transform(model, data)`, where implemented, the calls
-`predict(model, ..., observations)` and `transform(model, observations)` are supported
-alternatives, whenever `observations = obs(model, data)`.
+`predict(model, ..., observations)` and `transform(model, observations)` must be supported
+alternatives with the same output, whenever `observations = obs(model, data)`.
+
+Implicit in the above requirements is that `obs(learner, _)` and `obs(model, _)` are
+involutive, meaning both the following hold:
+
+```julia
+obs(learner, obs(learner, data)) == obs(learner, data)
+obs(model, obs(model, data) == obs(model, obs(model, data)
+```
+
+If one overloads `obs`, one typically needs additionally overloadings to guarantee
+involutivity.
 
 The fallback for `obs` is `obs(model_or_learner, data) = data`, and the fallback for
 `LearnAPI.data_interface(learner)` is `LearnAPI.RandomAccess()`. For details refer to
@@ -67,14 +78,16 @@ to be overloaded. However, the user will get no performance benefits by using `o
 that case.
 
 When overloading `obs(learner, data)` to output new model-specific representations of
-data, it may be necessary to also overload [`LearnAPI.features`](@ref),
-[`LearnAPI.target`](@ref) (supervised learners), and/or [`LearnAPI.weights`](@ref) (if
-weights are supported), for extracting relevant parts of the representation.
+data, it may be necessary to also overload [`LearnAPI.features(learner,
+observations)`](@ref), [`LearnAPI.target(learner, observations)`](@ref) (supervised
+learners), and/or [`LearnAPI.weights(learner, observations)`](@ref) (if weights are
+supported), for each kind output `observations` of `obs(learner, data)`.
 
 ## Sample implementation
 
-Refer to the "Anatomy of an Implementation" section of the LearnAPI.jl
-[manual](https://juliaai.github.io/LearnAPI.jl/dev/).
+Refer to the ["Anatomy of an
+Implementation"](https://juliaai.github.io/LearnAPI.jl/dev/anatomy_of_an_implementation/#Providing-an-advanced-data-interface)
+section of the LearnAPI.jl manual.
 
 
 """

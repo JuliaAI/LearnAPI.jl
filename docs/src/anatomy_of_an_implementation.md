@@ -420,10 +420,21 @@ LearnAPI.fit(learner::Ridge, data; kwargs...) =
 
 ### The `obs` contract
 
-Providing `fit` signatures matching the output of `obs`, is the first part of the `obs`
-contract. The second part is this: *The output of `obs` must implement the interface
-specified by the trait* [`LearnAPI.data_interface(learner)`](@ref). Assuming this is
-[`LearnAPI.RandomAccess()`](@ref) (the default) it usually suffices to overload
+Providing `fit` signatures matching the output of [`obs`](@ref), is the first part of the
+`obs` contract. Since `obs(learner, data)` should evidentally support all `data` that
+`fit(learner, data)` supports, we must be able to apply `obs(learner, _)` to it's own
+output (`observations` below). This leads to the additional "no-op" declaration
+
+```@example anatomy2
+LearnAPI.obs(::Ridge, observations::RidgeFitObs) = observations
+```
+
+In other words, we ensure that `obs(learner, _)` is
+[involutive](https://en.wikipedia.org/wiki/Involution_(mathematics)).
+
+The second part of the `obs` contract is this: *The output of `obs` must implement the
+interface specified by the trait* [`LearnAPI.data_interface(learner)`](@ref). Assuming
+this is [`LearnAPI.RandomAccess()`](@ref) (the default) it usually suffices to overload
 `Base.getindex` and `Base.length`:
 
 ```@example anatomy2
@@ -432,11 +443,11 @@ Base.getindex(data::RidgeFitObs, I) =
 Base.length(data::RidgeFitObs) = length(data.y)
 ```
 
-We can do something similar for `predict`, but there's no need for a new type in this
-case:
+We do something similar for `predict`, but there's no need for a new type in this case:
 
 ```@example anatomy2
 LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)'
+LearnAPI.obs(::RidgeFitted, observations::AbstractArray) = observations # involutivity
 
 LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
     observations'*model.coefficients
