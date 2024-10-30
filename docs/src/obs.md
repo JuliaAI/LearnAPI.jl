@@ -83,7 +83,7 @@ end
 | [`obs(model, data)`](@ref)     | here `data` is `predict`-consumable | not typically | returns `data` |
 
 
-A sample implementation is given in [Providing an advanced data interface](@ref). 
+A sample implementation is given in [Providing a separate data front end](@ref). 
 
 
 ## Reference

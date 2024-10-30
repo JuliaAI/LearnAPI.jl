@@ -16,9 +16,7 @@ ML/statistical algorithms are typically applied in conjunction with resampling o
 *observations*, as in
 [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)). In this
 document *data* will always refer to objects encapsulating an ordered sequence of
-individual observations. If a learner is trained using multiple data objects, it is
-undertood that individual objects share the same number of observations, and that
-resampling of one component implies synchronized resampling of the others.
+individual observations.
 
 A `DataFrame` instance, from [DataFrames.jl](https://dataframes.juliadata.org/stable/), is
 an example of data, the observations being the rows. Typically, data provided to
@@ -97,9 +95,11 @@ which can be tested with `@assert `[`LearnAPI.clone(learner)`](@ref)` == learner
 Note that if if `learner` is an instance of a *mutable* struct, this requirement
 generally requires overloading `Base.==` for the struct.
 
-No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
-deep copies of RNG hyperparameters before using them in a new implementation of
-[`fit`](@ref).
+!!! important
+
+    No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
+    deep copies of RNG hyperparameters before using them in a new implementation of
+    [`fit`](@ref).
 
 #### Composite learners (wrappers)
 
@@ -145,7 +145,7 @@ for each.
     [`LearnAPI.functions`](@ref).
 
 Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
-bare minimum implementation, see the implementation of `SmallLearner`
+minimal (but useless) implementation, see the implementation of `SmallLearner`
 [here](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/traits.jl).
 
 ### List of methods

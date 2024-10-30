@@ -35,7 +35,7 @@ A transformer ordinarily implements `transform` instead of `predict`. For more o
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     this interface, as illustrated below under
-    [Providing an advanced data interface](@ref), and which may additionally
+    [Providing a separate data front end](@ref), and which may additionally
     enable certain performance benefits; or (ii) overload the trait
     [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
     API.
@@ -314,7 +314,7 @@ recovered_model = deserialize(filename)
 @assert predict(recovered_model, X) == predict(model, X)
 ```
 
-## Providing an advanced data interface
+## Providing a separate data front end
 
 ```@setup anatomy2
 using LearnAPI
@@ -364,9 +364,13 @@ y = 2a - b + 3c + 0.05*rand(n)
 
 An implementation may optionally implement [`obs`](@ref), to expose to the user (or some
 meta-algorithm like cross-validation) the representation of input data internal to `fit`
-or `predict`, such as the matrix version `A` of `X` in the ridge example.  Here we
-specifically wrap all the pre-processed data into single object, for which we introduce a
-new type:
+or `predict`, such as the matrix version `A` of `X` in the ridge example.  That is, we may
+factor out of `fit` (and also `predict`) the data pre-processing step, `obs`, to expose
+its outcomes. These outcomes become alternative user inputs to `fit`. To see the use of
+`obs` in action, see [below](@ref advanced_demo).
+
+Here we specifically wrap all the pre-processed data into single object, for which we
+introduce a new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
@@ -503,7 +507,7 @@ As above, we add a signature which plays no role vis-à-vis LearnAPI.jl.
 LearnAPI.fit(learner::Ridge, X, y; kwargs...)  = fit(learner, (X, y); kwargs...)
 ```
 
-## Demonstration of an advanced `obs` workflow
+## [Demonstration of an advanced `obs` workflow](@id advanced_demo)
 
 We now can train and predict using internal data representations, resampled using the
 generic MLUtils.jl interface:
