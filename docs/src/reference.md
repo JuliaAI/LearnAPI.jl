@@ -116,7 +116,7 @@ understood to have a valid implementation of the LearnAPI.jl interface.
 
 #### Example
 
-Any instance of `GradientRidgeRegressor` defined below is a valid learner.
+Below is an example of a learner type with a valid constructor:
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}

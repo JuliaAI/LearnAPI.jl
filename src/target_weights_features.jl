@@ -72,7 +72,7 @@ implemented, as in the following sample workflow:
 ```julia
 model = fit(learner, data)
 X = LearnAPI.features(learner, data)
-ŷ = predict(learner, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
+ŷ = predict(model, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 ```
 
 For supervised models (i.e., where `:(LearnAPI.target) in LearnAPI.functions(learner)`)
