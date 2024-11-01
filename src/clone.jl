@@ -7,7 +7,7 @@ Return a shallow copy of `learner` with the specified hyperparameter replacement
 clone(learner; epochs=100, learning_rate=0.01)
 ```
 
-It is guaranteed that `LearnAPI.clone(learner) == learner`.
+A LearnAPI.jl contract ensures that `LearnAPI.clone(learner) == learner`.
 
 """
 function clone(learner; replacements...)
