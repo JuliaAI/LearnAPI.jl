@@ -31,8 +31,8 @@ implementations fall into one (or more) of the following informally understood p
 
 - Missing Value Imputation
 
-- [Transformers](@ref): Other transformers, such as standardizers, and categorical
-  encoders.
+- [Transformers](@ref transformers): Other transformers, such as standardizers, and
+  categorical encoders.
 
 - [Static Algorithms](@ref): Algorithms that do not learn, in the sense they must be
   re-executed for each new data set (do not generalize), but which have hyperparameters

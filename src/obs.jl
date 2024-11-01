@@ -57,7 +57,13 @@ fit(learner, observations)` is equivalent to `model = fit(learner, data)`, whene
 `predict(model, ..., observations)` and `transform(model, observations)` must be supported
 alternatives with the same output, whenever `observations = obs(model, data)`.
 
-Implicit in the above requirements is that `obs(learner, _)` and `obs(model, _)` are
+If `LearnAPI.data_interface(learner) == RandomAccess()` (the default), then `fit`,
+`predict` and `transform` must additionally accept `obs` output that has been *subsampled*
+using `MLUtils.getobs`, with the obvious interpretation applying to the outcomes of such
+calls (e.g., if *all* observations are subsampled, then outcomes should be the same as if
+using the original data).
+
+Implicit in preceding requirements is that `obs(learner, _)` and `obs(model, _)` are
 involutive, meaning both the following hold:
 
 ```julia
