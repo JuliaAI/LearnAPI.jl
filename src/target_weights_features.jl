@@ -5,11 +5,15 @@ Return, for each form of `data` supported in a call of the form [`fit(learner,
 data)`](@ref), the target variable part of `data`. If `nothing` is returned, the
 `learner` does not see a target variable in training (is unsupervised).
 
+The returned object `y` has the same number of observations as `data`. If `data` is the
+output of an [`obs`](@ref) call, then `y` is additionally guaranteed to implement the
+data interface specified by [`LearnAPI.data_interface(learner)`](@ref).
+
 # Extended help
 
 ## What is a target variable?
 
-Examples of target variables are house prices in realestate pricing estimates, the
+Examples of target variables are house prices in real estate pricing estimates, the
 "spam"/"not spam" labels in an email spam filtering task, "outlier"/"inlier" labels in
 outlier detection, cluster labels in clustering problems, and censored survival times in
 survival analysis. For more on targets and target proxies, see the "Reference" section of
@@ -17,8 +21,12 @@ the LearnAPI.jl documentation.
 
 ## New implementations
 
-A fallback returns `nothing`. Must be implemented if `fit` consumes data including a
-target variable.
+A fallback returns `nothing`. The method must be overloaded if `fit` consumes data
+including a target variable.
+
+If overloading [`obs`](@ref), ensure that the return value, unless `nothing`, implements
+the data interface specified by [`LearnAPI.data_interface(learner)`](@ref), in the special
+case that `data` is the output of an `obs` call.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.target)"; overloaded=true))
 
@@ -32,9 +40,19 @@ Return, for each form of `data` supported in a call of the form [`fit(learner,
 data)`](@ref), the per-observation weights part of `data`. Where `nothing` is returned, no
 weights are part of `data`, which is to be interpreted as uniform weighting.
 
+The returned object `w` has the same number of observations as `data`. If `data` is the
+output of an [`obs`](@ref) call, then `w` is additionally guaranteed to implement the
+data interface specified by [`LearnAPI.data_interface(learner)`](@ref).
+
+# Extended help
+
 # New implementations
 
 Overloading is optional. A fallback returns `nothing`.
+
+If overloading [`obs`](@ref), ensure that the return value, unless `nothing`, implements
+the data interface specified by [`LearnAPI.data_interface(learner)`](@ref), in the special
+case that `data` is the output of an `obs` call.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=true))
 
@@ -53,26 +71,34 @@ implemented, as in the following sample workflow:
 
 ```julia
 model = fit(learner, data)
-X = features(data)
-ŷ = predict(learner, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
+X = LearnAPI.features(learner, data)
+ŷ = predict(model, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 ```
 
-The returned object has the same number of observations as `data`. For supervised models
-(i.e., where `:(LearnAPI.target) in LearnAPI.functions(learner)`) `ŷ` above is generally
-intended to be an approximate proxy for `LearnAPI.target(learner, data)`, the training
-target.
+For supervised models (i.e., where `:(LearnAPI.target) in LearnAPI.functions(learner)`)
+`ŷ` above is generally intended to be an approximate proxy for `LearnAPI.target(learner,
+data)`, the training target.
 
+The object `X` returned by `LearnAPI.target` has the same number of observations as
+`data`. If `data` is the output of an [`obs`](@ref) call, then `X` is additionally
+guaranteed to implement the data interface specified by
+[`LearnAPI.data_interface(learner)`](@ref).
+
+# Extended help
 
 # New implementations
 
-That the output can be passed to `predict` and/or `transform`, and has the same number of
-observations as `data`, are the only contracts. A fallback returns `first(data)` if `data`
-is a tuple, and otherwise returns `data`.
+For density estimators, whose `fit` typically consumes *only* a target variable, you
+should overload this method to return `nothing`.
 
-Overloading may be necessary if [`obs(learner, data)`](@ref) is overloaded to return
-some learner-specific representation of training `data`. For density estimators, whose
-`fit` typically consumes *only* a target variable, you should overload this method to
-return `nothing`.
+It must otherwise be possible to pass the return value `X` to `predict` and/or
+`transform`, and `X` must have same number of observations as `data`. A fallback returns
+`first(data)` if `data` is a tuple, and otherwise returns `data`.
+
+Further overloadings may be necessary to handle the case that `data` is the output of
+[`obs(learner, data)`](@ref), if `obs` is being overloaded. In this case, be sure that
+`X`, unless `nothing`, implements the data interface specified by
+[`LearnAPI.data_interface(learner)`](@ref).
 
 """
 features(learner, data) = _first(data)

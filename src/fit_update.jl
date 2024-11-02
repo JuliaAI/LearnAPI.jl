@@ -17,7 +17,7 @@ model = fit(learner, (X, y))
 ŷ = predict(model, Xnew)
 ```
 
-The second signature, with `data` omitted, is provided by learners that do not
+The signature `fit(learner; verbosity=1)` (no `data`) is provided by learners that do not
 generalize to new observations (called *static algorithms*). In that case,
 `transform(model, data)` or `predict(model, ..., data)` carries out the actual algorithm
 execution, writing any byproducts of that operation to the mutable object `model` returned

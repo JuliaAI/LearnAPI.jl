@@ -27,12 +27,12 @@ implementations fall into one (or more) of the following informally understood p
 
 - [Feature Engineering](@ref): Algorithms for selecting or combining features
 
-- Dimension Reduction: Transformers that learn to reduce feature space dimension
+- [Dimension Reduction](@ref): Transformers that learn to reduce feature space dimension
 
 - Missing Value Imputation
 
-- Transformers: Other transformers, such as standardizers, and categorical
-  encoders.
+- [Transformers](@ref transformers): Other transformers, such as standardizers, and
+  categorical encoders.
 
 - [Static Algorithms](@ref): Algorithms that do not learn, in the sense they must be
   re-executed for each new data set (do not generalize), but which have hyperparameters

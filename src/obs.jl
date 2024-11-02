@@ -57,7 +57,13 @@ fit(learner, observations)` is equivalent to `model = fit(learner, data)`, whene
 `predict(model, ..., observations)` and `transform(model, observations)` must be supported
 alternatives with the same output, whenever `observations = obs(model, data)`.
 
-Implicit in the above requirements is that `obs(learner, _)` and `obs(model, _)` are
+If `LearnAPI.data_interface(learner) == RandomAccess()` (the default), then `fit`,
+`predict` and `transform` must additionally accept `obs` output that has been *subsampled*
+using `MLUtils.getobs`, with the obvious interpretation applying to the outcomes of such
+calls (e.g., if *all* observations are subsampled, then outcomes should be the same as if
+using the original data).
+
+Implicit in preceding requirements is that `obs(learner, _)` and `obs(model, _)` are
 involutive, meaning both the following hold:
 
 ```julia
@@ -77,11 +83,13 @@ only of suitable tables and arrays, then `obs` and `LearnAPI.data_interface` do 
 to be overloaded. However, the user will get no performance benefits by using `obs` in
 that case.
 
-When overloading `obs(learner, data)` to output new model-specific representations of
+If overloading `obs(learner, data)` to output new model-specific representations of
 data, it may be necessary to also overload [`LearnAPI.features(learner,
 observations)`](@ref), [`LearnAPI.target(learner, observations)`](@ref) (supervised
 learners), and/or [`LearnAPI.weights(learner, observations)`](@ref) (if weights are
-supported), for each kind output `observations` of `obs(learner, data)`.
+supported), for each kind output `observations` of `obs(learner, data)`. Moreover, the
+outputs of these methods, applied to `observations`, must also implement the interface
+specified by [`LearnAPI.data_interface(learner)`](@ref).
 
 ## Sample implementation
 

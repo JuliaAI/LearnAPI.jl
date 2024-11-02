@@ -164,21 +164,19 @@ kinds_of_proxy() = map(CONCRETE_TARGET_PROXY_SYMBOLS) do ex
     end |> eval
 end
 
-
-
 tags() = [
     "regression",
     "classification",
     "clustering",
     "gradient descent",
-    "iterative learners",
+    "iterative algorithms",
     "incremental algorithms",
     "feature engineering",
     "dimension reduction",
     "missing value imputation",
     "transformers",
     "static algorithms",
-    "ensemble algorithms",
+    "ensembling",
     "time series forecasting",
     "time series classification",
     "survival analysis",
