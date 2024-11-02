@@ -1,8 +1,8 @@
 # # FIT
 
 """
-    fit(learner, data; verbosity=1)
-    fit(learner; verbosity=1)
+    fit(learner, data; verbosity=LearnAPI.default_verbosity())
+    fit(learner; verbosity=LearnAPI.default_verbosity())
 
 Execute the machine learning or statistical algorithm with configuration `learner` using
 the provided training `data`, returning an object, `model`, on which other methods, such
@@ -17,26 +17,27 @@ model = fit(learner, (X, y))
 ŷ = predict(model, Xnew)
 ```
 
-The signature `fit(learner; verbosity=1)` (no `data`) is provided by learners that do not
-generalize to new observations (called *static algorithms*). In that case,
+The signature `fit(learner; verbosity=...)` (no `data`) is provided by learners that do
+not generalize to new observations (called *static algorithms*). In that case,
 `transform(model, data)` or `predict(model, ..., data)` carries out the actual algorithm
 execution, writing any byproducts of that operation to the mutable object `model` returned
 by `fit`.
 
 Use `verbosity=0` for warnings only, and `-1` for silent training.
 
-See also [`predict`](@ref), [`transform`](@ref), [`inverse_transform`](@ref),
-[`LearnAPI.functions`](@ref), [`obs`](@ref).
+See also [`LearnAPI.default_verbosity`](@ref), [`predict`](@ref), [`transform`](@ref),
+[`inverse_transform`](@ref), [`LearnAPI.functions`](@ref), [`obs`](@ref).
 
 # Extended help
 
 # New implementations
 
 Implementation of exactly one of the signatures is compulsory. If `fit(learner;
-verbosity=1)` is implemented, then the trait [`LearnAPI.is_static`](@ref) must be
+verbosity=...)` is implemented, then the trait [`LearnAPI.is_static`](@ref) must be
 overloaded to return `true`.
 
-The signature must include `verbosity`.
+The signature must include `verbosity` with [`LearnAPI.default_verbosity()`](@ref) as
+default.
 
 If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
 [`LearnAPI.target(data)`](@ref) must be overloaded to return it. If [`predict`](@ref) or
@@ -59,7 +60,7 @@ function fit end
 # # UPDATE AND COUSINS
 
 """
-    update(model, data; verbosity=1, hyperparam_replacements...)
+    update(model, data; verbosity=LearnAPI.default_verbosity(), hyperparam_replacements...)
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call, but with the specified hyperparameter replacements, in the form `p1=value1,
@@ -98,7 +99,12 @@ See also [`LearnAPI.clone`](@ref)
 function update end
 
 """
-    update_observations(model, new_data; verbosity=1, parameter_replacements...)
+    update_observations(
+        model,
+        new_data;
+        parameter_replacements...,
+        verbosity=LearnAPI.default_verbosity(),
+    )
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new observations present in `new_data`. One may additionally
@@ -134,7 +140,12 @@ See also [`LearnAPI.clone`](@ref).
 function update_observations end
 
 """
-    update_features(model, new_data; verbosity=1, parameter_replacements...)
+    update_features(
+        model,
+        new_data;
+        parameter_replacements...,
+        verbosity=LearnAPI.default_verbosity(),
+    )
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new features encapsulated in `new_data`. One may additionally

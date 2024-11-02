@@ -2,6 +2,7 @@ using Test
 
 test_files = [
     "tools.jl",
+    "verbosity.jl",
     "traits.jl",
     "clone.jl",
     "predict_transform.jl",

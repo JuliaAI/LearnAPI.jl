@@ -4,9 +4,10 @@ const DEFAULT_VERBOSITY = Ref(1)
     LearnAPI.default_verbosity()
     LearnAPI.default_verbosity(level::Int)
 
-Respectively return and set the default verbosity level for LearnAPI.jl, applying, in
-particular, to [`fit`](@ref), [`update`](@ref), [`update_observations`](@ref), and
-[`update_features`](@ref). The effect in a top-level call is generally:
+Respectively return, or set, the default `verbosity` level for LearnAPI.jl methods that
+support it, which includes [`fit`](@ref), [`update`](@ref),
+[`update_observations`](@ref), and [`update_features`](@ref). The effect in a top-level
+call is generally:
 
 
 
