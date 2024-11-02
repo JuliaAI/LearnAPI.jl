@@ -2,13 +2,14 @@
 
 The `obs` method takes data intended as input to `fit`, `predict` or `transform`, and
 transforms it to a learner-specific form guaranteed to implement a form of observation
-access designated by the learner. The transformed data can then be resampled and passed
-on to the relevant method in place of the original input. Using `obs` may provide
-performance advantages over naive workflows in some cases (e.g., cross-validation).
+access designated by the learner.  The transformed data can then passed on to the relevant
+method in place of the original input (after first resampling it, if the learner supports
+this). Using `obs` may provide performance advantages over naive workflows in some cases
+(e.g., cross-validation).
 
 ```julia
 obs(learner, data) # can be passed to `fit` instead of `data`
-obs(model, data)     # can be passed to `predict` or `transform` instead of `data`
+obs(model, data)   # can be passed to `predict` or `transform` instead of `data`
 ```
 
 ## [Typical workflows](@id obs_workflows)
