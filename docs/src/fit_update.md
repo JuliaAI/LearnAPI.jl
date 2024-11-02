@@ -1,4 +1,4 @@
-# [`fit`, `update`, `update_observations`, and `update_features`](@id fit)
+# [`fit`, `update`, `update_observations`, and `update_features`](@id fit_docs)
 
 ### Training
 

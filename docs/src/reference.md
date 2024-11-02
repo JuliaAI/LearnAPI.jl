@@ -150,16 +150,16 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 
 ### List of methods
 
-- [`fit`](@ref fit): for (i) training or updating learners that generalize to new data; or
-  (ii) wrapping `learner` in an object that is possibly mutated by `predict`/`transform`,
-  to record byproducts of those operations, in the special case of *non-generalizing*
-  learners (called here [static algorithms](@ref static_algorithms))
+- [`fit`](@ref fit_docs): for (i) training or updating learners that generalize to new
+  data; or (ii) wrapping `learner` in an object that is possibly mutated by
+  `predict`/`transform`, to record byproducts of those operations, in the special case of
+  *non-generalizing* learners (called here [static algorithms](@ref static_algorithms))
 
-- [`update`](@ref fit): for updating learning outcomes after hyperparameter changes, such
-  as increasing an iteration parameter.
+- [`update`](@ref fit_docs): for updating learning outcomes after hyperparameter changes,
+  such as increasing an iteration parameter.
 
-- [`update_observations`](@ref fit), [`update_features`](@ref fit): update learning
-  outcomes by presenting additional training data.
+- [`update_observations`](@ref fit_docs), [`update_features`](@ref fit_docs): update
+  learning outcomes by presenting additional training data.
 
 - [`predict`](@ref operations): for outputting [targets](@ref proxy) or [target
   proxies](@ref proxy) (such as probability density functions)
