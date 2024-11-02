@@ -1,7 +1,6 @@
 # Dimension Reduction
 
-Check out the following examples:
+See these examples from the JuliaTestAPI.jl test suite:
 
-- [Truncated
-  SVD]((https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/dimension_reduction.jl
-  (from the TestLearnAPI.jl test suite)
+- [Truncated SVD](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/dimension_reduction.jl)
+
