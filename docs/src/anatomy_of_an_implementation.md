@@ -425,7 +425,7 @@ LearnAPI.fit(learner::Ridge, data; kwargs...) =
 ### The `obs` contract
 
 Providing `fit` signatures matching the output of [`obs`](@ref), is the first part of the
-`obs` contract. Since `obs(learner, data)` should evidentally support all `data` that
+`obs` contract. Since `obs(learner, data)` should evidently support all `data` that
 `fit(learner, data)` supports, we must be able to apply `obs(learner, _)` to it's own
 output (`observations` below). This leads to the additional "no-op" declaration
 

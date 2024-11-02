@@ -89,7 +89,7 @@ observations)`](@ref), [`LearnAPI.target(learner, observations)`](@ref) (supervi
 learners), and/or [`LearnAPI.weights(learner, observations)`](@ref) (if weights are
 supported), for each kind output `observations` of `obs(learner, data)`. Moreover, the
 outputs of these methods, applied to `observations`, must also implement the interface
-specfied by [`LearnAPI.data_interface(learner)`](@ref).
+specified by [`LearnAPI.data_interface(learner)`](@ref).
 
 ## Sample implementation
 
