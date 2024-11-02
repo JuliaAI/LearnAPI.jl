@@ -12,9 +12,7 @@ The returned object is guaranteed to implement observation access as indicated b
 [`LearnAPI.RandomAccess()`](@ref).
 
 Calling `fit`/`predict`/`transform` on the returned objects may have performance
-advantages over calling directly on `data` in some contexts. And resampling the returned
-object using `MLUtils.getobs` may be cheaper than directly resampling the components of
-`data`.
+advantages over calling directly on `data` in some contexts.
 
 # Example
 
