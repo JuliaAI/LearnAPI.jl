@@ -1,7 +1,9 @@
 # Static Algorithms
 
-See [these
-examples](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/patterns/static_algorithms.jl)
-from tests.
+See these examples from the JuliaTestAI.jl test suite:
+
+- [feature
+  selection](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/static_algorithms.jl)
+
 
 

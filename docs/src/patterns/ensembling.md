@@ -1,5 +1,6 @@
 # Ensembling
 
-See [this
-example](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/patterns/ensembling.jl)
-from tests.
+See these examples from the JuliaTestAPI.jl test suite:
+
+- [bagged ensembling of a regression model](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/ensembling.jl)
+

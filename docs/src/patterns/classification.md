@@ -1,5 +1,6 @@
 # Classification
 
-See these examples from tests:
+See these examples from the JuliaTestAPI.jl test suite:
 
-- [perceptron classifier](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/patterns/gradient_descent.jl)
+- [perceptron
+  classifier](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/gradient_descent.jl)

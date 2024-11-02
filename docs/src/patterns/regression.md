@@ -1,5 +1,7 @@
 # Regression
 
-See [these
-examples](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/patterns/regression.jl)
-from tests.
+See these examples from the JuliaTestAI.jl test suite:
+
+- [ridge
+  regression](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/regression.jl)
+
