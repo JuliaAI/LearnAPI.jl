@@ -242,7 +242,7 @@ nothing # hide
 ```
 
 The last trait, `functions`, returns a list of all LearnAPI.jl methods that can be
-meaninfully applied to the learner or associated model. See [`LearnAPI.functions`](@ref)
+meaningfully applied to the learner or associated model. See [`LearnAPI.functions`](@ref)
 for a checklist.  [`LearnAPI.functions`](@ref) and [`LearnAPI.constructor`](@ref), are the
 only universally compulsory traits. However, it is worthwhile studying the [list of all
 traits](@ref traits_list) to see which might apply to a new implementation, to enable
