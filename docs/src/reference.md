@@ -77,7 +77,7 @@ object's *properties* (which conceivably differ from its fields). It does not st
 learned parameters.
 
 Informally, we will sometimes use the word "model" to refer to the output of
-`fit(learner, ...)` (see below), something which typically does *store* learned
+`fit(learner, ...)` (see below), something which typically *does* store learned
 parameters.
 
 For `learner` to be a valid LearnAPI.jl learner,
