@@ -94,6 +94,25 @@ LearnAPI.strip(LearnAPI.strip(model)) == LearnAPI.strip(model)
 LearnAPI.strip(model) = model
 
 """
+    LearnAPI.feature_names(model)
+
+Return the names of features encountered when fitting or updating some `learner` to obtain
+`model`.
+
+The value returned value is a vector of symbols.
+
+This method is implemented if `:(LearnAPI.feature_names) in LearnAPI.functions(learner)`.
+
+See also [`fit`](@ref).
+
+# New implementations
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.feature_names)")).
+
+"""
+function feature_names end
+
+"""
     LearnAPI.feature_importances(model)
 
 Return the learner-specific feature importances of a `model` output by
@@ -291,7 +310,6 @@ $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
 """
 function training_labels end
 
-
 # :extras intentionally excluded:
 const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     learner,
@@ -299,6 +317,7 @@ const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     intercept,
     tree,
     trees,
+    feature_names,
     feature_importances,
     training_labels,
     training_losses,
