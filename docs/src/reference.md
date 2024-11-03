@@ -108,7 +108,7 @@ values; for such learners [`LearnAPI.is_composite`](@ref)`(learner)` must be `tr
 (fallback is `false`). Generally, the keyword constructor provided by
 [`LearnAPI.constructor`](@ref) must provide default values for all properties that are not
 learner-valued. Instead, these learner-valued properties can have a `nothing` default,
-with the constructor throwing an error if the the constructor call does not explicitly
+with the constructor throwing an error if the constructor call does not explicitly
 specify a new value.
 
 Any object `learner` for which [`LearnAPI.functions(learner)`](@ref) is non-empty is
@@ -150,7 +150,7 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 
 ### List of methods
 
-- [`fit`](@ref fit_docs): for (i) training or updating learners that generalize to new
+- [`fit`](@ref fit_docs): for (i) training learners that generalize to new
   data; or (ii) wrapping `learner` in an object that is possibly mutated by
   `predict`/`transform`, to record byproducts of those operations, in the special case of
   *non-generalizing* learners (called here [static algorithms](@ref static_algorithms))

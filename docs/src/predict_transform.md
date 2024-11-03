@@ -84,23 +84,28 @@ dimension using distances from the cluster centres.
 
 ### [One-liners combining fit and transform/predict](@id one_liners)
 
-Learners may optionally overload `transform` to apply `fit` first, using the supplied
-data if required, and then immediately `transform` the same data. The same applies to
-`predict`. In that case the first argument of `transform`/`predict` is an *learner*
-instead of the output of `fit`:
+Learners may additionally overload `transform` to apply `fit` first, using the supplied
+data if required, and then immediately `transform` the same data.  In that case the first
+argument of `transform` is an *learner* instead of the output of `fit`:
 
 ```julia
-predict(learner, kind_of_proxy, data) # `fit` implied
 transform(learner, data) # `fit` implied
 ```
 
-For example, if `fit(learner, X)` is defined, then `predict(learner, X)` will be
-shorthand for
+This will be shorthand for 
 
 ```julia
-model = fit(learner, X)
-predict(model, X)
+model = fit(learner, X) # or `fit(learner)` in the static case
+transform(model, X)
 ```
+
+The same remarks apply to `predict`, as in 
+
+```julia
+predict(learner, kind_of_proxy, data) # `fit` implied
+```
+
+LearnAPI.jl does not, however, guarantee the provision of these one-liners.
 
 ## [Reference](@id predict_ref)
 
