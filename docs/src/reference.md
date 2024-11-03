@@ -60,8 +60,8 @@ More generally, whenever we have a variable (e.g., a class label) that can, at l
 principle, be paired with a predicted value, or some predicted "proxy" for that variable
 (such as a class probability), then we call the variable a *target* variable, and the
 predicted output a *target proxy*. In this definition, it is immaterial whether or not the
-target appears in training (is supervised) or whether or not the model generalizes to new
-observations ("learns").
+target appears in training (the algorithm is supervised) or whether or not predictions
+generalize to new input observations (the algorithm "learns").
 
 LearnAPI.jl provides singleton [target proxy types](@ref proxy_types) for prediction
 dispatch. These are also used to distinguish performance metrics provided by the package
