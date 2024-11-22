@@ -387,7 +387,7 @@ iteration_parameter(::Any) = nothing
 
 Return an upper bound `S` on the scitype of individual observations guaranteed to work
 when calling `fit`: if `observations = obs(learner, data)` and
-`ScientificTypes.scitype(o) <:S` for each `o` in `observations`, then the call
+`ScientificTypes.scitype(collect(o)) <:S` for each `o` in `observations`, then the call
 `fit(learner, data)` is supported.
 
 $DOC_EXPLAIN_EACHOBS
@@ -396,7 +396,7 @@ See also [`LearnAPI.target_observation_scitype`](@ref).
 
 # New implementations
 
-Optional. The fallback return value is `Union{}`. 
+Optional. The fallback return value is `Union{}`.
 
 """
 fit_observation_scitype(::Any) = Union{}

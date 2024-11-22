@@ -3,7 +3,7 @@
 !!! important
 
 	This section is only an implementation guide. The definitive specification of the
-	Learn API is given in [Reference](@ref reference).
+	LearnAPI is given in [Reference](@ref reference).
 
 This guide is intended to be consulted after reading [Anatomy of an Implementation](@ref),
 which introduces the main interface objects and terminology.

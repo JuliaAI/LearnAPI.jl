@@ -462,21 +462,14 @@ LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
 
 ### `target` and `features` methods
 
-We provide an additional overloading of [`LearnAPI.target`](@ref) to handle the additional
-supported data argument of `fit`:
+In the general case, we only need to implement [`LearnAPI.target`](@ref) and
+[`LearnAPI.features`](@ref) to handle all possible output of `obs(learner, data)`, and now
+the fallback for `LearnAPI.features` mentioned before is inadequate.
 
 ```@example anatomy2
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
-```
-
-Similarly, we must overload [`LearnAPI.features`](@ref), which extracts features from
-training data (objects that can be passed to `predict`) like this
-
-```@example anatomy2
 LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 ```
-as the fallback mentioned above is no longer adequate.
-
 
 ### Important notes:
 
@@ -501,7 +494,8 @@ interfaces](@ref data_interfaces) for details.
 
 ### Addition of signatures for user convenience
 
-As above, we add a signature which plays no role vis-à-vis LearnAPI.jl.
+As above, we add a signature for convenience, which the LearnAPI.jl specification
+neither requires nor forbids:
 
 ```@example anatomy2
 LearnAPI.fit(learner::Ridge, X, y; kwargs...)  = fit(learner, (X, y); kwargs...)

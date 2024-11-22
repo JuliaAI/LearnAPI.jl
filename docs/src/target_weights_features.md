@@ -1,11 +1,13 @@
 # [`target`, `weights`, and `features`](@id input)
 
-Methods for extracting parts of training data:
+Methods for extracting parts of training observations. Here "observations" means the
+output of [`obs(learner, data)`](@ref); if `obs` is not overloaded for `learner`, then
+"observations" is any `data` supported in calls of the form [`fit(learner, data)`](@ref)
 
 ```julia
-LearnAPI.target(learner, data) -> <target variable>
-LearnAPI.weights(learner, data) -> <per-observation weights>
-LearnAPI.features(learner, data) -> <training "features", suitable input for `predict` or `transform`>
+LearnAPI.target(learner, observations) -> <target variable>
+LearnAPI.weights(learner, observations) -> <per-observation weights>
+LearnAPI.features(learner, observations) -> <training "features", suitable input for `predict` or `transform`>
 ```
 
 Here `data` is something supported in a call of the form `fit(learner, data)`. 
@@ -19,7 +21,8 @@ Supposing `learner` is a supervised classifier predicting a one-dimensional vect
 target:
 
 ```julia
-model = fit(learner, data)
+observations = obs(learner, data)
+model = fit(learner, observations)
 X = LearnAPI.features(learner, data)
 y = LearnAPI.target(learner, data)
 ŷ = predict(model, Point(), X)

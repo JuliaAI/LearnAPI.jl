@@ -1,5 +1,15 @@
 ```@raw html
 <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<div style="font-size:1.4em;font-weight:bold;">
+  <a href="anatomy_of_an_implementation.html"
+    style="color: #389826;">Tutorial</a>           &nbsp;|&nbsp;
+  <a href="reference.html"
+    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
+  <a href="common_implementation_patterns.html"
+    style="color: #9558B2;">Patterns</a>
+</div>
+
 <span style="color: #9558B2;font-size:4.5em;">
 LearnAPI.jl</span>
 <br>
@@ -86,11 +96,11 @@ opts out. Moreover, the `fit` and `predict` methods will also be able to consume
 alternative data representations, for performance benefits in some situations.
 
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
-`getobs/numobs` interface (here tagged as [`LearnAPI.RandomAccess()`](@ref)) and if the
+`getobs/numobs` interface, here tagged as [`LearnAPI.RandomAccess()`](@ref), and if the
 input consumed by the algorithm already implements that interface (tables, arrays, etc.)
 then overloading `obs` is completely optional. Plain iteration interfaces, with or without
-knowledge of the number of observations, can also be specified (to support, e.g., data
-loaders reading images from disk).
+knowledge of the number of observations, can also be specified, to support, e.g., data
+loaders reading images from disk.
 
 ## Learning more
 

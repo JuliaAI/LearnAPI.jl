@@ -170,14 +170,14 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 - [`inverse_transform`](@ref operations): for inverting the output of
   `transform` ("inverting" broadly understood)
 
-- [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
-  [`LearnAPI.features`](@ref): for extracting relevant parts of training data, where
-  defined.
-
 - [`obs`](@ref data_interface): method for exposing to the user
   learner-specific representations of data, which are additionally guaranteed to
   implement the observation access API specified by
   [`LearnAPI.data_interface(learner)`](@ref).
+
+- [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
+  [`LearnAPI.features`](@ref): for extracting relevant parts of training data, where
+  defined.
 
 - [Accessor functions](@ref accessor_functions): these include functions like
   `LearnAPI.feature_importances` and `LearnAPI.training_losses`, for extracting, from
