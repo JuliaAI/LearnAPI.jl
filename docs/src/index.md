@@ -2,11 +2,11 @@
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 
 <div style="font-size:1.4em;font-weight:bold;">
-  <a href="anatomy_of_an_implementation.html"
+  <a href="anatomy_of_an_implementation"
     style="color: #389826;">Tutorial</a>           &nbsp;|&nbsp;
-  <a href="reference.html"
+  <a href="reference"
     style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
-  <a href="common_implementation_patterns.html"
+  <a href="common_implementation_patterns"
     style="color: #9558B2;">Patterns</a>
 </div>
 

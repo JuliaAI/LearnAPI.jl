@@ -366,8 +366,8 @@ An implementation may optionally implement [`obs`](@ref), to expose to the user 
 meta-algorithm like cross-validation) the representation of input data internal to `fit`
 or `predict`, such as the matrix version `A` of `X` in the ridge example.  That is, we may
 factor out of `fit` (and also `predict`) the data pre-processing step, `obs`, to expose
-its outcomes. These outcomes become alternative user inputs to `fit`. To see the use of
-`obs` in action, see [below](@ref advanced_demo).
+its outcomes. These outcomes become alternative user inputs to `fit`/`predict`. To see the
+use of `obs` in action, see [below](@ref advanced_demo).
 
 Here we specifically wrap all the pre-processed data into single object, for which we
 introduce a new type:
@@ -536,7 +536,5 @@ declaration.
 ³ The last index must be the observation index.
 
 ⁴ The `data = (X, y)` pattern implemented here is not the only supported pattern. For,
-example, `data` might be a single table containing both features and target variable. In
-this case, it will be necessary to overload [`LearnAPI.features`](@ref) in addition to
-[`LearnAPI.target`](@ref); the name of the target column would need to be a
-hyperparameter.
+example, `data` might be `(T, formula)` where `T` is a table and `formula` is an R-style
+formula.

@@ -17,7 +17,7 @@ clustering algorithms); there is no training data and the algorithm is executed 
 ```
 update(model, data; verbosity=..., param1=new_value1, param2=new_value2, ...) -> updated_model
 update_observations(model, new_data; verbosity=..., param1=new_value1, ...) -> updated_model
-update_features(model, new_data; verbosity=1, param1=new_value1, ...) -> updated_model
+update_features(model, new_data; verbosity=..., param1=new_value1, ...) -> updated_model
 ```
 
 ## Typical workflows
