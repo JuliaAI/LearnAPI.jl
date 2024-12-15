@@ -80,10 +80,9 @@ ŷ = predict(model, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
 ```
 
 For supervised models (i.e., where `:(LearnAPI.target) in LearnAPI.functions(learner)`)
-`ŷ` above is generally intended to be an approximate proxy for `LearnAPI.target(learner,
-data)`, the training target.
+`ŷ` above is generally intended to be an approximate proxy for the target variable.
 
-The object `X` returned by `LearnAPI.target` has the same number of observations as
+The object `X` returned by `LearnAPI.features` has the same number of observations as
 `observations` does and is guaranteed to implement the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
 

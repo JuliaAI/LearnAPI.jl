@@ -80,9 +80,8 @@ Informally, we will sometimes use the word "model" to refer to the output of
 `fit(learner, ...)` (see below), something which typically *does* store learned
 parameters.
 
-For `learner` to be a valid LearnAPI.jl learner,
-[`LearnAPI.constructor(learner)`](@ref) must be defined and return a keyword constructor
-enabling recovery of `learner` from its properties:
+For every `learner`, [`LearnAPI.constructor(learner)`](@ref) must return a keyword
+constructor enabling recovery of `learner` from its properties:
 
 ```julia
 properties = propertynames(learner)
@@ -92,7 +91,7 @@ named_properties = NamedTuple{properties}(getproperty.(Ref(learner), properties)
 
 which can be tested with `@assert `[`LearnAPI.clone(learner)`](@ref)` == learner`.
 
-Note that if if `learner` is an instance of a *mutable* struct, this requirement
+Note that if `learner` is an instance of a *mutable* struct, this requirement
 generally requires overloading `Base.==` for the struct.
 
 !!! important
@@ -124,6 +123,13 @@ struct GradientRidgeRegressor{T<:Real}
     epochs::Int
     l2_regularization::T
 end
+
+"""
+    GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
+	
+Instantiate a gradient ridge regressor with the specified hyperparameters.
+
+"""
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
     GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
@@ -132,9 +138,9 @@ LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ## Documentation
 
 Attach public LearnAPI.jl-related documentation for a learner to it's *constructor*,
-rather than to the struct defining its type. In this way, a learner can implement
-multiple interfaces, in addition to the LearnAPI interface, with separate document strings
-for each.
+rather than to the struct defining its type, as shown in the example above. (In this way,
+multiple interfaces can share a common struct, with separate document strings for each
+interface.)
 
 ## Methods
 

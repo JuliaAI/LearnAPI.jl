@@ -2,7 +2,7 @@ const DEFAULT_VERBOSITY = Ref(1)
 
 """
     LearnAPI.default_verbosity()
-    LearnAPI.default_verbosity(level::Int)
+    LearnAPI.default_verbosity(verbosity::Int)
 
 Respectively return, or set, the default `verbosity` level for LearnAPI.jl methods that
 support it, which includes [`fit`](@ref), [`update`](@ref),
@@ -11,11 +11,10 @@ call is generally:
 
 
 
-| `level` | behaviour                         |
-|:--------|:----------------------------------|
-| 1       | informational                     |
-| 0       | warnings only                     |
-| -1      | silent                            |
+| `verbosity` | behaviour     |
+|:------------|:--------------|
+| 1           | informational |
+| 0           | warnings only |
 
 
 Methods consuming `verbosity` generally call other verbosity-supporting methods

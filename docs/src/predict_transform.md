@@ -86,7 +86,7 @@ dimension using distances from the cluster centres.
 
 Learners may additionally overload `transform` to apply `fit` first, using the supplied
 data if required, and then immediately `transform` the same data.  In that case the first
-argument of `transform` is an *learner* instead of the output of `fit`:
+argument of `transform` is a *learner* instead of the output of `fit`:
 
 ```julia
 transform(learner, data) # `fit` implied

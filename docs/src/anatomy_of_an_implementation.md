@@ -1,6 +1,6 @@
 # Anatomy of an Implementation
 
-This section explains a detailed implementation of the LearnAPI.jl for naive [ridge
+This tutorial details an implementation of the LearnAPI.jl for naive [ridge
 regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. The kind of
 workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
 refer to the [demonstration](@ref workflow) of the implementation given later.
@@ -35,8 +35,7 @@ A transformer ordinarily implements `transform` instead of `predict`. For more o
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     this interface, as illustrated below under
-    [Providing a separate data front end](@ref), and which may additionally
-    enable certain performance benefits; or (ii) overload the trait
+    [Providing a separate data front end](@ref); or (ii) overload the trait
     [`LearnAPI.data_interface`](@ref) to specify a more relaxed data
     API.
 
@@ -62,7 +61,7 @@ nothing # hide
 
 Instances of `Ridge` are *[learners](@ref learners)*, in LearnAPI.jl parlance.
 
-Associated with each new type of LearnAPI.jl [learner](@ref learners) will be a keyword
+Associated with each new type of LearnAPI.jl learner will be a keyword
 argument constructor, providing default values for all properties (typically, struct
 fields) that are not other learners, and we must implement
 [`LearnAPI.constructor(learner)`](@ref), for recovering the constructor from an instance:
@@ -365,9 +364,41 @@ y = 2a - b + 3c + 0.05*rand(n)
 An implementation may optionally implement [`obs`](@ref), to expose to the user (or some
 meta-algorithm like cross-validation) the representation of input data internal to `fit`
 or `predict`, such as the matrix version `A` of `X` in the ridge example.  That is, we may
-factor out of `fit` (and also `predict`) the data pre-processing step, `obs`, to expose
-its outcomes. These outcomes become alternative user inputs to `fit`/`predict`. To see the
-use of `obs` in action, see [below](@ref advanced_demo).
+factor out of `fit` (and also `predict`) a data pre-processing step, `obs`, to expose
+its outcomes. These outcomes become alternative user inputs to `fit`/`predict`.
+
+In the default case, the alternative data representations will implement the MLUtils.jl
+`getobs/numobs` interface for observation subsampling, which is generally all a user or
+meta-algorithm will need, before passing the data on to `fit`/`predict` as you would the
+original data.
+
+So, instead of the pattern
+
+```julia
+model = fit(learner, data)
+predict(model, newdata)
+```
+
+one enables the following alternative (which in any case will still work, because of a
+no-op `obs` fallback provided by LearnAPI.jl):
+
+```julia
+observations = obs(learner, data) # pre-processed training data
+
+# optional subsampling:
+observations = MLUtils.getobs(observations, train_indices)
+
+model = fit(learner, observations)
+
+newobservations = obs(model, newdata)
+
+# optional subsampling:
+newobservations = MLUtils.getobs(observations, test_indices)
+
+predict(model, newobservations)
+```
+
+See also the demonstration [below](@ref advanced_demo).
 
 Here we specifically wrap all the pre-processed data into single object, for which we
 introduce a new type:

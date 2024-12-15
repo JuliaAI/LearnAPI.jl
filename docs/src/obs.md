@@ -47,8 +47,6 @@ import MLUtils
 learner = <some supervised learner>
 
 data = <some data that `fit` can consume, with 30 observations>
-X = LearnAPI.features(learner, data)
-y = LearnAPI.target(learner, data)
 
 train_test_folds = map([1:10, 11:20, 21:30]) do test
     (setdiff(1:30, test), test)
@@ -65,12 +63,14 @@ scores = map(train_test_folds) do (train, test)
 
     # predict on the fold complement:
     if never_trained
+        X = LearnAPI.features(learner, data)
         global predictobs = obs(model, X)
         global never_trained = false
     end
     predictobs_subset = MLUtils.getobs(predictobs, test)
     ŷ = predict(model, Point(), predictobs_subset)
 
+    y = LearnAPI.target(learner, data)
     return <score comparing ŷ with y[test]>
 
 end
@@ -96,8 +96,8 @@ obs
 ### [Data interfaces](@id data_interfaces)
 
 New implementations must overload [`LearnAPI.data_interface(learner)`](@ref) if the
-output of [`obs`](@ref) does not implement [`LearnAPI.RandomAccess`](@ref). (Arrays, most
-tables, and all tuples thereof, implement `RandomAccess`.)
+output of [`obs`](@ref) does not implement [`LearnAPI.RandomAccess()`](@ref). Arrays, most
+tables, and all tuples thereof, implement `RandomAccess()`.
 
 - [`LearnAPI.RandomAccess`](@ref) (default)
 - [`LearnAPI.FiniteIterable`](@ref)

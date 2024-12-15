@@ -229,7 +229,8 @@ A data interface type.  We say that `data` implements the `FiniteIterable` inter
 it implements Julia's `iterate` interface, including `Base.length`, and if
 `Base.IteratorSize(typeof(data)) == Base.HasLength()`. For example, this is true if:
 
-- `data` implements the [`LearnAPI.RandomAccess`](@ref) interface (arrays and most tables)
+- `data` implements the [`LearnAPI.RandomAccess`](@ref) interface (arrays and most
+  tables); or
 
 - `data isa MLUtils.DataLoader`, which includes output from `MLUtils.eachobs`.
 

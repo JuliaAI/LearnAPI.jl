@@ -25,22 +25,19 @@ model = fit(learner, data_train)
 ŷ = predict(model, Point(), X[101:150])
 ```
 
-Alternative, data agnostic, workflow using `obs` and the MLUtils.jl method `getobs`
-(assumes `LearnAPI.data_interface(learner) == RandomAccess()`):
+Alternative workflow using `obs` and the MLUtils.jl method `getobs` to carry out
+subsampling (assumes `LearnAPI.data_interface(learner) == RandomAccess()`):
 
 ```julia
 import MLUtils
-
 fit_observations = obs(learner, data)
 model = fit(learner, MLUtils.getobs(fit_observations, 1:100))
-
 predict_observations = obs(model, X)
 ẑ = predict(model, Point(), MLUtils.getobs(predict_observations, 101:150))
 @assert ẑ == ŷ
 ```
 
 See also [`LearnAPI.data_interface`](@ref).
-
 
 # Extended help
 

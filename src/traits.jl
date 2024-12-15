@@ -79,9 +79,9 @@ All new implementations must implement this trait. Here's a checklist for elemen
 return value:
 
 | expression                        | implementation compulsory? | include in returned tuple?         |
-|-----------------------------------|----------------------------|------------------------------------|
+|:----------------------------------|:---------------------------|:-----------------------------------|
 | `:(LearnAPI.fit)`                 | yes                        | yes                                |
-| `:(LearnAPI.learner)`           | yes                        | yes                                |
+| `:(LearnAPI.learner)`             | yes                        | yes                                |
 | `:(LearnAPI.strip)`               | no                         | yes                                |
 | `:(LearnAPI.obs)`                 | no                         | yes                                |
 | `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |

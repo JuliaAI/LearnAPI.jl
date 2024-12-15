@@ -21,7 +21,8 @@ The signature `fit(learner; verbosity=...)` (no `data`) is provided by learners 
 not generalize to new observations (called *static algorithms*). In that case,
 `transform(model, data)` or `predict(model, ..., data)` carries out the actual algorithm
 execution, writing any byproducts of that operation to the mutable object `model` returned
-by `fit`.
+by `fit`. Inspect the value of [`LearnAPI.is_static(learner)`](@ref) to determine whether
+`fit` consumes `data` or not.
 
 Use `verbosity=0` for warnings only, and `-1` for silent training.
 
@@ -117,7 +118,7 @@ learner = MyNeuralNetwork(epochs=10, learning_rate=0.01)
 model = fit(learner, data)
 
 # train for two more epochs using new data and new learning rate:
-model = update_observations(model, new_data; epochs=2, learning_rate=0.1)
+model = update_observations(model, new_data; epochs=12, learning_rate=0.1)
 ```
 
 When following the call `fit(learner, data)`, the `update` call is semantically
