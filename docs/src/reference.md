@@ -199,8 +199,9 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 ## Utilities
 
 ```@docs
+@functions
 LearnAPI.clone
-LearnAPI.@trait
+@trait
 ```
 
 ---

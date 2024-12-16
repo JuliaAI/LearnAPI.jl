@@ -22,9 +22,8 @@ julia> ridge = Ridge(lambda=0.1)
 Inspect available functionality:
 
 ```
-julia> LearnAPI.functions(ridge)
-(:(LearnAPI.fit), :(LearnAPI.learner), :(LearnAPI.strip), :(LearnAPI.obs), 
-:(LearnAPI.features), :(LearnAPI.target), :(LearnAPI.predict), :(LearnAPI.coefficients))
+julia> @functions ridge
+(fit, LearnAPI.learner, LearnAPI.strip, obs, LearnAPI.features, LearnAPI.target, predict, LearnAPI.coefficients
 ```
 
 Train:

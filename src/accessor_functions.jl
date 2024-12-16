@@ -312,23 +312,23 @@ function training_labels end
 
 # :extras intentionally excluded:
 const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
-    learner,
-    coefficients,
-    intercept,
-    tree,
-    trees,
-    feature_names,
-    feature_importances,
-    training_labels,
-    training_losses,
-    training_predictions,
-    training_scores,
-    components,
+    :(LearnAPI.learner),
+    :(LearnAPI.coefficients),
+    :(LearnAPI.intercept),
+    :(LearnAPI.tree),
+    :(LearnAPI.trees),
+    :(LearnAPI.feature_names),
+    :(LearnAPI.feature_importances),
+    :(LearnAPI.training_labels),
+    :(LearnAPI.training_losses),
+    :(LearnAPI.training_predictions),
+    :(LearnAPI.training_scores),
+    :(LearnAPI.components),
 )
 
 const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS_LIST = join(
     map(ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS) do f
-    "[`LearnAPI.$f`](@ref)"
+    "[`$f`](@ref)"
     end,
     ", ",
     " and ",
@@ -354,11 +354,12 @@ $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
 """
 function extras end
 
-const ACCESSOR_FUNCTIONS = (extras, ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS...)
+const ACCESSOR_FUNCTIONS =
+    (:(LearnAPI.extras), ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS...)
 
 const ACCESSOR_FUNCTIONS_LIST = join(
     map(ACCESSOR_FUNCTIONS) do f
-    "[`LearnAPI.$f`](@ref)"
+    "[`$f`](@ref)"
     end,
     ", ",
     " and ",

@@ -55,7 +55,7 @@ y = <some training target>
 Xnew = <some test or production features>
 
 # List LearnaAPI functions implemented for `forest`:
-LearnAPI.functions(forest)
+@functions forest
 
 # Train:
 model = fit(forest, X, y)

@@ -65,11 +65,17 @@ with `learner`, or an associated model (object returned by `fit(learner, ...)`, 
 first argument. Learner traits (methods for which `learner` is the *only* argument)
 are excluded.
 
+To return actual functions, instead of symbols, use [`@functions`](@ref)` learner`
+instead.
+
 The returned tuple may include expressions like `:(DecisionTree.print_tree)`, which
 reference functions not owned by LearnAPI.jl.
 
 The understanding is that `learner` is a LearnAPI-compliant object whenever the return
 value is non-empty.
+
+Do `LearnAPI.functions()` to list all possible elements of the return value owned by
+LearnAPI.jl.
 
 # Extended help
 
@@ -100,6 +106,7 @@ learner-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIO
 (`LearnAPI.strip` is always included).
 
 """
+functions(::Any) = ()
 functions() = (
     :(LearnAPI.fit),
     :(LearnAPI.learner),
@@ -114,8 +121,34 @@ functions() = (
     :(LearnAPI.predict),
     :(LearnAPI.transform),
     :(LearnAPI.inverse_transform),
+    ACCESSOR_FUNCTIONS...,
 )
-functions(::Any) = ()
+
+"""
+    @functions learner
+
+Return a tuple of functions that can be meaningfully applied with `learner`, or an
+associated model, as the first argument. An "associated model" is an object returned by
+`fit(learner, ...)`. Learner traits (methods for which `learner` is the *only* argument)
+are excluded.
+
+```
+julia> @functions my_feature_selector
+(fit, LearnAPI.learner, strip, obs, transform)
+
+```
+
+New learner implementations should overload [`LearnAPI.functions`](@ref).
+
+See also [`LearnAPI.functions`](@ref).
+
+"""
+macro functions(learner)
+    quote
+        exs = LearnAPI.functions(learner)
+        eval.(exs)
+    end |> esc
+end
 
 """
     LearnAPI.kinds_of_proxy(learner)
