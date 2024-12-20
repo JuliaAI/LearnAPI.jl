@@ -23,7 +23,7 @@ Inspect available functionality:
 
 ```
 julia> @functions ridge
-(fit, LearnAPI.learner, LearnAPI.strip, obs, LearnAPI.features, LearnAPI.target, predict, LearnAPI.coefficients
+(fit, LearnAPI.learner, LearnAPI.strip, obs, LearnAPI.features, LearnAPI.target, predict, LearnAPI.coefficients)
 ```
 
 Train:
