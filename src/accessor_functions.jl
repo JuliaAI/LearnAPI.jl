@@ -247,7 +247,7 @@ See also [`fit`](@ref).
 # New implementations
 
 Implement for iterative algorithms that compute and record training losses as part of
-training (e.g. neural networks).
+training (e.g. neural networks). Return value should be `AbstractVector`.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_predictions)")).
 

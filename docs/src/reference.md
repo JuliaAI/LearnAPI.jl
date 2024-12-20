@@ -45,7 +45,7 @@ values in the set of dictionary keys, can be specified as a hyperparameter.
 #### Context
 
 After training, a supervised classifier predicts labels on some input which are then
-compared with ground truth labels using some accuracy measure, to assesses the performance
+compared with ground truth labels using some accuracy measure, to assess the performance
 of the classifier. Alternatively, the classifier predicts class probabilities, which are
 instead paired with ground truth labels using a proper scoring rule, say. In outlier
 detection, "outlier"/"inlier" predictions, or probability-like scores, are similarly
