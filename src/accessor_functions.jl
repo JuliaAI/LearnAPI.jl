@@ -349,7 +349,7 @@ See also [`fit`](@ref).
 Implementation is discouraged for byproducts already covered by other LearnAPI.jl accessor
 functions: $ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS_LIST.
 
-$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.extras)")).
 
 """
 function extras end
