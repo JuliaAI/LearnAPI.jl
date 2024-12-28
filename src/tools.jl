@@ -11,7 +11,8 @@ end
 """
     @trait(LearnerType, trait1=value1, trait2=value2, ...)
 
-Overload a number of traits for learners of type `LearnerType`. For example, the code
+Simultaneously overload a number of traits for learners of type `LearnerType`. For
+example, the code
 
 ```julia
 @trait(

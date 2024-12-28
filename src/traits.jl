@@ -88,6 +88,7 @@ return value:
 |:----------------------------------|:---------------------------|:-----------------------------------|
 | `:(LearnAPI.fit)`                 | yes                        | yes                                |
 | `:(LearnAPI.learner)`             | yes                        | yes                                |
+| `:(LearnAPI.clone)`               | never overloaded           | yes                                |
 | `:(LearnAPI.strip)`               | no                         | yes                                |
 | `:(LearnAPI.obs)`                 | no                         | yes                                |
 | `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
@@ -110,6 +111,7 @@ functions(::Any) = ()
 functions() = (
     :(LearnAPI.fit),
     :(LearnAPI.learner),
+    :(LearnAPI.clone),
     :(LearnAPI.strip),
     :(LearnAPI.obs),
     :(LearnAPI.features),
@@ -129,8 +131,8 @@ functions() = (
 
 Return a tuple of functions that can be meaningfully applied with `learner`, or an
 associated model, as the first argument. An "associated model" is an object returned by
-`fit(learner, ...)`. Learner traits (methods for which `learner` is the *only* argument)
-are excluded.
+`fit(learner, ...)`. Learner traits (methods for which `learner` always the *only*
+argument) are excluded.
 
 ```
 julia> @functions my_feature_selector

@@ -13,9 +13,10 @@ The sole argument of an accessor function is the output, `model`, of
 - [`LearnAPI.trees(model)`](@ref)
 - [`LearnAPI.feature_names(model)`](@ref)
 - [`LearnAPI.feature_importances(model)`](@ref)
-- [`LearnAPI.training_labels(model)`](@ref)
 - [`LearnAPI.training_losses(model)`](@ref)
-- [`LearnAPI.training_predictions(model)`](@ref)
+- [`LearnAPI.out_of_sample_losses(model)`](@ref)
+- [`LearnAPI.predictions(model)`](@ref)
+- [`LearnAPI.out_of_sample_indices(model)`](@ref)
 - [`LearnAPI.training_scores(model)`](@ref)
 - [`LearnAPI.components(model)`](@ref)
 
@@ -42,9 +43,10 @@ LearnAPI.trees
 LearnAPI.feature_names
 LearnAPI.feature_importances
 LearnAPI.training_losses
-LearnAPI.training_predictions
+LearnAPI.out_of_sample_losses
+LearnAPI.predictions
+LearnAPI.out_of_sample_indices
 LearnAPI.training_scores
-LearnAPI.training_labels
 LearnAPI.components
 ```
 

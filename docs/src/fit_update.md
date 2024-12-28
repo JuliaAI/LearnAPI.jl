@@ -111,8 +111,8 @@ Exactly one of the following must be implemented:
 | method                                                                               | fallback | compulsory? |
 |:-------------------------------------------------------------------------------------|:---------|-------------|
 | [`update`](@ref)`(model, data; verbosity=..., hyperparameter_updates...)`              | none     | no          |
-| [`update_observations`](@ref)`(model, data; verbosity=..., hyperparameter_updates...)` | none     | no          |
-| [`update_features`](@ref)`(model, data; verbosity=..., hyperparameter_updates...)`     | none     | no          |
+| [`update_observations`](@ref)`(model, new_data; verbosity=..., hyperparameter_updates...)` | none     | no          |
+| [`update_features`](@ref)`(model, new_data; verbosity=..., hyperparameter_updates...)`     | none     | no          |
 
 There are some contracts governing the behaviour of the update methods, as they relate to
 a previous `fit` call. Consult the document strings for details.

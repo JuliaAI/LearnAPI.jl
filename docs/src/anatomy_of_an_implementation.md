@@ -50,7 +50,7 @@ nothing # hide
 
 ## Defining learners
 
-Here's a new type whose instances specify ridge regression hyperparameters:
+Here's a new type whose instances specify the single ridge regression hyperparameter:
 
 ```@example anatomy
 struct Ridge{T<:Real}
@@ -280,7 +280,7 @@ nothing # hide
 
 ```@example anatomy
 learner = Ridge(lambda=0.5)
-foreach(println, LearnAPI.functions(learner))
+@functions learner
 ```
 
 Training and predicting:
@@ -344,6 +344,7 @@ LearnAPI.strip(model::RidgeFitted) =
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.learner),
+        :(LearnAPI.clone),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),

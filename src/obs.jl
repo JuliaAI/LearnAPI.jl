@@ -2,10 +2,10 @@
     obs(learner, data)
     obs(model, data)
 
-Return learner-specific representation of `data`, suitable for passing to `fit`
-(first signature) or to `predict` and `transform` (second signature), in place of
-`data`. Here `model` is the return value of `fit(learner, ...)` for some LearnAPI.jl
-learner, `learner`.
+Return learner-specific representation of `data`, suitable for passing to `fit`, `update`,
+ `update_observations`, or `update_features` (first signature) or to `predict` and
+ `transform` (second signature), in place of `data`. Here `model` is the return value of
+ `fit(learner, ...)` for some LearnAPI.jl learner, `learner`.
 
 The returned object is guaranteed to implement observation access as indicated by
 [`LearnAPI.data_interface(learner)`](@ref), typically

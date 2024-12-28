@@ -27,9 +27,9 @@ see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
 !!! note
 
-    In the MLUtils.jl
-    convention, observations in tables are the rows but observations in a matrix are the
-    columns.
+	In the MLUtils.jl
+	convention, observations in tables are the rows but observations in a matrix are the
+	columns.
 
 ### [Hyperparameters](@id hyperparameters)
 
@@ -96,9 +96,9 @@ generally requires overloading `Base.==` for the struct.
 
 !!! important
 
-    No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
-    deep copies of RNG hyperparameters before using them in a new implementation of
-    [`fit`](@ref).
+	No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
+	deep copies of RNG hyperparameters before using them in a new implementation of
+	[`fit`](@ref).
 
 #### Composite learners (wrappers)
 
@@ -119,19 +119,19 @@ Below is an example of a learner type with a valid constructor:
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}
-    learning_rate::T
-    epochs::Int
-    l2_regularization::T
+	learning_rate::T
+	epochs::Int
+	l2_regularization::T
 end
 
 """
-    GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
-	
+	GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
+
 Instantiate a gradient ridge regressor with the specified hyperparameters.
 
 """
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
-    GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
@@ -146,9 +146,9 @@ interface.)
 
 !!! note "Compulsory methods"
 
-    All new learner types must implement [`fit`](@ref),
-    [`LearnAPI.learner`](@ref), [`LearnAPI.constructor`](@ref) and
-    [`LearnAPI.functions`](@ref).
+	All new learner types must implement [`fit`](@ref),
+	[`LearnAPI.learner`](@ref), [`LearnAPI.constructor`](@ref) and
+	[`LearnAPI.functions`](@ref).
 
 Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
 minimal (but useless) implementation, see the implementation of `SmallLearner`
@@ -198,10 +198,14 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 
 ## Utilities
 
+- [`clone`](@ref): for cloning a learner with specified hyperparameter replacements.
+- [`@trait`](@ref): for simultaneously declaring multiple traits
+- [`@functions`](@ref): for listing functions available for use with a learner 
+
 ```@docs
-@functions
-LearnAPI.clone
+clone
 @trait
+@functions
 ```
 
 ---

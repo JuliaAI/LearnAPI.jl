@@ -181,20 +181,22 @@ function intercept end
 """
     LearnAPI.tree(model)
 
-Return a user-friendly tree, in the form of a root object implementing the following
-interface defined in AbstractTrees.jl:
-
-- subtypes `AbstractTrees.AbstractNode{T}`
-- implements `AbstractTrees.children()`
-- implements `AbstractTrees.printnode()`
-
-Such a tree can be visualized using the TreeRecipe.jl package, for example.
+Return a user-friendly `tree`, implementing the AbstractTrees.jl interface. In particular,
+such a tree can be visualized using `AbstractTrees.print_tree(tree)` or using the
+TreeRecipe.jl package.
 
 See also [`LearnAPI.trees`](@ref).
 
 # New implementations
 
-Implementation is optional.
+Implementation is optional. The returned object should implement the following interface
+defined in AbstractTrees.jl:
+
+- `tree` subtypes `AbstractTrees.AbstractNode{T}`
+
+- `AbstractTrees.children(tree)`
+
+- `AbstractTrees.printnode(tree)` should be human-readable
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.tree)")).
 
@@ -204,14 +206,15 @@ function tree end
 """
     LearnAPI.trees(model)
 
-For some ensemble model, return a vector of trees. See [`LearnAPI.tree`](@ref) for the
-form of such trees.
+For tree ensemble model, return a vector of trees, each implementing the AbstractTrees.jl
+interface.
 
 See also [`LearnAPI.tree`](@ref).
 
 # New implementations
 
-Implementation is optional.
+Implementation is optional. See [`LearnAPI.tree`](@ref) for the interface each tree in the
+ensemble should implement.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.trees)")).
 
@@ -221,15 +224,20 @@ function trees end
 """
     LearnAPI.training_losses(model)
 
-Return the training losses obtained when running `model = fit(learner, ...)` for some
-`learner`.
+Return internally computed training losses obtained when running `model = fit(learner,
+...)` for some `learner`, one for each iteration of the algorithm. This will be a
+numerical vector. The metric used to compute the loss is generally learner-specific, but
+may be a user-specifiable learner hyperparameter. Generally, the smaller the loss, the
+better the performance.
 
 See also [`fit`](@ref).
 
 # New implementations
 
-Implement for iterative algorithms that compute and record training losses as part of
-training (e.g. neural networks).
+Implement for iterative algorithms that compute meausures of training performance as part
+of training (e.g. neural networks). Return one value per iteration, in chronological
+order, with an optional pre-training intial value. If scores are being computed rather
+than losses, ensure values are multiplied by -1.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_losses)")).
 
@@ -237,36 +245,111 @@ $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_losses)")).
 function training_losses end
 
 """
-    LearnAPI.training_predictions(model)
+    LearnAPI.out_of_sample_losses(model)
 
-Return internally computed training predictions when running `model = fit(learner, ...)`
-for some `learner`.
+Return internally computed out-of-sample losses obtained when running `model =
+fit(learner, ...)` for some `learner`, one for each iteration of the algorithm. This will
+be a numeric vector. The metric used to compute the loss is generally learner-specific,
+but may be a user-specifiable learner hyperparameter. Generally, the smaller the loss, the
+better the performance.
+
+If the learner is not setting aside a separate validation set, then the losses are all
+`Inf`.
 
 See also [`fit`](@ref).
 
 # New implementations
 
-Implement for iterative algorithms that compute and record training losses as part of
-training (e.g. neural networks). Return value should be `AbstractVector`.
+Only implement this method for learners that specifically allow for the supplied training
+data to be internally split into separate "train" and "validation" subsets, and which
+additionally compute an out-of-sample loss.  Return one value per iteration, in
+chronological order, with an optional pre-training intial value. If scores are being
+computed rather than losses, ensure values are multiplied by -1.
 
-$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_predictions)")).
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.out_of_sample_losses)")).
 
 """
-function training_predictions end
+function out_of_sample_losses end
+
+"""
+    LearnAPI.predictions(model)
+
+Return internally computed predictions on the training data when running `model =
+fit(learner, ...)` for some `learner`. These will be actual target predictions or proxies
+for the target, according to the first value of
+[`LearnAPI.kinds_of_proxy(learner)`](@ref).
+
+See also [`fit`](@ref).
+
+# New implementations
+
+Implement for algorithms that internally compute predictions for the training
+data. Predictions for the complete test data must be returned, even if only a subset is
+used for training. Here are use cases:
+
+- Clustering algorithms that generalize to new data, but by first learning labels for the
+  training data (e.g., K-means); use `predictions(model)` to expose these labels
+  to the user so they can avoid a separate `predict` call.
+
+- Iterative learners such as neural networks, that need to make in-sample predictions
+   to estimate to estimate an in-sample loss; use `predictions(model)`
+   to expose these predictions to the user so they can avoid a separate `predict` call.
+
+- Ensemble learners, such as gradient tree boosting algorithms, may split the training
+  data into internal train and validation subsets and can efficiently build up predictions
+  on both with an update for each new ensemble member; expose these predictions to the
+  user (for external iteration control, for example) using `predictions(model)`
+  and articulate the actual split used using
+  [`LearnAPI.out_of_sample_indices(model)`](@ref).
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predictions)")).
+
+"""
+function predictions end
+
+"""
+    LearnAPI.out_of_sample_indices(model)
+
+For a learner implementing [`LearnAPI.predictions`](@ref), return a vector of
+observation indices identifying which part, if any, of `yhat =
+LearnAPI.predictions(model)`, is actually out-of-sample predictions. If the
+learner trained on all data this will be an empty vector.
+
+Here's a sample workflow for some such `learner`, with training data, `(X, y)`, where `y`
+is the training target, here assumed to be a vector.
+
+```julia
+import MLUtils.getobs
+model = fit(learner, (X, y))
+yhat = LearnAPI.predictions(model)
+test_indices = LearnAPI.out_of_sample_indices(model)
+out_of_sample_loss = yhat[test_indices] .!= y[test_indices] |> mean
+```
+
+# New implementations
+
+Implement for algorithms that internally split training data into "train" and
+"validate" subsets. Assumes
+[`LearnAPI.data_interface(learner)`](@ref)`==LearnAPI.RandomAccess()`.
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.out_of_sample_indices)")).
+"""
+function out_of_sample_indices end
 
 """
     LearnAPI.training_scores(model)
 
 Return the training scores obtained when running `model = fit(learner, ...)` for some
-`learner`.
+`learner`. This will be a numerical vector whose length coincides with the number of
+training observations, and whose interpretation depends on the learner.
 
 See also [`fit`](@ref).
 
 # New implementations
 
-Implement for learners, such as outlier detection algorithms, which associate a score
-with each observation during training, where these scores are of interest in later
-processes (e.g, in defining normalized scores for new data).
+Implement for learners, such as outlier detection algorithms, which associate a numerical
+score with each observation during training, when these scores are of interest in
+workflows (e.g, to normalize the scores for new observations).
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_scores)")).
 
@@ -295,21 +378,6 @@ $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.components)")).
 """
 function components end
 
-"""
-    LearnAPI.training_labels(model)
-
-Return the training labels obtained when running `model = fit(learner, ...)` for some
-`learner`.
-
-See also [`fit`](@ref).
-
-# New implementations
-
-$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_labels)")).
-
-"""
-function training_labels end
-
 # :extras intentionally excluded:
 const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     :(LearnAPI.learner),
@@ -319,9 +387,10 @@ const ACCESSOR_FUNCTIONS_WITHOUT_EXTRAS = (
     :(LearnAPI.trees),
     :(LearnAPI.feature_names),
     :(LearnAPI.feature_importances),
-    :(LearnAPI.training_labels),
     :(LearnAPI.training_losses),
-    :(LearnAPI.training_predictions),
+    :(LearnAPI.out_of_sample_losses),
+    :(LearnAPI.predictions),
+    :(LearnAPI.out_of_sample_indices),
     :(LearnAPI.training_scores),
     :(LearnAPI.components),
 )

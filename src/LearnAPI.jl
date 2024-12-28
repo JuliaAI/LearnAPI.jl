@@ -11,7 +11,7 @@ include("accessor_functions.jl")
 include("traits.jl")
 include("clone.jl")
 
-export @trait, @functions
+export @trait, @functions, clone
 export fit, update, update_observations, update_features
 export predict, transform, inverse_transform, obs
 

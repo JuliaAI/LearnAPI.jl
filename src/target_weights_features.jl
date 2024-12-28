@@ -7,7 +7,8 @@ data)`](@ref), the target variable part of `observations`. If `nothing` is retur
 
 The returned object `y` has the same number of observations as `observations` does and is
 guaranteed to implement the data interface specified by
-[`LearnAPI.data_interface(learner)`](@ref).
+[`LearnAPI.data_interface(learner)`](@ref). It's form should be suitable for pairing with
+the output of [`predict`](@ref), for example in a loss function.
 
 # Extended help
 

@@ -50,9 +50,9 @@ enable the basic workflow below. In this case data is presented following the
 "scikit-learn" `X, y` pattern, although LearnAPI.jl supports other patterns as well.
 
 ```julia
-X = <some training features>
-y = <some training target>
-Xnew = <some test or production features>
+# `X` is some training features
+# `y` is some training target
+# `Xnew` is some test or production features
 
 # List LearnaAPI functions implemented for `forest`:
 @functions forest
@@ -72,11 +72,6 @@ LearnAPI.feature_importances(model)
 # Slim down and otherwise prepare model for serialization:
 small_model = LearnAPI.strip(model)
 serialize("my_random_forest.jls", small_model)
-
-# Recover saved model and algorithm configuration ("learner"):
-recovered_model = deserialize("my_random_forest.jls")
-@assert LearnAPI.learner(recovered_model) == forest
-@assert predict(recovered_model, Point(), Xnew) == ŷ
 ```
 
 `Distribution` and `Point` are singleton types owned by LearnAPI.jl. They allow

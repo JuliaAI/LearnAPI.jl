@@ -9,6 +9,8 @@ clone(learner; epochs=100, learning_rate=0.01)
 
 A LearnAPI.jl contract ensures that `LearnAPI.clone(learner) == learner`.
 
+A new learner implementation does not overload `clone`.
+
 """
 function clone(learner; replacements...)
     reps = NamedTuple(replacements)

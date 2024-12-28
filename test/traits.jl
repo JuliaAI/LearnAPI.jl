@@ -13,6 +13,7 @@ LearnAPI.learner(model::SmallLearner) = model
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.learner),
+        :(LearnAPI.clone),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),

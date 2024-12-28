@@ -5,3 +5,5 @@ See these examples from the JuliaTestAI.jl test suite:
 - [bagged ensembling](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/ensembling.jl)
 
 - [perceptron classifier](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/gradient_descent.jl)
+
+- [extremely randomized ensemble of decision stumps (regression)](https://github.com/JuliaAI/LearnTestAPI.jl/blob/dev/test/patterns/ensembling.jl)
