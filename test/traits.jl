@@ -36,10 +36,10 @@ small = SmallLearner()
 @test isempty(LearnAPI.tags(small))
 @test !LearnAPI.is_pure_julia(small)
 @test LearnAPI.pkg_name(small) == "unknown"
+@test isempty(LearnAPI.nonlearners(small))
 @test LearnAPI.pkg_license(small) == "unknown"
 @test LearnAPI.doc_url(small) == "unknown"
 @test LearnAPI.load_path(small) == "unknown"
-@test !LearnAPI.is_composite(small)
 @test LearnAPI.human_name(small) == "small learner"
 @test isnothing(LearnAPI.iteration_parameter(small))
 @test LearnAPI.data_interface(small) == LearnAPI.RandomAccess()
@@ -49,6 +49,7 @@ small = SmallLearner()
 
 # DERIVED TRAITS
 
+@test isempty(LearnAPI.learners(small))
 @trait SmallLearner kinds_of_proxy=(Point(),)
 @test LearnAPI.is_learner(small)
 @test !LearnAPI.is_learner("junk")

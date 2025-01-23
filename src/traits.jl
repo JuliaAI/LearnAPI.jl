@@ -60,10 +60,10 @@ function constructor end
 """
     LearnAPI.functions(learner)
 
-Return a tuple of expressions representing functions that can be meaningfully applied
-with `learner`, or an associated model (object returned by `fit(learner, ...)`, as the
-first argument. Learner traits (methods for which `learner` is the *only* argument)
-are excluded.
+Return a tuple of expressions representing functions that can be meaningfully applied with
+`learner`, or an associated model (object returned by `fit(learner, ...)`), as the first
+argument. Learner traits (methods for which `learner` is the *only* argument) are
+excluded.
 
 To return actual functions, instead of symbols, use [`@functions`](@ref)` learner`
 instead.
@@ -320,25 +320,25 @@ load_path(::Any) = "unknown"
 
 
 """
-    LearnAPI.is_composite(learner)
+    LearnAPI.nonlearners(learner)
 
-Returns `true` if one or more properties (fields) of `learner` may themselves be
-learners, and `false` otherwise.
+Return the properties of `learner` whose corresponding values are not themselves
+learners.
 
-See also [`LearnAPI.components`](@ref).
+See also [`LearnAPI.learners`](@ref).
 
 # New implementations
 
-This trait should be overloaded if one or more properties (fields) of `learner` may take
-learner values. Fallback return value is `false`. The keyword constructor for such an
-learner need not prescribe defaults for learner-valued properties. Implementation of
-the accessor function [`LearnAPI.components`](@ref) is recommended.
+This trait should be overloaded if one or more properties (fields) of `learner` take
+learner values. The fallback returns `propertynames(learner)`, meaning no properties have
+learner values. If overloaded, implementation of the accessor function
+[`LearnAPI.components`](@ref) is recommended.
 
 $DOC_ON_TYPE
 
 
 """
-is_composite(::Any) = false
+nonlearners(learner) = propertynames(learner)
 
 """
     LearnAPI.human_name(learner)
@@ -472,6 +472,21 @@ target_observation_scitype(::Any) = Any
 # # DERIVED TRAITS
 
 name(learner) = split(string(constructor(learner)), ".") |> last
+
+"""
+    LearnAPI.learners(learner)
+
+Return the properties of `learner` whose corresponding values are themselves
+learners.
+
+See also [`LearnAPI.learners`](@ref).
+
+# New implementations
+
+This trait should not be overloaded. Instead overload [`LearnAPI.nonlearners`](@ref).
+
+"""
+learners(learner) = setdiff(propertynames(learner), nonlearners(learner))
 is_learner(learner) = !isempty(functions(learner))
 preferred_kind_of_proxy(learner) = first(kinds_of_proxy(learner))
 target(learner) = :(LearnAPI.target) in functions(learner)

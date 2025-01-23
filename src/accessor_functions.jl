@@ -96,8 +96,8 @@ LearnAPI.strip(model) = model
 """
     LearnAPI.feature_names(model)
 
-Return the names of features encountered when fitting or updating some `learner` to obtain
-`model`.
+Where supported, return the names of features encountered when fitting or updating some
+`learner` to obtain `model`.
 
 The value returned value is a vector of symbols.
 
@@ -115,9 +115,9 @@ function feature_names end
 """
     LearnAPI.feature_importances(model)
 
-Return the learner-specific feature importances of a `model` output by
-[`fit`](@ref)`(learner, ...)` for some `learner`.  The value returned has the form of
-an abstract vector of `feature::Symbol => importance::Real` pairs (e.g `[:gender => 0.23,
+Where supported, return the learner-specific feature importances of a `model` output by
+[`fit`](@ref)`(learner, ...)` for some `learner`.  The value returned has the form of an
+abstract vector of `feature::Symbol => importance::Real` pairs (e.g `[:gender => 0.23,
 :height => 0.7, :weight => 0.1]`).
 
 The `learner` supports feature importances if `:(LearnAPI.feature_importances) in
@@ -247,11 +247,11 @@ function training_losses end
 """
     LearnAPI.out_of_sample_losses(model)
 
-Return internally computed out-of-sample losses obtained when running `model =
-fit(learner, ...)` for some `learner`, one for each iteration of the algorithm. This will
-be a numeric vector. The metric used to compute the loss is generally learner-specific,
-but may be a user-specifiable learner hyperparameter. Generally, the smaller the loss, the
-better the performance.
+Where supported, return internally computed out-of-sample losses obtained when running
+`model = fit(learner, ...)` for some `learner`, one for each iteration of the
+algorithm. This will be a numeric vector. The metric used to compute the loss is generally
+learner-specific, but may be a user-specifiable learner hyperparameter. Generally, the
+smaller the loss, the better the performance.
 
 If the learner is not setting aside a separate validation set, then the losses are all
 `Inf`.
@@ -274,10 +274,10 @@ function out_of_sample_losses end
 """
     LearnAPI.predictions(model)
 
-Return internally computed predictions on the training data when running `model =
-fit(learner, ...)` for some `learner`. These will be actual target predictions or proxies
-for the target, according to the first value of
-[`LearnAPI.kinds_of_proxy(learner)`](@ref).
+Where supported, return internally computed predictions on the training `data` after
+running `model = fit(learner, data)` for some `learner`. Sematically equivalent to calling
+`LearnAPI.predict(model, X)`, where `X = LearnAPI.features(obs(learner, data))` but
+generally cheaper.
 
 See also [`fit`](@ref).
 
@@ -285,11 +285,12 @@ See also [`fit`](@ref).
 
 Implement for algorithms that internally compute predictions for the training
 data. Predictions for the complete test data must be returned, even if only a subset is
-used for training. Here are use cases:
+internally used for training. Cannot be implemented for static algorithms (algorithms for
+which `fit` consumes no data). Here are some possible use cases:
 
 - Clustering algorithms that generalize to new data, but by first learning labels for the
   training data (e.g., K-means); use `predictions(model)` to expose these labels
-  to the user so they can avoid a separate `predict` call.
+  to the user so they can avoid the expense of a separate `predict` call.
 
 - Iterative learners such as neural networks, that need to make in-sample predictions
    to estimate to estimate an in-sample loss; use `predictions(model)`
@@ -298,9 +299,8 @@ used for training. Here are use cases:
 - Ensemble learners, such as gradient tree boosting algorithms, may split the training
   data into internal train and validation subsets and can efficiently build up predictions
   on both with an update for each new ensemble member; expose these predictions to the
-  user (for external iteration control, for example) using `predictions(model)`
-  and articulate the actual split used using
-  [`LearnAPI.out_of_sample_indices(model)`](@ref).
+  user (for external iteration control, for example) using `predictions(model)` and
+  articulate the actual split used using [`LearnAPI.out_of_sample_indices(model)`](@ref).
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predictions)")).
 
@@ -310,10 +310,10 @@ function predictions end
 """
     LearnAPI.out_of_sample_indices(model)
 
-For a learner implementing [`LearnAPI.predictions`](@ref), return a vector of
+For a learner also implementing [`LearnAPI.predictions`](@ref), return a vector of
 observation indices identifying which part, if any, of `yhat =
-LearnAPI.predictions(model)`, is actually out-of-sample predictions. If the
-learner trained on all data this will be an empty vector.
+LearnAPI.predictions(model)`, is actually out-of-sample predictions. If the learner
+trained on all data this will be an empty vector.
 
 Here's a sample workflow for some such `learner`, with training data, `(X, y)`, where `y`
 is the training target, here assumed to be a vector.
@@ -339,9 +339,9 @@ function out_of_sample_indices end
 """
     LearnAPI.training_scores(model)
 
-Return the training scores obtained when running `model = fit(learner, ...)` for some
-`learner`. This will be a numerical vector whose length coincides with the number of
-training observations, and whose interpretation depends on the learner.
+Where supported, return the training scores obtained when running `model = fit(learner,
+...)` for some `learner`. This will be a numerical vector whose length coincides with the
+number of training observations, and whose interpretation depends on the learner.
 
 See also [`fit`](@ref).
 
@@ -360,14 +360,14 @@ function training_scores end
     LearnAPI.components(model)
 
 For a composite `model`, return the component models (`fit` outputs). These will be in the
-form of a vector of named pairs, `property_name::Symbol => component_model`. Here
-`property_name` is the name of some learner-valued property (hyper-parameter) of
-`learner = LearnAPI.learner(model)`.
+form of a vector of named pairs, `sublearner::Symbol => component_model(s)`, one for each
+`sublearner` in [`LearnAPI.learners(learner)`](@ref), where `learner =
+LearnAPI.learner(model)`. Here `component_model(s)` will be the `fit` output (or vector of
+`fit` outputs) generated internally for the the corresponding sublearner.
 
-A composite model is one for which the corresponding `learner` includes one or more
-learner-valued properties, and for which `LearnAPI.is_composite(learner)` is `true`.
+The `model` is composite if [`LearnAPI.learners(learner)`](@ref) is non-empty.
 
-See also [`is_composite`](@ref).
+See also [`LearnAPI.learners`](@ref).
 
 # New implementations
 

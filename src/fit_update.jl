@@ -61,11 +61,11 @@ function fit end
 # # UPDATE AND COUSINS
 
 """
-    update(model, data; verbosity=LearnAPI.default_verbosity(), hyperparam_replacements...)
+    update(model, data, param_replacements...; verbosity=1)
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
-`update` call, but with the specified hyperparameter replacements, in the form `p1=value1,
-p2=value2, ...`.
+`update` call, but with the specified hyperparameter replacements, in the form `p1 =>
+value1, p2 => value2, ...`.
 
 ```julia
 learner = MyForest(ntrees=100)
@@ -74,7 +74,7 @@ learner = MyForest(ntrees=100)
 model = fit(learner, data)
 
 # add 50 more trees:
-model = update(model, data; ntrees=150)
+model = update(model, data, :ntrees => 150)
 ```
 
 Provided that `data` is identical with the data presented in a preceding `fit` call *and*
@@ -91,8 +91,12 @@ See also [`fit`](@ref), [`update_observations`](@ref), [`update_features`](@ref)
 
 # New implementations
 
-Implementation is optional. The signature must include
-`verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update)"))
+Implementation is optional. The signature must include `verbosity`. It should be true that
+`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
+`newlearner = LearnAPI.clone(learner, replacements...)`.
+
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update)"))
 
 See also [`LearnAPI.clone`](@ref)
 
@@ -100,25 +104,20 @@ See also [`LearnAPI.clone`](@ref)
 function update end
 
 """
-    update_observations(
-        model,
-        new_data;
-        parameter_replacements...,
-        verbosity=LearnAPI.default_verbosity(),
-    )
+    update_observations(model, new_data, param_replacements...; verbosity=1)
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new observations present in `new_data`. One may additionally
-specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
+specify hyperparameter replacements in the form `p1 => value1, p2 => value2, ...`.
 
 ```julia-repl
-learner = MyNeuralNetwork(epochs=10, learning_rate=0.01)
+learner = MyNeuralNetwork(epochs=10, learning_rate => 0.01)
 
 # train for ten epochs:
 model = fit(learner, data)
 
 # train for two more epochs using new data and new learning rate:
-model = update_observations(model, new_data; epochs=12, learning_rate=0.1)
+model = update_observations(model, new_data, epochs => 12, learning_rate => 0.1)
 ```
 
 When following the call `fit(learner, data)`, the `update` call is semantically
@@ -132,8 +131,11 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
 # New implementations
 
-Implementation is optional. The signature must include
-`verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_observations)"))
+Implementation is optional. The signature must include `verbosity`. It should be true that
+`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
+`newlearner = LearnAPI.clone(learner, replacements...)`.
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_observations)"))
 
 See also [`LearnAPI.clone`](@ref).
 
@@ -141,16 +143,12 @@ See also [`LearnAPI.clone`](@ref).
 function update_observations end
 
 """
-    update_features(
-        model,
-        new_data;
-        parameter_replacements...,
-        verbosity=LearnAPI.default_verbosity(),
+    update_features(model, new_data, param_replacements...; verbosity=1)
     )
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new features encapsulated in `new_data`. One may additionally
-specify hyperparameter replacements in the form `p1=value1, p2=value2, ...`.
+specify hyperparameter replacements in the form `p1 => value1, p2 => value2, ...`.
 
 When following the call `fit(learner, data)`, the `update` call is semantically
 equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
@@ -163,8 +161,11 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
 # New implementations
 
-Implementation is optional. The signature must include
-`verbosity`. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_features)"))
+Implementation is optional. The signature must include `verbosity`. It should be true that
+`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
+`newlearner = LearnAPI.clone(learner, replacements...)`.
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.update_features)"))
 
 See also [`LearnAPI.clone`](@ref).
 

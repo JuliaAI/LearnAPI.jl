@@ -1,10 +1,5 @@
 # Anatomy of an Implementation
 
-This tutorial details an implementation of the LearnAPI.jl for naive [ridge
-regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. The kind of
-workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
-refer to the [demonstration](@ref workflow) of the implementation given later.
-
 The core LearnAPI.jl pattern looks like this:
 
 ```julia
@@ -14,8 +9,20 @@ predict(model, newdata)
 
 Here `learner` specifies hyperparameters, while `model` stores learned parameters and any byproducts of algorithm execution.
 
-A transformer ordinarily implements `transform` instead of `predict`. For more on
+[Transformers](@ref) ordinarily implement `transform` instead of `predict`. For more on
 `predict` versus `transform`, see [Predict or transform?](@ref)
+
+["Static" algorithms](@ref static_algorithms) have a `fit` that consumes no `data`
+(instead `predict` or `transform` does the heavy lifting). In [density
+estimation](@ref density_estimation), `predict` consumes no data.
+
+These are the basic possibilities.
+
+Elaborating on the core pattern above, we detail in this tutorial an implementation of the
+LearnAPI.jl for naive [ridge regression](https://en.wikipedia.org/wiki/Ridge_regression)
+with no intercept. The kind of workflow we want to enable has been previewed in [Sample
+workflow](@ref). Readers can also refer to the [demonstration](@ref workflow) of the
+implementation given later.
 
 !!! note
 
@@ -102,7 +109,7 @@ nothing # hide
 Note that we also include `learner` in the struct, for it must be possible to recover
 `learner` from the output of `fit`; see [Accessor functions](@ref) below.
 
-The core implementation of `fit` looks like this:
+The implementation of `fit` looks like this:
 
 ```@example anatomy
 function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
@@ -131,7 +138,7 @@ end
 
 ## Implementing `predict`
 
-Users will be able to call `predict` like this:
+One way users will be able to call `predict` is like this:
 
 ```julia
 predict(model, Point(), Xnew)
@@ -229,6 +236,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.learner),
+        :(LearnAPI.clone),
         :(LearnAPI.strip),
         :(LearnAPI.obs),
         :(LearnAPI.features),
@@ -241,12 +249,17 @@ nothing # hide
 ```
 
 The last trait, `functions`, returns a list of all LearnAPI.jl methods that can be
-meaningfully applied to the learner or associated model. See [`LearnAPI.functions`](@ref)
-for a checklist.  [`LearnAPI.functions`](@ref) and [`LearnAPI.constructor`](@ref), are the
-only universally compulsory traits. However, it is worthwhile studying the [list of all
-traits](@ref traits_list) to see which might apply to a new implementation, to enable
-maximum buy into functionality provided by third party packages, and to assist third party
-algorithms that match machine learning algorithms to user-defined tasks.
+meaningfully applied to the learner or associated model. You always include the first five
+you see here: `fit`, `learner`, `clone` ,`strip`, `obs`. Here [`clone`](@ref) is a utility
+function provided by LearnAPI that you never overload; overloading [`obs`](@ref) is
+optional (see [Providing a separate data front end](@ref)) but it is always included
+because it has a fallback. See [`LearnAPI.functions`](@ref) for a checklist.
+
+[`LearnAPI.functions`](@ref) and [`LearnAPI.constructor`](@ref), are the only universally
+compulsory traits. However, it is worthwhile studying the [list of all traits](@ref
+traits_list) to see which might apply to a new implementation, to enable maximum buy into
+functionality provided by third party packages, and to assist third party algorithms that
+match machine learning algorithms to user-defined tasks.
 
 Note that we know `Ridge` instances are supervised learners because `:(LearnAPI.target)
 in LearnAPI.functions(learner)`, for every instance `learner`. With [some

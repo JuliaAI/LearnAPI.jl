@@ -76,7 +76,7 @@ LearnAPI.extras(model)
 
 See also [Static Algorithms](@ref)
 
-### Density estimation
+### [Density estimation](@id density_estimation)
 
 In density estimation, `fit` consumes no features, only a target variable; `predict`,
 which consumes no data, returns the learned density:

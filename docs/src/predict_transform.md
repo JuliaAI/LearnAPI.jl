@@ -6,8 +6,8 @@ transform(model, data)
 inverse_transform(model, data)
 ```
 
-Versions without the `data` argument may apply, for example in [Density
-estimation](@ref).
+Versions without the `data` argument may apply, for example in [density
+estimation](@ref density_estimation).
 
 ## [Typical worklows](@id predict_workflow)
 

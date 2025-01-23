@@ -103,12 +103,11 @@ generally requires overloading `Base.==` for the struct.
 #### Composite learners (wrappers)
 
 A *composite learner* is one with at least one property that can take other learners as
-values; for such learners [`LearnAPI.is_composite`](@ref)`(learner)` must be `true`
-(fallback is `false`). Generally, the keyword constructor provided by
-[`LearnAPI.constructor`](@ref) must provide default values for all properties that are not
-learner-valued. Instead, these learner-valued properties can have a `nothing` default,
-with the constructor throwing an error if the constructor call does not explicitly
-specify a new value.
+values; for such learners [`LearnAPI.learners(learner)`](@ref) is non-empty. A keyword
+constructor provided by [`LearnAPI.constructor`](@ref) must provide default values for all
+properties that are not in [`LearnAPI.learners(learner)`](@ref). Instead, these
+learner-valued properties can have a `nothing` default, with the constructor throwing an
+error if the constructor call does not explicitly specify a new value.
 
 Any object `learner` for which [`LearnAPI.functions(learner)`](@ref) is non-empty is
 understood to have a valid implementation of the LearnAPI.jl interface.

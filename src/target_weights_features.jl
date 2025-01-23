@@ -67,11 +67,11 @@ weights(::Any, observations) = nothing
     LearnAPI.features(learner, observations)
 
 Return, for every conceivable `observations` returned by a call of the form [`obs(learner,
-data)`](@ref), the "features" part of `data` (as opposed to the target variable, for
-example).
+data)`](@ref), the "features" part of `observations` (as opposed to the target variable,
+for example).
 
-The returned object `X` may always be passed to `predict` or `transform`, where
-implemented, as in the following sample workflow:
+It must always be possible to pass the returned object `X` to `predict` or `transform`,
+where implemented, as in the following sample workflow:
 
 ```julia
 observations = obs(learner, data)
