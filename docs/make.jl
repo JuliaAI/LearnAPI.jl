@@ -1,6 +1,7 @@
 using Documenter
 using LearnAPI
 using ScientificTypesBase
+using DocumenterInterLinks
 
 const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
