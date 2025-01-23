@@ -234,9 +234,9 @@ See also [`fit`](@ref).
 
 # New implementations
 
-Implement for iterative algorithms that compute meausures of training performance as part
+Implement for iterative algorithms that compute measures of training performance as part
 of training (e.g. neural networks). Return one value per iteration, in chronological
-order, with an optional pre-training intial value. If scores are being computed rather
+order, with an optional pre-training initial value. If scores are being computed rather
 than losses, ensure values are multiplied by -1.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.training_losses)")).
@@ -263,7 +263,7 @@ See also [`fit`](@ref).
 Only implement this method for learners that specifically allow for the supplied training
 data to be internally split into separate "train" and "validation" subsets, and which
 additionally compute an out-of-sample loss.  Return one value per iteration, in
-chronological order, with an optional pre-training intial value. If scores are being
+chronological order, with an optional pre-training initial value. If scores are being
 computed rather than losses, ensure values are multiplied by -1.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.out_of_sample_losses)")).
@@ -275,7 +275,7 @@ function out_of_sample_losses end
     LearnAPI.predictions(model)
 
 Where supported, return internally computed predictions on the training `data` after
-running `model = fit(learner, data)` for some `learner`. Sematically equivalent to calling
+running `model = fit(learner, data)` for some `learner`. Semantically equivalent to calling
 `LearnAPI.predict(model, X)`, where `X = LearnAPI.features(obs(learner, data))` but
 generally cheaper.
 
