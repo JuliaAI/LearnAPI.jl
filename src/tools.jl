@@ -8,38 +8,38 @@ function name_value_pair(ex)
     return (ex.args[1], ex.args[2])
 end
 
-macro trait(algorithm_ex, exs...)
+"""
+    @trait(LearnerType, trait1=value1, trait2=value2, ...)
+
+Simultaneously overload a number of traits for learners of type `LearnerType`. For
+example, the code
+
+```julia
+@trait(
+    RidgeRegressor,
+    tags = ("regression", ),
+    doc_url = "https://some.cool.documentation",
+)
+```
+
+is equivalent to
+
+```julia
+LearnAPI.tags(::RidgeRegressor) = ("regression", ),
+LearnAPI.doc_url(::RidgeRegressor) = "https://some.cool.documentation",
+```
+
+"""
+macro trait(learner_ex, exs...)
     program = quote end
     for ex in exs
         trait_ex, value_ex = name_value_pair(ex)
         push!(
             program.args,
-            :($LearnAPI.$trait_ex(::$algorithm_ex) = $value_ex),
+            :($LearnAPI.$trait_ex(::$learner_ex) = $value_ex),
         )
     end
     return esc(program)
-end
-
-"""
-    typename(x)
-
-Return a symbolic representation of the name of `type(x)`, stripped of any type-parameters
-and module qualifications. For example, if
-
-    typeof(x) = MLJBase.Machine{MLJAlgorithms.ConstantRegressor,true}
-
-Then `typename(x)` returns `:Machine`.
-
-"""
-function typename(x)
-    M = typeof(x)
-    if isdefined(M, :name)
-        return M.name.name
-    elseif isdefined(M, :body)
-        return typename(M.body)
-    else
-        return Symbol(string(M))
-    end
 end
 
 function is_uppercase(char::Char)
@@ -47,14 +47,14 @@ function is_uppercase(char::Char)
     i > 64 && i < 91
 end
 
-"""
-    snakecase(str, del='_')
+# """
+#     snakecase(str, del='_')
 
-Return the snake case version of the abstract string or symbol, `str`, as in
+# Return the snake case version of the abstract string or symbol, `str`, as in
 
-    snakecase("TheLASERBeam") == "the_laser_beam"
+#     snakecase("TheLASERBeam") == "the_laser_beam"
 
-"""
+# """
 function snakecase(str::AbstractString; delim='_')
     snake = Char[]
     n = length(str)

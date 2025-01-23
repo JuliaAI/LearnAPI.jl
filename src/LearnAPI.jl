@@ -1,16 +1,22 @@
 module LearnAPI
 
-using Statistics
-import InteractiveUtils.subtypes
-
+include("types.jl")
+include("verbosity.jl")
 include("tools.jl")
-include("algorithms.jl")
-include("operations.jl")
-include("fit_update_ingest.jl")
+include("predict_transform.jl")
+include("fit_update.jl")
+include("target_weights_features.jl")
+include("obs.jl")
 include("accessor_functions.jl")
-include("data_interface.jl")
-include("algorithm_traits.jl")
+include("traits.jl")
+include("clone.jl")
 
-export @trait
+export @trait, @functions, clone
+export fit, update, update_observations, update_features
+export predict, transform, inverse_transform, obs
 
+for name in CONCRETE_TARGET_PROXY_SYMBOLS
+    @eval export $name
 end
+
+end # module

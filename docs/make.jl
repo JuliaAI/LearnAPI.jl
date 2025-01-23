@@ -1,31 +1,39 @@
 using Documenter
 using LearnAPI
 using ScientificTypesBase
+using DocumenterInterLinks
 
-const REPO="github.com/JuliaAI/LearnAPI.jl"
+const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
-makedocs(;
+makedocs(
     modules=[LearnAPI,],
-    format=Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
+    format=Documenter.HTML(
+        prettyurls = true,#get(ENV, "CI", nothing) == "true",
+        collapselevel = 1,
+    ),
     pages=[
-        "Overview" => "index.md",
-        "Goals and Approach" => "goals_and_approach.md",
+        "Home" => "index.md",
         "Anatomy of an Implementation" => "anatomy_of_an_implementation.md",
-        "Reference" => "reference.md",
-        "Fit, update and ingest" => "fit_update_and_ingest.md",
-        "Predict and other operations" => "operations.md",
-        "Accessor Functions" => "accessor_functions.md",
-        "Optional Data Interface" => "optional_data_interface.md",
-        "Algorithm Traits" => "algorithm_traits.md",
+        "Reference" => [
+            "Overview" => "reference.md",
+            "fit/update" => "fit_update.md",
+            "predict/transform" => "predict_transform.md",
+            "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
+            "obs and Data Interfaces" => "obs.md",
+            "target/weights/features" => "target_weights_features.md",
+            "Accessor Functions" => "accessor_functions.md",
+            "Learner Traits" => "traits.md",
+        ],
         "Common Implementation Patterns" => "common_implementation_patterns.md",
         "Testing an Implementation" => "testing_an_implementation.md",
     ],
-    repo="https://$REPO/blob/{commit}{path}#L{line}",
-    sitename="LearnAPI.jl"
+    sitename="LearnAPI.jl",
+    warnonly = [:cross_references, :missing_docs],
+    repo = Remotes.GitHub("JuliaAI", "LearnAPI.jl"),
 )
 
 deploydocs(
-    ; repo=REPO,
     devbranch="dev",
     push_preview=false,
+    repo="github.com/JuliaAI/LearnAPI.jl.git",
 )
