@@ -84,11 +84,13 @@ appear as an input to training but not to prediction.
 ## Data interfaces
 
 Algorithms are free to consume data in any format. However, a method called [`obs`](@ref
-data_interface) (read as "observations") gives users and meta-algorithms access to an
-algorithm-specific representation of input data, which is also guaranteed to implement a
-standard interface for accessing individual observations, unless the algorithm explicitly
-opts out. Moreover, the `fit` and `predict` methods will also be able to consume these
-alternative data representations, for performance benefits in some situations.
+data_interface) (read as "observations") gives developers the option of providing a
+separate data front end for their algorithms. In this case `obs` gives users and
+meta-algorithms access to an algorithm-specific representation of input data, which is
+also guaranteed to implement a standard interface for accessing individual observations,
+unless the algorithm explicitly opts out. Moreover, the `fit` and `predict` methods will
+also be able to consume these alternative data representations, for performance benefits
+in some situations.
 
 The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
 `getobs/numobs` interface, here tagged as [`LearnAPI.RandomAccess()`](@ref), and if the
@@ -96,6 +98,9 @@ input consumed by the algorithm already implements that interface (tables, array
 then overloading `obs` is completely optional. Plain iteration interfaces, with or without
 knowledge of the number of observations, can also be specified, to support, e.g., data
 loaders reading images from disk.
+
+Some canned data front ends are provided by the
+[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/stable/) package.
 
 ## Learning more
 
