@@ -440,16 +440,17 @@ fit_observation_scitype(::Any) = Union{}
     LearnAPI.target_observation_scitype(learner)
 
 Return an upper bound `S` on the scitype of each observation of an applicable target
-variable. Specifically:
+variable. Specifically, both of the following is always true:
 
 - If `:(LearnAPI.target) in LearnAPI.functions(learner)` (i.e., `fit` consumes target
-  variables) then "target" means anything returned by `LearnAPI.target(learner, data)`,
-  where `data` is an admissible argument in the call `fit(learner, data)`.
+  variables) then "target" means anything returned by [`LearnAPI.target(learner,
+  observations)`](@ref), where `observations = `[`LearnAPI.obs(learner, data)`](@ref) and
+  `data` is an admissible argument in the call [`fit(learner, data)`](@ref).
 
 - `S` will always be an upper bound on the scitype of (point) observations that could be
   conceivably extracted from the output of [`predict`](@ref).
 
-To illustate the second case, suppose we have
+To illustate the second property, suppose we have
 
 ```julia
 model = fit(learner, data)
