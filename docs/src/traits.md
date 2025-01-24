@@ -28,7 +28,7 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 | [`LearnAPI.human_name`](@ref)`(learner)`                 | human name for the learner; should be a noun                                                                           | type name with spaces                                 | "elastic net regressor"                                        |
 | [`LearnAPI.iteration_parameter`](@ref)`(learner)`        | symbolic name of an iteration parameter                                                                                | `nothing`                                             | :epochs                                                        |
 | [`LearnAPI.data_interface`](@ref)`(learner)`             | Interface implemented by objects returned by [`obs`](@ref)                                                             | `Base.HasLength()` (supports `MLUtils.getobs/numobs`) | `Base.SizeUnknown()` (supports `iterate`)                      |
-| [`LearnAPI.fit_observation_scitype`](@ref)`(learner)`    | upper bound on `scitype(observation)` for `observation` in `data` ensuring `fit(learner, data)` works                  | `Union{}`                                             | `Tuple{AbstractVector{Continuous}, Continuous}`                |
+| [`LearnAPI.fit_scitype`](@ref)`(learner)`                | upper bound on `scitype(data)` ensuring `fit(learner, data)` works                                                     | `Union{}`                                             | `Tuple{AbstractVector{Continuous}, Continuous}`                |
 | [`LearnAPI.target_observation_scitype`](@ref)`(learner)` | upper bound on the scitype of each observation of the targget                                                          | `Any`                                                 | `Continuous`                                                   |
 | [`LearnAPI.is_static`](@ref)`(learner)`                  | `true` if `fit` consumes no data                                                                                       | `false`                                               | `true`                                                         |
 
@@ -105,7 +105,7 @@ LearnAPI.nonlearners
 LearnAPI.human_name
 LearnAPI.data_interface
 LearnAPI.iteration_parameter
-LearnAPI.fit_observation_scitype
+LearnAPI.fit_scitype
 LearnAPI.target_observation_scitype
 LearnAPI.is_static
 ```

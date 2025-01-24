@@ -43,7 +43,7 @@ small = SmallLearner()
 @test LearnAPI.human_name(small) == "small learner"
 @test isnothing(LearnAPI.iteration_parameter(small))
 @test LearnAPI.data_interface(small) == LearnAPI.RandomAccess()
-@test !(6 isa LearnAPI.fit_observation_scitype(small))
+@test !(6 isa LearnAPI.fit_scitype(small))
 @test 6 isa LearnAPI.target_observation_scitype(small)
 @test !LearnAPI.is_static(small)
 
