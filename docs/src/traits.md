@@ -82,7 +82,7 @@ requires:
    non-empty) this requirement is dropped.
 
 2. *Low level deserializability:* It should be possible to evaluate the trait *value* when
-   `LearnAPI` is the only imported module. 
+   `LearnAPI` and `ScientificTypesBase` are the only imported modules. 
 
 Because of 1, combining a lot of functionality into one learner (e.g. the learner can
 perform both classification or regression) can mean traits are necessarily less

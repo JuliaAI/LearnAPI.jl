@@ -42,7 +42,7 @@ See also [`LearnAPI.KindOfProxy`](@ref).
 | `SurvivalDistribution`       | probability distribution for survival time                                                                                                                                        |
 | `SurvivalHazardFunction`     | hazard function for survival time                                                                                                                                                 |
 | `OutlierScore`               | numerical score reflecting degree of outlierness (not necessarily normalized)                                                                                                     |
-| `Continuous`                 | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls)                                                                |
+| `Interpolated`               | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls)                                                                |
 
 ¹Provided for completeness but discouraged to avoid [ambiguities in
 representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation).
@@ -72,7 +72,7 @@ const IID_SYMBOLS = [
     :SurvivalDistribution,
     :HazardFunction,
     :OutlierScore,
-    :Continuous,
+    :Interpolated,
     :Quantile,
     :Expectile,
 ]
