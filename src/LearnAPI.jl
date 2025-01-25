@@ -1,7 +1,6 @@
 module LearnAPI
 
 include("types.jl")
-include("verbosity.jl")
 include("tools.jl")
 include("predict_transform.jl")
 include("fit_update.jl")

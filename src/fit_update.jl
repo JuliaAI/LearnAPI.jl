@@ -1,8 +1,8 @@
 # # FIT
 
 """
-    fit(learner, data; verbosity=LearnAPI.default_verbosity())
-    fit(learner; verbosity=LearnAPI.default_verbosity())
+    fit(learner, data; verbosity=1)
+    fit(learner; verbosity=1)
 
 Execute the machine learning or statistical algorithm with configuration `learner` using
 the provided training `data`, returning an object, `model`, on which other methods, such
@@ -26,7 +26,7 @@ by `fit`. Inspect the value of [`LearnAPI.is_static(learner)`](@ref) to determin
 
 Use `verbosity=0` for warnings only, and `-1` for silent training.
 
-See also [`LearnAPI.default_verbosity`](@ref), [`predict`](@ref), [`transform`](@ref),
+See also [`predict`](@ref), [`transform`](@ref),
 [`inverse_transform`](@ref), [`LearnAPI.functions`](@ref), [`obs`](@ref).
 
 # Extended help
@@ -37,10 +37,9 @@ Implementation of exactly one of the signatures is compulsory. If `fit(learner;
 verbosity=...)` is implemented, then the trait [`LearnAPI.is_static`](@ref) must be
 overloaded to return `true`.
 
-The signature must include `verbosity` with [`LearnAPI.default_verbosity()`](@ref) as
-default.
+The signature must include `verbosity` with `1` as default.
 
-If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
+If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentati[on, then
 [`LearnAPI.target(data)`](@ref) must be overloaded to return it. If [`predict`](@ref) or
 [`transform`](@ref) are implemented and consume data, then
 [`LearnAPI.features(data)`](@ref) must return something that can be passed as data to

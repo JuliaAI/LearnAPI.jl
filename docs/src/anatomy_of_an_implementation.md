@@ -112,7 +112,7 @@ Note that we also include `learner` in the struct, for it must be possible to re
 The implementation of `fit` looks like this:
 
 ```@example anatomy
-function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
+function LearnAPI.fit(learner::Ridge, data; verbosity=1)
 
     X, y = data
 
@@ -443,7 +443,7 @@ methods - one to handle "regular" input, and one to handle the pre-processed dat
 (observations) which appears first below:
 
 ```@example anatomy2
-function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=LearnAPI.default_verbosity())
+function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
 
     lambda = learner.lambda
 
