@@ -98,8 +98,10 @@ implementation must be added to the list returned by
 [`LearnAPI.kinds_of_proxy(learner)`](@ref). List all available kinds of proxy by doing
 `LearnAPI.kinds_of_proxy()`.
 
-If `data` is not present in the implemented signature (eg., for density estimators) then
-[`LearnAPI.features(learner, data)`](@ref) must return `nothing`.
+When `predict` is implemented, it may be necessary to overload
+[`LearnAPI.features`](@ref). If `data` is not present in the implemented signature (eg.,
+for density estimators) then [`LearnAPI.features(learner, data)`](@ref) must always return
+`nothing`.
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predict)"))
 
@@ -161,7 +163,12 @@ See also [`fit`](@ref), [`predict`](@ref),
 # New implementations
 
 Implementation for new LearnAPI.jl learners is
-optional. $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.transform)"))
+optional.
+
+When `predict` is implemented, it may be necessary to overload
+[`LearnAPI.features`](@ref).
+
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.transform)"))
 
 $(DOC_SLURPING(:transform))
 

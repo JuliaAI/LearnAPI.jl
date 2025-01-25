@@ -39,12 +39,10 @@ overloaded to return `true`.
 
 The signature must include `verbosity` with `1` as default.
 
-If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentati[on, then
-[`LearnAPI.target(data)`](@ref) must be overloaded to return it. If [`predict`](@ref) or
-[`transform`](@ref) are implemented and consume data, then
-[`LearnAPI.features(data)`](@ref) must return something that can be passed as data to
-these methods. A fallback returns `first(data)` if `data` is a tuple, and `data`
-otherwise.
+If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
+[`LearnAPI.target`](@ref) must be implemented. If [`predict`](@ref) or [`transform`](@ref)
+are implemented and consume data, then you made need to overload
+[`LearnAPI.features`](@ref).
 
 The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
 two arguments. For convenience, for example, an implementation is free to implement a

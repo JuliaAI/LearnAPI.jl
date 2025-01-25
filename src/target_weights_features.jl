@@ -24,7 +24,7 @@ the LearnAPI.jl documentation.
 
 A fallback returns `nothing`. The method must be overloaded if [`fit`](@ref) consumes data
 that includes a target variable. If `obs` is not being overloaded, then `observations`
-above is any `data` supported in calls of the form [`fit(learner, data)`](@ref).  The form
+above is any `data` supported in calls of the form [`fit(learner, data)`](@ref). The form
 of the output `y` should be suitable for pairing with the output of [`predict`](@ref), in
 the evaluation of a loss function, for example.
 
@@ -93,11 +93,11 @@ The object `X` returned by `LearnAPI.features` has the same number of observatio
 
 A fallback returns `first(observations)` if `observations` is a tuple, and otherwise
 returns `observations`. New implementations may need to overload this method if this
-fallback is inadequate.
+fallback is inadequate. 
 
 For density estimators, whose `fit` typically consumes *only* a target variable, you
-should overload this method to return `nothing`.  If `obs` is not being overloaded, then
-`observations` above is any `data` supported in calls of the form [`fit(learner,
+should overload this method to always return `nothing`.  If `obs` is not being overloaded,
+then `observations` above is any `data` supported in calls of the form [`fit(learner,
 data)`](@ref).
 
 It must otherwise be possible to pass the return value `X` to `predict` and/or
