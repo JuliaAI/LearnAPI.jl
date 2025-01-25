@@ -6,15 +6,15 @@ const DOC_UNKNOWN =
     "not overloaded the trait. "
 const DOC_ON_TYPE = "The value of the trait must depend only on the type of `learner`. "
 
-const DOC_EXPLAIN_EACHOBS =
-    """
+# const DOC_EXPLAIN_EACHOBS =
+#     """
 
-    Here, "for each `o` in `observations`" is understood in the sense of
-    [`LearnAPI.data_interface(learner)`](@ref). For example, if
-    `LearnAPI.data_interface(learner) == Base.HasLength()`, then this means "for `o` in
-    `MLUtils.eachobs(observations)`".
+#     Here, "for each `o` in `observations`" is understood in the sense of the data
+#     interface specified for the learner, [`LearnAPI.data_interface(learner)`](@ref). For
+#     example, if this is `LearnAPI.RandomAccess()`, then this means "for `o` in
+#     `MLUtils.eachobs(observations)`".
 
-    """
+#     """
 
 # # OVERLOADABLE TRAITS
 
@@ -461,12 +461,17 @@ target variable associated with the learner. See LearnAPI.jl documentation for t
 of "target variable".  See ScientificTypes.jl documentation for an explanation of the
 `scitype` function, which it provides.
 
-Specifically, both of the following is always true:
+Specifically, both of the following are always true:
 
 - If `:(LearnAPI.target) in LearnAPI.functions(learner)` (i.e., `fit` consumes target
-  variables) then "target" means anything returned by [`LearnAPI.target(learner,
-  observations)`](@ref), where `observations = `[`LearnAPI.obs(learner, data)`](@ref) and
-  `data` is a supported argument in the call [`fit(learner, data)`](@ref).
+  variables) then `ScientificTypes.scitype(o) <: S` for each `o` in `target_observations`,
+  where `target_observations = `[`LearnAPI.target(learner, observations)`](@ref),
+  `observations = `[`LearnAPI.obs(learner, data)`](@ref), and `data` is a supported
+  argument in the call [`fit(learner, data)`](@ref).  Here, "for each `o` in
+  `target_observations`" is understood in the sense of the data interface specified for
+  the learner, [`LearnAPI.data_interface(learner)`](@ref). For example, if this is
+  `LearnAPI.RandomAccess()`, then this means "for each `o in
+  MLUtils.eachobs(target_observations)`".
 
 - `S` is an upper bound on the `scitype` of (point) observations that might normally be
   extracted from the output of [`predict`](@ref).
