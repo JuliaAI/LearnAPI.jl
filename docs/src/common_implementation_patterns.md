@@ -10,7 +10,7 @@ which introduces the main interface objects and terminology.
 
 Although an implementation is defined purely by the methods and traits it implements, many
 implementations fall into one (or more) of the following informally understood patterns or
-"tasks":
+tasks:
 
 - [Regression](@ref): Supervised learners for continuous targets
 

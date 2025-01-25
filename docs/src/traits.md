@@ -78,8 +78,8 @@ requires:
 
 1. *Finiteness:* The value of a trait is the same for all `learner`s with same value of
    [`LearnAPI.constructor(learner)`](@ref). This typically means trait values do not
-   depend on type parameters! For composite models (`LearnAPI.learners(learner)`
-   non-empty) this requirement is dropped.
+   depend on type parameters! For composite models (non-empty
+   `LearnAPI.learners(learner)`) this requirement is dropped.
 
 2. *Low level deserializability:* It should be possible to evaluate the trait *value* when
    `LearnAPI` and `ScientificTypesBase` are the only imported modules. 

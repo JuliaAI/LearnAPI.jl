@@ -136,7 +136,7 @@ argument) are excluded.
 
 ```
 julia> @functions my_feature_selector
-(fit, LearnAPI.learner, strip, obs, transform)
+(fit, LearnAPI.learner, clone, strip, obs, transform)
 
 ```
 

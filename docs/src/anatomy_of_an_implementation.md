@@ -37,8 +37,8 @@ implementation given later.
     If the `data` object consumed by `fit`, `predict`, or `transform` is not
     not a suitable table¹, array³, tuple of tables and arrays, or some
     other object implementing
-    the [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) 
-	`getobs`/`numobs` interface,
+    the [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/)
+        `getobs`/`numobs` interface,
     then an implementation must: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     this interface, as illustrated below under
@@ -232,7 +232,7 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
     Ridge,
     constructor = Ridge,
     kinds_of_proxy=(Point(),),
-    tags = (:regression,),
+    tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.learner),
@@ -295,6 +295,7 @@ nothing # hide
 learner = Ridge(lambda=0.5)
 @functions learner
 ```
+(Exact output may differ here because of way documentation is generated.)
 
 Training and predicting:
 
@@ -353,7 +354,7 @@ LearnAPI.strip(model::RidgeFitted) =
     Ridge,
     constructor = Ridge,
     kinds_of_proxy=(Point(),),
-    tags = (:regression,),
+    tags = ("regression",),
     functions = (
         :(LearnAPI.fit),
         :(LearnAPI.learner),
@@ -381,10 +382,10 @@ or `predict`, such as the matrix version `A` of `X` in the ridge example.  That 
 factor out of `fit` (and also `predict`) a data pre-processing step, `obs`, to expose
 its outcomes. These outcomes become alternative user inputs to `fit`/`predict`.
 
-In the default case, the alternative data representations will implement the MLUtils.jl
-`getobs/numobs` interface for observation subsampling, which is generally all a user or
-meta-algorithm will need, before passing the data on to `fit`/`predict` as you would the
-original data.
+In typical case (where [`LearnAPI.data_interface`](@ref) not overloaded) the alternative data
+representations will implement the MLUtils.jl `getobs/numobs` interface for observation
+subsampling, which is generally all a user or meta-algorithm will need, before passing the
+data on to `fit`/`predict` as you would the original data.
 
 So, instead of the pattern
 
@@ -472,7 +473,7 @@ LearnAPI.fit(learner::Ridge, data; kwargs...) =
 Providing `fit` signatures matching the output of [`obs`](@ref), is the first part of the
 `obs` contract. Since `obs(learner, data)` should evidently support all `data` that
 `fit(learner, data)` supports, we must be able to apply `obs(learner, _)` to it's own
-output (`observations` below). This leads to the additional "no-op" declaration
+output (`observations` below). This leads to the additional declaration
 
 ```@example anatomy2
 LearnAPI.obs(::Ridge, observations::RidgeFitObs) = observations
@@ -529,7 +530,7 @@ LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 
 Since LearnAPI.jl provides fallbacks for `obs` that simply return the unadulterated data
 argument, overloading `obs` is optional. This is provided data in publicized
-`fit`/`predict` signatures consists only of objects implement the
+`fit`/`predict` signatures already consists only of objects implement the
 [`LearnAPI.RandomAccess`](@ref) interface (most tables¹, arrays³, and tuples thereof).
 
 To opt out of supporting the MLUtils.jl interface altogether, an implementation must

@@ -8,7 +8,7 @@ fit(learner; verbosity=LearnAPI.default_verbosity()) -> static_model
 ```
 
 A "static" algorithm is one that does not generalize to new observations (e.g., some
-clustering algorithms); there is no training data and the algorithm is executed by
+clustering algorithms); there is no training data and heavy lifting is carried out by
 `predict` or `transform` which receive the data. See example below.
 
 

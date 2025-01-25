@@ -12,7 +12,7 @@ The LearnAPI.jl specification is predicated on a few basic, informally defined n
 
 ### Data and observations
 
-ML/statistical algorithms are typically applied in conjunction with resampling of
+ML/statistical algorithms are frequently applied in conjunction with resampling of
 *observations*, as in
 [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)). In this
 document *data* will always refer to objects encapsulating an ordered sequence of
@@ -35,9 +35,14 @@ see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
 Besides the data it consumes, a machine learning algorithm's behavior is governed by a
 number of user-specified *hyperparameters*, such as the number of trees in a random
-forest. In LearnAPI.jl, one is allowed to have hyperparameters that are not data-generic.
-For example, a class weight dictionary, which will only make sense for a target taking
-values in the set of dictionary keys, can be specified as a hyperparameter.
+forest. Hyperparameters are understood in a rather broad sense. For example, one is
+allowed to have hyperparameters that are not data-generic.  For example, a class weight
+dictionary, which will only make sense for a target taking values in the set of specified
+dictionary keys, should be given as a hyperparameter. For simplicity, LearnAPI.jl
+discourages "run time" parameters (extra arguments to `fit`) such as acceleration
+options (cpu/gpu/multithreading/multiprocessing). These should be included as
+hyperparameters as far as possible. An exception is the compulsory `verbosity` keyword
+argument of `fit`.
 
 
 ### [Targets and target proxies](@id proxy)
@@ -56,16 +61,16 @@ compared with censored ground truth survival times. And so on ...
 
 #### Definitions
 
-More generally, whenever we have a variable (e.g., a class label) that can, at least in
-principle, be paired with a predicted value, or some predicted "proxy" for that variable
-(such as a class probability), then we call the variable a *target* variable, and the
-predicted output a *target proxy*. In this definition, it is immaterial whether or not the
-target appears in training (the algorithm is supervised) or whether or not predictions
-generalize to new input observations (the algorithm "learns").
+More generally, whenever we have a variable that can, at least in principle, be paired
+with a predicted value, or some predicted "proxy" for that variable (such as a class
+probability), then we call the variable a *target* variable, and the predicted output a
+*target proxy*. In this definition, it is immaterial whether or not the target appears in
+training (the algorithm is supervised) or whether or not predictions generalize to new
+input observations (the algorithm "learns").
 
 LearnAPI.jl provides singleton [target proxy types](@ref proxy_types) for prediction
-dispatch. These are also used to distinguish performance metrics provided by the package
-[StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
+dispatch. These are the same types used to distinguish performance metrics provided by the
+package [StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
 ### [Learners](@id learners)
@@ -149,9 +154,7 @@ interface.)
 	[`LearnAPI.learner`](@ref), [`LearnAPI.constructor`](@ref) and
 	[`LearnAPI.functions`](@ref).
 
-Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref). For a
-minimal (but useless) implementation, see the implementation of `SmallLearner`
-[here](https://github.com/JuliaAI/LearnAPI.jl/blob/dev/test/traits.jl).
+Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref). 
 
 ### List of methods
 
@@ -187,7 +190,7 @@ minimal (but useless) implementation, see the implementation of `SmallLearner`
 - [Accessor functions](@ref accessor_functions): these include functions like
   `LearnAPI.feature_importances` and `LearnAPI.training_losses`, for extracting, from
   training outcomes, information common to many learners. This includes
-  [`LearnAPI.strip(model)`](@ref) for replacing a learning outcome `model` with a
+  [`LearnAPI.strip(model)`](@ref) for replacing a learning outcome, `model`, with a
   serializable version that can still `predict` or `transform`.
 
 - [Learner traits](@ref traits): methods that promise specific learner behavior or
