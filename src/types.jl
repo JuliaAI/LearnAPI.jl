@@ -20,9 +20,10 @@ See also [`LearnAPI.KindOfProxy`](@ref).
 
 # Extended help
 
-| type                                  | form of an observation                                                                                                                                                            |
-|:-------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Point`              | same as target observations; may have the interpretation of a 50% quantile, 50% expectile or mode                                                                                 |
+| type                         | form of an observation                                                                                                                                                            |
+|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Point`                      | same as target observations; may have the interpretation of a 50% quantile, 50% expectile or mode                                                                                 |
+| `Interpolated`               | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls)                                                                |
 | `Sampleable`                 | object that can be sampled to obtain object of the same form as target observation                                                                                                |
 | `Distribution`               | explicit probability density/mass function whose sample space is all possible target observations                                                                                 |
 | `LogDistribution`            | explicit log-probability density/mass function whose sample space is possible target observations                                                                                 |
@@ -42,7 +43,6 @@ See also [`LearnAPI.KindOfProxy`](@ref).
 | `SurvivalDistribution`       | probability distribution for survival time                                                                                                                                        |
 | `SurvivalHazardFunction`     | hazard function for survival time                                                                                                                                                 |
 | `OutlierScore`               | numerical score reflecting degree of outlierness (not necessarily normalized)                                                                                                     |
-| `Interpolated`               | real-valued approximation/interpolation of a discrete-valued target, such as a count (e.g., number of phone calls)                                                                |
 
 ¹Provided for completeness but discouraged to avoid [ambiguities in
 representation](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/paper/paper.md#a-unified-approach-to-probabilistic-predictions-and-their-evaluation).
