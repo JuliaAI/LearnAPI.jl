@@ -183,8 +183,8 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
   implement the observation access API specified by
   [`LearnAPI.data_interface(learner)`](@ref).
 
-- [`LearnAPI.target`](@ref input), [`LearnAPI.weights`](@ref input),
-  [`LearnAPI.features`](@ref): for extracting relevant parts of training data, where
+- [`LearnAPI.features`](@ref input), [`LearnAPI.target`](@ref input),
+  [`LearnAPI.weights`](@ref input): for extracting relevant parts of training data, where
   defined.
 
 - [Accessor functions](@ref accessor_functions): these include functions like
