@@ -7,7 +7,7 @@ test_files = [
     "predict_transform.jl",
     "obs.jl",
     "accessor_functions.jl",
-    "target_features.jl",
+    "features_target_weights.jl",
 ]
 
 files = isempty(ARGS) ? test_files : ARGS
