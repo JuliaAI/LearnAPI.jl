@@ -1,14 +1,14 @@
 """
-    LearnAPI.target(learner, observations) -> target
+    LearnAPI.target(learner, data) -> target
 
-Return, for every conceivable `observations` returned by a call of the form [`obs(learner,
-data)`](@ref), the target variable part of `observations`. If `nothing` is returned, the
-`learner` does not see a target variable in training (is unsupervised).
+Return, for each form of `data` supported by the call [`fit(learner, data)`](@ref), the
+target part of `data`, in a form suitable for pairing with predictions. The return value
+is only meaningful if `learner` is supervised, i.e., if `:(LearnAPI.target) in
+LearnAPI.functions(learner)`.
 
-The returned object `y` has the same number of observations as `observations` does and is
-guaranteed to implement the data interface specified by
-[`LearnAPI.data_interface(learner)`](@ref). It's form should be suitable for pairing with
-the output of [`predict`](@ref), for example in a loss function.
+The returned object has the same number of observations
+as `data` has and is guaranteed to implement the data interface specified by
+[`LearnAPI.data_interface(learner)`](@ref).
 
 # Extended help
 
@@ -22,38 +22,55 @@ the LearnAPI.jl documentation.
 
 ## New implementations
 
-A fallback returns `nothing`. The method must be overloaded if [`fit`](@ref) consumes data
-that includes a target variable. If `obs` is not being overloaded, then `observations`
-above is any `data` supported in calls of the form [`fit(learner, data)`](@ref). The form
-of the output `y` should be suitable for pairing with the output of [`predict`](@ref), in
-the evaluation of a loss function, for example.
+A fallback returns `last(data)`.  The method must be overloaded if [`fit`](@ref) consumes
+data that includes a target variable and this fallback fails to fulfill the contract stated
+above.
 
-Ensure the object `y` returned by `LearnAPI.target`, unless `nothing`, implements the data
+If `obs` is being overloaded, then typically it suffices to overload
+`LearnAPI.target(learner, observations)` where `observations = obs(learner, data)` and
+`data` is any documented supported `data` in calls of the form [`fit(learner,
+data)`](@ref), and to add a declaration of the form
+
+```julia
+LearnAPI.target(learner, data) = LearnAPI.target(learner, obs(learner, data))
+```
+to catch all other forms of supported input `data`.
+
+Remember to ensure the return value of `LearnAPI.target` implements the data
 interface specified by [`LearnAPI.data_interface(learner)`](@ref).
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.target)"; overloaded=true))
 
 """
-target(::Any, observations) = nothing
+target(::Any, data) = last(data)
 
 """
-    LearnAPI.weights(learner, observations) -> weights
+    LearnAPI.weights(learner, data) -> weights
 
-Return, for every conceivable `observations` returned by a call of the form [`obs(learner,
-data)`](@ref), the weights part of `observations`. Where `nothing` is returned, no weights
-are part of `data`, which is to be interpreted as uniform weighting.
+Return, for each form of `data` supported by the call [`fit(learner, data)`](@ref), the
+per-observation weights part of `data`.
 
-The returned object `w` has the same number of observations as `observations` does and is
-guaranteed to implement the data interface specified by
+The returned object has the same number of observations
+as `data` has and is guaranteed to implement the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
+
+Where `nothing` is returned, weighting is understood to be uniform.
 
 # Extended help
 
 # New implementations
 
-Overloading is optional. A fallback returns `nothing`. If `obs` is not being overloaded,
-then `observations` above is any `data` supported in calls of the form [`fit(learner,
-data)`](@ref).
+Overloading is optional. A fallback returns `nothing`.
+
+If `obs` is being overloaded, then typically it suffices to overload
+`LearnAPI.weights(learner, observations)` where `observations = obs(learner, data)` and
+`data` is any documented supported `data` in calls of the form [`fit(learner,
+data)`](@ref), and to add a declaration of the form
+
+```julia
+LearnAPI.weights(learner, data) = LearnAPI.weights(learner, obs(learner, data))
+```
+to catch all other forms of supported input `data`.
 
 Ensure the returned object, unless `nothing`, implements the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
@@ -61,53 +78,54 @@ Ensure the returned object, unless `nothing`, implements the data interface spec
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=true))
 
 """
-weights(::Any, observations) = nothing
+weights(::Any, data) = nothing
 
 """
-    LearnAPI.features(learner, observations)
+    LearnAPI.features(learner, data)
 
-Return, for every conceivable `observations` returned by a call of the form [`obs(learner,
-data)`](@ref), the "features" part of `observations` (as opposed to the target variable,
-for example).
+Return, for each form of `data` supported by the call [`fit(learner, data)`](@ref), the
+features part `X` of `data`.
 
-It must always be possible to pass the returned object `X` to `predict` or `transform`,
-where implemented, as in the following sample workflow:
+While "features" will typically have the commonly understood meaning, the only
+learner-generic guaranteed properties of `X` are:
 
-```julia
-observations = obs(learner, data)
-model = fit(learner, observations)
-X = LearnAPI.features(learner, observations)
-ŷ = predict(model, kind_of_proxy, X) # eg, `kind_of_proxy = Point()`
-```
+- `X` can be passed to [`predict`](@ref) or [`transform`](@ref) when these are supported
+  by `learner`, as in the call `predict(model, X)`, where `model = fit(learner, data)`.
 
-For supervised models (i.e., where `:(LearnAPI.target) in LearnAPI.functions(learner)`)
-`ŷ` above is generally intended to be an approximate proxy for the target variable.
+- `X` has the same number of observations as `data` has and is guaranteed to implement
+  the data interface specified by [`LearnAPI.data_interface(learner)`](@ref).
 
-The object `X` returned by `LearnAPI.features` has the same number of observations as
-`observations` does and is guaranteed to implement the data interface specified by
-[`LearnAPI.data_interface(learner)`](@ref).
+Where `nothing` is returned, `predict` and `transform` consume no data.
 
 # Extended help
 
 # New implementations
 
-A fallback returns `first(observations)` if `observations` is a tuple, and otherwise
-returns `observations`. New implementations may need to overload this method if this
-fallback is inadequate. 
+A fallback returns `first(data)` if `data` is a tuple, and otherwise
+returns `data`. New implementations will need to overload this method if this
+fallback is inadequate.
 
 For density estimators, whose `fit` typically consumes *only* a target variable, you
-should overload this method to always return `nothing`.  If `obs` is not being overloaded,
-then `observations` above is any `data` supported in calls of the form [`fit(learner,
-data)`](@ref).
+should overload this method to always return `nothing`.
 
-It must otherwise be possible to pass the return value `X` to `predict` and/or
-`transform`, and `X` must have same number of observations as `data`.
+If `obs` is being overloaded, then typically it suffices to overload
+`LearnAPI.features(learner, observations)` where `observations = obs(learner, data)` and
+`data` is any documented supported `data` in calls of the form [`fit(learner,
+data)`](@ref), and to add a declaration of the form
+
+```julia
+LearnAPI.features(learner, data) = LearnAPI.features(learner, obs(learner, data))
+```
+to catch all other forms of supported input `data`.
 
 Ensure the returned object, unless `nothing`, implements the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
 
+`:(LearnAPI.features)` must always be included in the return value of
+[`LearnAPI.functions(learner)`](@ref).
+
 """
-features(learner, observations) = _first(observations)
-_first(observations) = observations
-_first(observations::Tuple) = first(observations)
+features(learner, data) = _first(data)
+_first(data) = data
+_first(data::Tuple) = first(data)
 # note the factoring above guards against method ambiguities

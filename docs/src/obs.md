@@ -12,6 +12,9 @@ obs(learner, data) # can be passed to `fit` instead of `data`
 obs(model, data)   # can be passed to `predict` or `transform` instead of `data`
 ```
 
+- [Data interfaces](@ref data_interfaces)
+
+
 ## [Typical workflows](@id obs_workflows)
 
 LearnAPI.jl makes no universal assumptions about the form of `data` in a call
@@ -93,18 +96,11 @@ A sample implementation is given in [Providing a separate data front end](@ref).
 obs
 ```
 
-### [Data interfaces](@id data_interfaces)
-
-New implementations must overload [`LearnAPI.data_interface(learner)`](@ref) if the
-output of [`obs`](@ref) does not implement [`LearnAPI.RandomAccess()`](@ref). Arrays, most
-tables, and all tuples thereof, implement `RandomAccess()`.
-
-- [`LearnAPI.RandomAccess`](@ref) (default)
-- [`LearnAPI.FiniteIterable`](@ref)
-- [`LearnAPI.Iterable`](@ref)
+### [Available data interfaces](@id data_interfaces)
 
 
 ```@docs
+LearnAPI.DataInterface
 LearnAPI.RandomAccess
 LearnAPI.FiniteIterable
 LearnAPI.Iterable

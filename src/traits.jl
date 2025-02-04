@@ -91,7 +91,7 @@ return value:
 | `:(LearnAPI.clone)`               | never overloaded           | yes                                |
 | `:(LearnAPI.strip)`               | no                         | yes                                |
 | `:(LearnAPI.obs)`                 | no                         | yes                                |
-| `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
+| `:(LearnAPI.features)`            | no                         | yes                                |
 | `:(LearnAPI.target)`              | no                         | only if implemented                |
 | `:(LearnAPI.weights)`             | no                         | only if implemented                |
 | `:(LearnAPI.update)`              | no                         | only if implemented                |
@@ -364,8 +364,7 @@ in representations of input data returned by [`obs(learner, data)`](@ref) or
 [`obs(model, data)`](@ref), whenever `learner == LearnAPI.learner(model)`. Here `data`
 is `fit`, `predict`, or `transform`-consumable data.
 
-Possible return values are [`LearnAPI.RandomAccess`](@ref),
-[`LearnAPI.FiniteIterable`](@ref), and [`LearnAPI.Iterable`](@ref).
+See [`LearnAPI.DataInterface`](@ref) for possible return values.
 
 See also [`obs`](@ref).
 
