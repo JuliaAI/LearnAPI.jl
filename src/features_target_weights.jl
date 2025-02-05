@@ -101,9 +101,9 @@ Where `nothing` is returned, `predict` and `transform` consume no data.
 
 # New implementations
 
-A fallback returns `first(data)` if `data` is a tuple, and otherwise
-returns `data`. New implementations will need to overload this method if this
-fallback is inadequate.
+A fallback returns `first(data)` if `data` is a tuple, and otherwise returns `data`. The
+method has no meaning for static learners (where `data` is not an argument of `fit`) and
+otherwise an implementation needs to overload this method if the fallback is inadequate.
 
 For density estimators, whose `fit` typically consumes *only* a target variable, you
 should overload this method to always return `nothing`.
@@ -121,8 +121,9 @@ to catch all other forms of supported input `data`.
 Ensure the returned object, unless `nothing`, implements the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
 
-`:(LearnAPI.features)` must always be included in the return value of
-[`LearnAPI.functions(learner)`](@ref).
+`:(LearnAPI.features)` must be included in the return value of
+[`LearnAPI.functions(learner)`](@ref), unless the learner is static (`fit` consumes no
+data).
 
 """
 features(learner, data) = _first(data)

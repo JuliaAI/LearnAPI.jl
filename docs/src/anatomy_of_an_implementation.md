@@ -7,19 +7,20 @@ model = fit(learner, data)
 predict(model, newdata)
 ```
 
-Here `learner` specifies hyperparameters, while `model` stores learned parameters and any
-byproducts of algorithm execution.
+Here `learner` specifies [hyperparameters](@ref hyperparameters), while `model` stores
+learned parameters and any byproducts of algorithm execution.
 
 Variations on this pattern:
 
 - [Transformers](@ref) ordinarily implement `transform` instead of `predict`. For more on
   `predict` versus `transform`, see [Predict or transform?](@ref)
 
-- ["Static" (non-generalizing) algorithms](@ref static_algorithms) (some simple
-  transformers and some clustering algorithms) have a `fit` that consumes no
+- ["Static" (non-generalizing) algorithms](@ref static_algorithms), which includes some
+  simple transformers and some clustering algorithms, have a `fit` that consumes no
   `data`. Instead `predict` or `transform` does the heavy lifting.
 
-- In [density estimation](@ref density_estimation), `predict` consumes no data.
+- In [density estimation](@ref density_estimation), the `newdata` argument in `predict` is
+  missing.
 
 These are the basic possibilities.
 
@@ -31,14 +32,16 @@ implementation given later.
 
 ## A basic implementation
 
+See [here](@ref code) for code without explanations.
+
 We suppose our algorithm's `fit` method consumes data in the form `(X, y)`, where
 `X` is a suitable table¹ (the features) and `y` a vector (the target).
 
 !!! important
 
-	Implementations wishing to support other data
-	patterns may need to take additional steps explained under
-	[Other data patterns](@ref di) below.
+    Implementations wishing to support other data
+    patterns may need to take additional steps explained under
+    [Other data patterns](@ref di) below.
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -56,7 +59,7 @@ Here's a new type whose instances specify the single ridge regression hyperparam
 
 ```@example anatomy
 struct Ridge{T<:Real}
-	lambda::T
+    lambda::T
 end
 nothing # hide
 ```
@@ -70,7 +73,7 @@ fields) that are not other learners, and we must implement
 
 ```@example anatomy
 """
-	Ridge(; lambda=0.1)
+    Ridge(; lambda=0.1)
 
 Instantiate a ridge regression learner, with regularization of `lambda`.
 """
@@ -94,9 +97,9 @@ coefficients labelled by feature name for inspection after training:
 
 ```@example anatomy
 struct RidgeFitted{T,F}
-	learner::Ridge
-	coefficients::Vector{T}
-	named_coefficients::F
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 nothing # hide
 ```
@@ -108,26 +111,25 @@ The implementation of `fit` looks like this:
 
 ```@example anatomy
 function LearnAPI.fit(learner::Ridge, data; verbosity=1)
+    X, y = data
 
-	X, y = data
+    # data preprocessing:
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    A = Tables.matrix(table, transpose=true)
 
-	# data preprocessing:
-	table = Tables.columntable(X)
-	names = Tables.columnnames(table) |> collect
-	A = Tables.matrix(table, transpose=true)
+    lambda = learner.lambda
 
-	lambda = learner.lambda
+    # apply core algorithm:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # vector
 
-	# apply core algorithm:
-	coefficients = (A*A' + learner.lambda*I)\(A*y) # vector
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-	# determine named coefficients:
-	named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-	# make some noise, if allowed:
-	verbosity > 0 && @info "Coefficients: $named_coefficients"
-
-	return RidgeFitted(learner, coefficients, named_coefficients)
+    return RidgeFitted(learner, coefficients, named_coefficients)
 end
 ```
 
@@ -149,7 +151,7 @@ We provide this implementation for our ridge regressor:
 
 ```@example anatomy
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
-	Tables.matrix(Xnew)*model.coefficients
+    Tables.matrix(Xnew)*model.coefficients
 ```
 
 If the kind of proxy is omitted, as in `predict(model, Xnew)`, then a fallback grabs the
@@ -183,7 +185,7 @@ dump the named version of the coefficients:
 
 ```@example anatomy
 LearnAPI.strip(model::RidgeFitted) =
-	RidgeFitted(model.learner, model.coefficients, nothing)
+    RidgeFitted(model.learner, model.coefficients, nothing)
 ```
 
 Crucially, we can still use `LearnAPI.strip(model)` in place of `model` to make new
@@ -208,20 +210,20 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
 
 ```@example anatomy
 @trait(
-	Ridge,
-	constructor = Ridge,
-	kinds_of_proxy=(Point(),),
-	tags = ("regression",),
-	functions = (
-		:(LearnAPI.fit),
-		:(LearnAPI.learner),
-		:(LearnAPI.clone),
-		:(LearnAPI.strip),
-		:(LearnAPI.obs),
-		:(LearnAPI.features),
-		:(LearnAPI.target),
-		:(LearnAPI.predict),
-		:(LearnAPI.coefficients),
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = ("regression",),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
    )
 )
 nothing # hide
@@ -240,8 +242,8 @@ the *type* of the argument.
 
 The last trait, `functions`, above returns a list of all LearnAPI.jl methods that can be
 meaningfully applied to the learner or associated model, with the exception of traits. You
-always include the first six you see here: `fit`, `learner`, `clone` ,`strip`, `obs`,
-`features`. Here [`clone`](@ref) is a utility function provided by LearnAPI that you never
+always include the first five you see here: `fit`, `learner`, `clone` ,`strip`,
+`obs`. Here [`clone`](@ref) is a utility function provided by LearnAPI that you never
 overload, while [`obs`](@ref) is discussed under [Providing a separate data front
 end](@ref) below and is always included because it has a meaningful fallback. The
 `features` method, here provided by a fallback, articulates how the features `X` can be
@@ -251,7 +253,6 @@ present case.
 
 See [`LearnAPI.functions`](@ref) for a checklist of what the `functions` trait needs to
 return.
-
 
 ### Signatures added for convenience
 
@@ -314,6 +315,13 @@ recovered_model = deserialize(filename)
 @assert predict(recovered_model, X) == predict(model, X)
 ```
 
+### Testing an implementation
+
+```julia
+using LearnTestAPI
+@testapi learner (X, y) verbosity=0
+```
+
 ## [Other data patterns](@id di)
 
 Here are some important remarks for implementations wanting to deviate in their
@@ -340,6 +348,8 @@ assumptions about data from those made above.
 
 ## Providing a separate data front end
 
+See [here](@ref code) for code without explanations.
+
 ```@setup anatomy2
 using LearnAPI
 using LinearAlgebra, Tables
@@ -351,31 +361,31 @@ end
 Ridge(; lambda=0.1) = Ridge(lambda)
 
 struct RidgeFitted{T,F}
-	learner::Ridge
-	coefficients::Vector{T}
-	named_coefficients::F
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 
 LearnAPI.learner(model::RidgeFitted) = model.learner
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
 LearnAPI.strip(model::RidgeFitted) =
-	RidgeFitted(model.learner, model.coefficients, nothing)
+    RidgeFitted(model.learner, model.coefficients, nothing)
 
 @trait(
-	Ridge,
-	constructor = Ridge,
-	kinds_of_proxy=(Point(),),
-	tags = ("regression",),
-	functions = (
-		:(LearnAPI.fit),
-		:(LearnAPI.learner),
-		:(LearnAPI.clone),
-		:(LearnAPI.strip),
-		:(LearnAPI.obs),
-		:(LearnAPI.features),
-		:(LearnAPI.target),
-		:(LearnAPI.predict),
-		:(LearnAPI.coefficients),
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = ("regression",),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
    )
 )
 
@@ -393,27 +403,25 @@ or `predict`, such as the matrix version `A` of `X` in the ridge example.  That 
 factor out of `fit` (and also `predict`) a data preprocessing step, `obs`, to expose
 its outcomes. These outcomes become alternative user inputs to `fit`/`predict`.
 
-The [`obs`](@ref) methods exists to:
+The [`obs`](@ref) methods exist to:
 
 - Enable meta-algorithms to avoid redundant conversions of user-provided data into the form
   ultimately used by the core training algorithms.
 
-- Through the provision of canned data front ends (as provided by
-  [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/dev/) for example) enable
-  users to provide data in a variety of formats while allowing new implementations to
-  focus on core algorithms that consume a standardized, preprocessed, representation of
-  that data.
+- Through the provision of canned data front ends, enable users to provide data in a
+  variety of formats, while allowing new implementations to focus on core algorithms that
+  consume a standardized, preprocessed, representation of that data.
 
 !!! important
 
-    While many new learner implementations will want to adopt a canned data front end, we
+    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/dev/), we
     focus here on a self-contained implemementation of `obs` for the ridge example above, to show
     how it works.
 
 In the typical case, where [`LearnAPI.data_interface`](@ref) is not overloaded, the
-alternative data representations will implement the MLUtils.jl `getobs/numobs` interface
+alternative data representations must implement the MLUtils.jl `getobs/numobs` interface
 for observation subsampling, which is generally all a user or meta-algorithm will need,
-before passing the data on to `fit`/`predict` as you would the original data.
+before passing the data on to `fit`/`predict`, as you would the original data.
 
 So, instead of the pattern
 
@@ -422,8 +430,7 @@ model = fit(learner, data)
 predict(model, newdata)
 ```
 
-one enables the following alternative (which in any case will still work, because of a
-an `obs` fallback provided by LearnAPI.jl):
+one enables the following alternative:
 
 ```julia
 observations = obs(learner, data) # preprocessed training data
@@ -441,16 +448,20 @@ newobservations = MLUtils.getobs(observations, test_indices)
 predict(model, newobservations)
 ```
 
-See also the demonstration [below](@ref advanced_demo).
+which works for any non-static learner implementing `predict`, no matter how one is
+supposed to accesses the individual observations of `data` or `newdata`. See also the
+demonstration [below](@ref advanced_demo). Furthermore, fallbacks ensure the above pattern
+still works if we choose not to implement a front end at all, which is allowed, if
+supported `data` and `newdata` already implement `getobs`/`numobs`.
 
 Here we specifically wrap all the preprocessed data into single object, for which we
 introduce a new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
-	A::M                  # `p` x `n` matrix
-	names::Vector{Symbol} # features
-	y::Vector{T}          # target
+    A::M                  # `p` x `n` matrix
+    names::Vector{Symbol} # features
+    y::Vector{T}          # target
 end
 ```
 
@@ -458,10 +469,10 @@ Now we overload `obs` to carry out the data preprocessing previously in `fit`, l
 
 ```@example anatomy2
 function LearnAPI.obs(::Ridge, data)
-	X, y = data
-	table = Tables.columntable(X)
-	names = Tables.columnnames(table) |> collect
-	return RidgeFitObs(Tables.matrix(table)', names, y)
+    X, y = data
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    return RidgeFitObs(Tables.matrix(table)', names, y)
 end
 ```
 
@@ -473,27 +484,27 @@ methods - one to handle "regular" input, and one to handle the pre-processed dat
 ```@example anatomy2
 function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
 
-	lambda = learner.lambda
+    lambda = learner.lambda
 
-	A = observations.A
-	names = observations.names
-	y = observations.y
+    A = observations.A
+    names = observations.names
+    y = observations.y
 
-	# apply core learner:
-	coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
+    # apply core learner:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
 
-	# determine named coefficients:
-	named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-	# make some noise, if allowed:
-	verbosity > 0 && @info "Coefficients: $named_coefficients"
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-	return RidgeFitted(learner, coefficients, named_coefficients)
+    return RidgeFitted(learner, coefficients, named_coefficients)
 
 end
 
 LearnAPI.fit(learner::Ridge, data; kwargs...) =
-	fit(learner, obs(learner, data); kwargs...)
+    fit(learner, obs(learner, data); kwargs...)
 ```
 
 ### The `obs` contract
@@ -517,7 +528,7 @@ this is [`LearnAPI.RandomAccess()`](@ref) (the default) it usually suffices to o
 
 ```@example anatomy2
 Base.getindex(data::RidgeFitObs, I) =
-	RidgeFitObs(data.A[:,I], data.names, y[I])
+    RidgeFitObs(data.A[:,I], data.names, y[I])
 Base.length(data::RidgeFitObs) = length(data.y)
 ```
 
@@ -528,10 +539,10 @@ LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)'
 LearnAPI.obs(::RidgeFitted, observations::AbstractArray) = observations # involutivity
 
 LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
-	observations'*model.coefficients
+    observations'*model.coefficients
 
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
-	predict(model, Point(), obs(model, Xnew))
+    predict(model, Point(), obs(model, Xnew))
 ```
 
 ### `features` and `target` methods

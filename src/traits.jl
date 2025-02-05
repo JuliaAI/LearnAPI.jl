@@ -84,23 +84,23 @@ LearnAPI.jl.
 All new implementations must implement this trait. Here's a checklist for elements in the
 return value:
 
-| expression                        | implementation compulsory? | include in returned tuple?         |
-|:----------------------------------|:---------------------------|:-----------------------------------|
-| `:(LearnAPI.fit)`                 | yes                        | yes                                |
-| `:(LearnAPI.learner)`             | yes                        | yes                                |
-| `:(LearnAPI.clone)`               | never overloaded           | yes                                |
-| `:(LearnAPI.strip)`               | no                         | yes                                |
-| `:(LearnAPI.obs)`                 | no                         | yes                                |
-| `:(LearnAPI.features)`            | no                         | yes                                |
-| `:(LearnAPI.target)`              | no                         | only if implemented                |
-| `:(LearnAPI.weights)`             | no                         | only if implemented                |
-| `:(LearnAPI.update)`              | no                         | only if implemented                |
-| `:(LearnAPI.update_observations)` | no                         | only if implemented                |
-| `:(LearnAPI.update_features)`     | no                         | only if implemented                |
-| `:(LearnAPI.predict)`             | no                         | only if implemented                |
-| `:(LearnAPI.transform)`           | no                         | only if implemented                |
-| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented                |
-| < accessor functions>             | no                         | only if implemented                |
+| expression                        | implementation compulsory? | include in returned tuple?       |
+|:----------------------------------|:---------------------------|:---------------------------------|
+| `:(LearnAPI.fit)`                 | yes                        | yes                              |
+| `:(LearnAPI.learner)`             | yes                        | yes                              |
+| `:(LearnAPI.clone)`               | never overloaded           | yes                              |
+| `:(LearnAPI.strip)`               | no                         | yes                              |
+| `:(LearnAPI.obs)`                 | no                         | yes                              |
+| `:(LearnAPI.features)`            | no                         | yes, unless `learner` is static  |
+| `:(LearnAPI.target)`              | no                         | only if implemented              |
+| `:(LearnAPI.weights)`             | no                         | only if implemented              |
+| `:(LearnAPI.update)`              | no                         | only if implemented              |
+| `:(LearnAPI.update_observations)` | no                         | only if implemented              |
+| `:(LearnAPI.update_features)`     | no                         | only if implemented              |
+| `:(LearnAPI.predict)`             | no                         | only if implemented              |
+| `:(LearnAPI.transform)`           | no                         | only if implemented              |
+| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented              |
+| < accessor functions>             | no                         | only if implemented              |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
 learner-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
