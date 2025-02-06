@@ -1,12 +1,12 @@
 # Road map
 
-- [ ] Mock up a challenging `update` use-case: controlling an iterative algorithm that
+- [x] Mock up a challenging `update` use-case: controlling an iterative algorithm that
       wants, for efficiency, to internally compute the out-of-sample predictions that will
       be for used to *externally* determined early stopping cc: @jeremiedb
 
 - [ ] Get code coverage to 100% (see next item)
 
-- [ ] Add to this repo or a utility repo methods to test a valid implementation of
+- [x] Add to this repo or a utility repo methods to test a valid implementation of
 	  LearnAPI.jl
 	  
 - [ ] Flush out "Common Implementation Patterns". The current plan is to mock up example
