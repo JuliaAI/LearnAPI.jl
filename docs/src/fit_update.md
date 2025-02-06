@@ -3,12 +3,12 @@
 ### Training
 
 ```julia
-fit(learner, data; verbosity=LearnAPI.default_verbosity()) -> model
-fit(learner; verbosity=LearnAPI.default_verbosity()) -> static_model 
+fit(learner, data; verbosity=1) -> model
+fit(learner; verbosity=1) -> static_model 
 ```
 
 A "static" algorithm is one that does not generalize to new observations (e.g., some
-clustering algorithms); there is no training data and the algorithm is executed by
+clustering algorithms); there is no training data and heavy lifting is carried out by
 `predict` or `transform` which receive the data. See example below.
 
 
@@ -101,18 +101,18 @@ See also [Density Estimation](@ref).
 
 Exactly one of the following must be implemented:
 
-| method                                                                 | fallback |
-|:-----------------------------------------------------------------------|:---------|
-| [`fit`](@ref)`(learner, data; verbosity=LearnAPI.default_verbosity())` | none     |
-| [`fit`](@ref)`(learner; verbosity=LearnAPI.default_verbosity())`       | none     |
+| method                                      | fallback |
+|:--------------------------------------------|:---------|
+| [`fit`](@ref)`(learner, data; verbosity=1)` | none     |
+| [`fit`](@ref)`(learner; verbosity=1)`       | none     |
 
 ### Updating
 
 | method                                                                               | fallback | compulsory? |
 |:-------------------------------------------------------------------------------------|:---------|-------------|
-| [`update`](@ref)`(model, data; verbosity=..., hyperparameter_updates...)`              | none     | no          |
-| [`update_observations`](@ref)`(model, new_data; verbosity=..., hyperparameter_updates...)` | none     | no          |
-| [`update_features`](@ref)`(model, new_data; verbosity=..., hyperparameter_updates...)`     | none     | no          |
+| [`update`](@ref)`(model, data; verbosity=1, hyperparameter_updates...)`              | none     | no          |
+| [`update_observations`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)` | none     | no          |
+| [`update_features`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)`     | none     | no          |
 
 There are some contracts governing the behaviour of the update methods, as they relate to
 a previous `fit` call. Consult the document strings for details.
@@ -124,5 +124,4 @@ fit
 update
 update_observations
 update_features
-LearnAPI.default_verbosity
 ```

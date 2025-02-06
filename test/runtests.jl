@@ -2,13 +2,12 @@ using Test
 
 test_files = [
     "tools.jl",
-    "verbosity.jl",
     "traits.jl",
     "clone.jl",
     "predict_transform.jl",
     "obs.jl",
     "accessor_functions.jl",
-    "target_features.jl",
+    "features_target_weights.jl",
 ]
 
 files = isempty(ARGS) ? test_files : ARGS

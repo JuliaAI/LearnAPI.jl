@@ -6,15 +6,15 @@ const DOC_UNKNOWN =
     "not overloaded the trait. "
 const DOC_ON_TYPE = "The value of the trait must depend only on the type of `learner`. "
 
-const DOC_EXPLAIN_EACHOBS =
-    """
+# const DOC_EXPLAIN_EACHOBS =
+#     """
 
-    Here, "for each `o` in `observations`" is understood in the sense of
-    [`LearnAPI.data_interface(learner)`](@ref). For example, if
-    `LearnAPI.data_interface(learner) == Base.HasLength()`, then this means "for `o` in
-    `MLUtils.eachobs(observations)`".
+#     Here, "for each `o` in `observations`" is understood in the sense of the data
+#     interface specified for the learner, [`LearnAPI.data_interface(learner)`](@ref). For
+#     example, if this is `LearnAPI.RandomAccess()`, then this means "for `o` in
+#     `MLUtils.eachobs(observations)`".
 
-    """
+#     """
 
 # # OVERLOADABLE TRAITS
 
@@ -74,8 +74,8 @@ reference functions not owned by LearnAPI.jl.
 The understanding is that `learner` is a LearnAPI-compliant object whenever the return
 value is non-empty.
 
-Do `LearnAPI.functions()` to list all possible elements of the return value owned by
-LearnAPI.jl.
+Do `LearnAPI.functions()` to list all possible elements of the return value representing
+functions owned by LearnAPI.jl.
 
 # Extended help
 
@@ -84,23 +84,23 @@ LearnAPI.jl.
 All new implementations must implement this trait. Here's a checklist for elements in the
 return value:
 
-| expression                        | implementation compulsory? | include in returned tuple?         |
-|:----------------------------------|:---------------------------|:-----------------------------------|
-| `:(LearnAPI.fit)`                 | yes                        | yes                                |
-| `:(LearnAPI.learner)`             | yes                        | yes                                |
-| `:(LearnAPI.clone)`               | never overloaded           | yes                                |
-| `:(LearnAPI.strip)`               | no                         | yes                                |
-| `:(LearnAPI.obs)`                 | no                         | yes                                |
-| `:(LearnAPI.features)`            | no                         | yes, unless `fit` consumes no data |
-| `:(LearnAPI.target)`              | no                         | only if implemented                |
-| `:(LearnAPI.weights)`             | no                         | only if implemented                |
-| `:(LearnAPI.update)`              | no                         | only if implemented                |
-| `:(LearnAPI.update_observations)` | no                         | only if implemented                |
-| `:(LearnAPI.update_features)`     | no                         | only if implemented                |
-| `:(LearnAPI.predict)`             | no                         | only if implemented                |
-| `:(LearnAPI.transform)`           | no                         | only if implemented                |
-| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented                |
-| < accessor functions>             | no                         | only if implemented                |
+| expression                        | implementation compulsory? | include in returned tuple?       |
+|:----------------------------------|:---------------------------|:---------------------------------|
+| `:(LearnAPI.fit)`                 | yes                        | yes                              |
+| `:(LearnAPI.learner)`             | yes                        | yes                              |
+| `:(LearnAPI.clone)`               | never overloaded           | yes                              |
+| `:(LearnAPI.strip)`               | no                         | yes                              |
+| `:(LearnAPI.obs)`                 | no                         | yes                              |
+| `:(LearnAPI.features)`            | no                         | yes, unless `learner` is static  |
+| `:(LearnAPI.target)`              | no                         | only if implemented              |
+| `:(LearnAPI.weights)`             | no                         | only if implemented              |
+| `:(LearnAPI.update)`              | no                         | only if implemented              |
+| `:(LearnAPI.update_observations)` | no                         | only if implemented              |
+| `:(LearnAPI.update_features)`     | no                         | only if implemented              |
+| `:(LearnAPI.predict)`             | no                         | only if implemented              |
+| `:(LearnAPI.transform)`           | no                         | only if implemented              |
+| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented              |
+| < accessor functions>             | no                         | only if implemented              |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
 learner-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
@@ -136,7 +136,7 @@ argument) are excluded.
 
 ```
 julia> @functions my_feature_selector
-(fit, LearnAPI.learner, strip, obs, transform)
+(fit, LearnAPI.learner, clone, strip, obs, transform)
 
 ```
 
@@ -364,8 +364,7 @@ in representations of input data returned by [`obs(learner, data)`](@ref) or
 [`obs(model, data)`](@ref), whenever `learner == LearnAPI.learner(model)`. Here `data`
 is `fit`, `predict`, or `transform`-consumable data.
 
-Possible return values are [`LearnAPI.RandomAccess`](@ref),
-[`LearnAPI.FiniteIterable`](@ref), and [`LearnAPI.Iterable`](@ref).
+See [`LearnAPI.DataInterface`](@ref) for possible return values.
 
 See also [`obs`](@ref).
 
@@ -416,16 +415,33 @@ Implement if algorithm is iterative. Returns a symbol or `nothing`.
 """
 iteration_parameter(::Any) = nothing
 
+# """
+#     LearnAPI.fit_observation_scitype(learner)
+
+# Return an upper bound `S` on the scitype of individual observations guaranteed to work
+# when calling `fit`: if `observations = obs(learner, data)` and
+# `ScientificTypes.scitype(collect(o)) <:S` for each `o` in `observations`, then the call
+# `fit(learner, data)` is supported.
+
+# $DOC_EXPLAIN_EACHOBS
+
+# See also [`LearnAPI.target_observation_scitype`](@ref).
+
+# # New implementations
+
+# Optional. The fallback return value is `Union{}`.
+
+# """
+# fit_observation_scitype(::Any) = Union{}
 
 """
-    LearnAPI.fit_observation_scitype(learner)
+    LearnAPI.fit_scitype(learner)
 
-Return an upper bound `S` on the scitype of individual observations guaranteed to work
-when calling `fit`: if `observations = obs(learner, data)` and
-`ScientificTypes.scitype(collect(o)) <:S` for each `o` in `observations`, then the call
-`fit(learner, data)` is supported.
+Return an upper bound `S` on the `scitype` (scientific type) of `data` for which the call
+[`fit(learner, data)`](@ref) is supported. Specifically, if `ScientificTypes.scitype(data)
+<: S` then the call is guaranteed to succeed. If not, the call may or may not succeed.
 
-$DOC_EXPLAIN_EACHOBS
+See ScientificTypes.jl documentation for more on the `scitype` function.
 
 See also [`LearnAPI.target_observation_scitype`](@ref).
 
@@ -434,22 +450,32 @@ See also [`LearnAPI.target_observation_scitype`](@ref).
 Optional. The fallback return value is `Union{}`.
 
 """
-fit_observation_scitype(::Any) = Union{}
+fit_scitype(::Any) = Union{}
 
 """
     LearnAPI.target_observation_scitype(learner)
 
-Return an upper bound `S` on the scitype of each observation of an applicable target
-variable. Specifically:
+Return an upper bound `S` on the `scitype` (scientific type) of each observation of any
+target variable associated with the learner. See LearnAPI.jl documentation for the meaning
+of "target variable".  See ScientificTypes.jl documentation for an explanation of the
+`scitype` function, which it provides.
+
+Specifically, both of the following are always true:
 
 - If `:(LearnAPI.target) in LearnAPI.functions(learner)` (i.e., `fit` consumes target
-  variables) then "target" means anything returned by `LearnAPI.target(learner, data)`,
-  where `data` is an admissible argument in the call `fit(learner, data)`.
+  variables) then `ScientificTypes.scitype(o) <: S` for each `o` in `target_observations`,
+  where `target_observations = `[`LearnAPI.target(learner, observations)`](@ref),
+  `observations = `[`LearnAPI.obs(learner, data)`](@ref), and `data` is a supported
+  argument in the call [`fit(learner, data)`](@ref).  Here, "for each `o` in
+  `target_observations`" is understood in the sense of the data interface specified for
+  the learner, [`LearnAPI.data_interface(learner)`](@ref). For example, if this is
+  `LearnAPI.RandomAccess()`, then this means "for each `o in
+  MLUtils.eachobs(target_observations)`".
 
-- `S` will always be an upper bound on the scitype of (point) observations that could be
-  conceivably extracted from the output of [`predict`](@ref).
+- `S` is an upper bound on the `scitype` of (point) observations that might normally be
+  extracted from the output of [`predict`](@ref).
 
-To illustate the second case, suppose we have
+To illustate the second property, suppose we have
 
 ```julia
 model = fit(learner, data)
@@ -457,9 +483,9 @@ ŷ = predict(model, Sampleable(), data_new)
 ```
 
 Then each individual sample generated by each "observation" of `ŷ` (a vector of sampleable
-objects, say) will be bound in scitype by `S`.
+objects, say) will be bound in `scitype` by `S`.
 
-See also See also [`LearnAPI.fit_observation_scitype`](@ref).
+See also See also [`LearnAPI.fit_scitype`](@ref).
 
 # New implementations
 
@@ -487,6 +513,16 @@ This trait should not be overloaded. Instead overload [`LearnAPI.nonlearners`](@
 
 """
 learners(learner) = setdiff(propertynames(learner), nonlearners(learner))
+
+"""
+    LearnAPI.is_learner(object)
+
+Returns `true` if `object` has a valid implementation of the LearnAPI.jl
+interface. Equivalent to non-emptiness of [`LearnAPI.functions(object)`](@ref).
+
+This trait should never be overloaded explicitly.
+
+"""
 is_learner(learner) = !isempty(functions(learner))
 preferred_kind_of_proxy(learner) = first(kinds_of_proxy(learner))
 target(learner) = :(LearnAPI.target) in functions(learner)
