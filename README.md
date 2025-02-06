@@ -35,7 +35,7 @@ julia> model = fit(ridge, data)
 Predict:
 
 ```julia
-julia> predict(model, data)[1]
+julia> predict(model, newdata)[1]
 "virginica"
 ```
 
