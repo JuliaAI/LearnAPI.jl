@@ -38,9 +38,9 @@ number of user-specified *hyperparameters*, such as the number of trees in a ran
 forest. Hyperparameters are understood in a rather broad sense. For example, one is
 allowed to have hyperparameters that are not data-generic.  For example, a class weight
 dictionary, which will only make sense for a target taking values in the set of specified
-dictionary keys, should be given as a hyperparameter. For simplicity, LearnAPI.jl
-discourages "run time" parameters (extra arguments to `fit`) such as acceleration
-options (cpu/gpu/multithreading/multiprocessing). These should be included as
+dictionary keys, should be given as a hyperparameter. For simplicity and composability,
+LearnAPI.jl discourages "run time" parameters (extra arguments to `fit`) such as
+acceleration options (cpu/gpu/multithreading/multiprocessing). These should be included as
 hyperparameters as far as possible. An exception is the compulsory `verbosity` keyword
 argument of `fit`.
 
@@ -102,7 +102,7 @@ generally requires overloading `Base.==` for the struct.
 !!! important
 
 	No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
-	deep copies of RNG hyperparameters before using them in a new implementation of
+	deep copies of RNG hyperparameters before using them in an implementation of
 	[`fit`](@ref).
 
 #### Composite learners (wrappers)
@@ -113,9 +113,6 @@ constructor provided by [`LearnAPI.constructor`](@ref) must provide default valu
 properties that are not in [`LearnAPI.learners(learner)`](@ref). Instead, these
 learner-valued properties can have a `nothing` default, with the constructor throwing an
 error if the constructor call does not explicitly specify a new value.
-
-Any object `learner` for which [`LearnAPI.functions(learner)`](@ref) is non-empty is
-understood to have a valid implementation of the LearnAPI.jl interface.
 
 #### Example
 
@@ -138,6 +135,14 @@ GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) 
 	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
+
+#### Testing something is a learner
+
+Any object `object` for which [`LearnAPI.functions(object)`](@ref) is non-empty is
+understood to have a valid implementation of the LearnAPI.jl interface. You can test this
+with the convenience method [`LearnAPI.is_learner(object)`](@ref) but this is never explicitly
+overloaded.
+
 
 ## Documentation
 
@@ -200,11 +205,14 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
 
 ## Utilities
 
+
+- [`LearnAPI.is_learner`](@ref)
 - [`clone`](@ref): for cloning a learner with specified hyperparameter replacements.
 - [`@trait`](@ref): for simultaneously declaring multiple traits
 - [`@functions`](@ref): for listing functions available for use with a learner 
 
 ```@docs
+LearnAPI.is_learner
 clone
 @trait
 @functions

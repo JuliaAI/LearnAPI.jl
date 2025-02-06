@@ -47,7 +47,7 @@ Suppose `forest` is some object encapsulating the hyperparameters of the [random
 algorithm](https://en.wikipedia.org/wiki/Random_forest) (the number of trees, etc.). Then,
 a LearnAPI.jl interface can be implemented, for objects with the type of `forest`, to
 enable the basic workflow below. In this case data is presented following the
-"scikit-learn" `X, y` pattern, although LearnAPI.jl supports other patterns as well.
+"scikit-learn" `X, y` pattern, although LearnAPI.jl supports other data pattern.
 
 ```julia
 # `X` is some training features

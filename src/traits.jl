@@ -74,8 +74,8 @@ reference functions not owned by LearnAPI.jl.
 The understanding is that `learner` is a LearnAPI-compliant object whenever the return
 value is non-empty.
 
-Do `LearnAPI.functions()` to list all possible elements of the return value owned by
-LearnAPI.jl.
+Do `LearnAPI.functions()` to list all possible elements of the return value representing
+functions owned by LearnAPI.jl.
 
 # Extended help
 
@@ -513,6 +513,16 @@ This trait should not be overloaded. Instead overload [`LearnAPI.nonlearners`](@
 
 """
 learners(learner) = setdiff(propertynames(learner), nonlearners(learner))
+
+"""
+    LearnAPI.is_learner(object)
+
+Returns `true` if `object` has a valid implementation of the LearnAPI.jl
+interface. Equivalent to non-emptiness of [`LearnAPI.functions(object)`](@ref).
+
+This trait should never be overloaded explicitly.
+
+"""
 is_learner(learner) = !isempty(functions(learner))
 preferred_kind_of_proxy(learner) = first(kinds_of_proxy(learner))
 target(learner) = :(LearnAPI.target) in functions(learner)

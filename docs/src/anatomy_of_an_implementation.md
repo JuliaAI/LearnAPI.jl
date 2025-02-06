@@ -324,12 +324,12 @@ using LearnTestAPI
 
 ## [Other data patterns](@id di)
 
-Here are some important remarks for implementations wanting to deviate in their
+Here are some important remarks for implementations deviating in their
 assumptions about data from those made above.
 
 - New implementations of `fit`, `predict`, etc, always have a *single* `data` argument as
-  above.  For convenience, a signature such as `fit(learner, X, y)`, calling `fit(learner,
-  (X, y))`, can be added, but the LearnAPI.jl specification is silent on the meaning or
+  above.  For convenience, a signature such as `fit(learner, table, formula)`, calling `fit(learner,
+  (table, formula))`, can be added, but the LearnAPI.jl specification is silent on the meaning or
   existence of signatures with extra arguments.
 
 - If the `data` object consumed by `fit`, `predict`, or `transform` is not not a suitable
@@ -415,7 +415,7 @@ The [`obs`](@ref) methods exist to:
 !!! important
 
     While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/dev/), we
-    focus here on a self-contained implemementation of `obs` for the ridge example above, to show
+    focus here on a self-contained implementation of `obs` for the ridge example above, to show
     how it works.
 
 In the typical case, where [`LearnAPI.data_interface`](@ref) is not overloaded, the
