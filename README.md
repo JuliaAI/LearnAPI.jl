@@ -42,7 +42,7 @@ julia> predict(model, newdata)[1]
 Predict a probability distribution ([proxy](https://juliaai.github.io/LearnAPI.jl/dev/kinds_of_target_proxy/#proxy_types) for the target):
 
 ```julia
-julia> predict(model, Distribution(), data)[1]
+julia> predict(model, Distribution(), newdata)[1]
 UnivariateFinite{Multiclass{3}}(setosa=>0.0, versicolor=>0.25, virginica=>0.75)
 ```
 
