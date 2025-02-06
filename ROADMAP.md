@@ -18,17 +18,17 @@
   - [ ] clustering
   - [x] gradient descent
   - [x] iterative algorithms
-  - [ ] incremental algorithms
-  - [ ] dimension reduction
+  - [x] incremental algorithms
+  - [x] dimension reduction
   - [x] feature engineering
   - [x] static algorithms
   - [ ] missing value imputation
-  - [ ] transformers
+  - [x] transformers
   - [x] ensemble algorithms
   - [ ] time series forecasting
   - [ ] time series classification
   - [ ] survival analysis
-  - [ ] density estimation
+  - [x] density estimation
   - [ ] Bayesian algorithms
   - [ ] outlier detection
   - [ ] collaborative filtering
@@ -36,10 +36,10 @@
   - [ ] audio analysis
   - [ ] natural language processing
   - [ ] image processing
-  - [ ] meta-algorithms
+  - [x] meta-algorithms
 
-- [ ] In a utility package provide:
-   - [ ] Methods to facilitate common-use case data interfaces: support simultaneously
+- [x] In a utility package provide:
+   - [x] Methods to facilitate common-use case data interfaces: support simultaneously
      `fit` data of the form `data = (X, y)` where `X` is table *or* matrix, and `data` a
      table with target specified by hyperparameter; here `obs` will return a thin wrapping
      of the matrix of `X`, the target `y`, and the names of all fields. We can have
