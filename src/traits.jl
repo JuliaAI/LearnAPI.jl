@@ -12,7 +12,7 @@ const DOC_ON_TYPE = "The value of the trait must depend only on the type of `lea
 #     Here, "for each `o` in `observations`" is understood in the sense of the data
 #     interface specified for the learner, [`LearnAPI.data_interface(learner)`](@ref). For
 #     example, if this is `LearnAPI.RandomAccess()`, then this means "for `o` in
-#     `MLUtils.eachobs(observations)`".
+#     `MLCore.eachobs(observations)`".
 
 #     """
 
@@ -470,7 +470,7 @@ Specifically, both of the following are always true:
   `target_observations`" is understood in the sense of the data interface specified for
   the learner, [`LearnAPI.data_interface(learner)`](@ref). For example, if this is
   `LearnAPI.RandomAccess()`, then this means "for each `o in
-  MLUtils.eachobs(target_observations)`".
+  MLCore.eachobs(target_observations)`".
 
 - `S` is an upper bound on the `scitype` of (point) observations that might normally be
   extracted from the output of [`predict`](@ref).

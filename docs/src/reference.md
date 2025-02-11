@@ -21,13 +21,13 @@ individual observations.
 A `DataFrame` instance, from [DataFrames.jl](https://dataframes.juliadata.org/stable/), is
 an example of data, the observations being the rows. Typically, data provided to
 LearnAPI.jl algorithms, will implement the
-[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/stable) `getobs/numobs` interface for
+[MLCore.jl](https://juliaml.github.io/MLCore.jl/stable) `getobs/numobs` interface for
 accessing individual observations, but implementations can opt out of this requirement;
 see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
 !!! note
 
-	In the MLUtils.jl
+	In the MLCore.jl
 	convention, observations in tables are the rows but observations in a matrix are the
 	columns.
 

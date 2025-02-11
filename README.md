@@ -26,7 +26,7 @@ Here `learner` specifies the configuration the algorithm (the hyperparameters) w
 
 ## Related packages
 
-- [MLCore.jl](https://github.com/JuliaML/MLCore.jl) ([docs](https://juliaml.github.io/MLUtils.jl/stable/api/#Core-API))
+- [MLCore.jl](https://github.com/JuliaML/MLCore.jl) ([docs](https://juliaml.github.io/MLCore.jl/stable/api/#Core-API))
 
 - [LearnTestAPI.jl](https://github.com/JuliaAI/LearnTestAPI.jl): Package to test implementations of LearnAPI.jl (but documented here)
 

@@ -25,15 +25,15 @@ model = fit(learner, data_train)
 ŷ = predict(model, Point(), X[101:150])
 ```
 
-Alternative workflow using `obs` and the MLUtils.jl method `getobs` to carry out
+Alternative workflow using `obs` and the MLCore.jl method `getobs` to carry out
 subsampling (assumes `LearnAPI.data_interface(learner) == RandomAccess()`):
 
 ```julia
-import MLUtils
+import MLCore
 fit_observations = obs(learner, data)
-model = fit(learner, MLUtils.getobs(fit_observations, 1:100))
+model = fit(learner, MLCore.getobs(fit_observations, 1:100))
 predict_observations = obs(model, X)
-ẑ = predict(model, Point(), MLUtils.getobs(predict_observations, 101:150))
+ẑ = predict(model, Point(), MLCore.getobs(predict_observations, 101:150))
 @assert ẑ == ŷ
 ```
 
@@ -54,7 +54,7 @@ alternatives with the same output, whenever `observations = obs(model, data)`.
 
 If `LearnAPI.data_interface(learner) == RandomAccess()` (the default), then `fit`,
 `predict` and `transform` must additionally accept `obs` output that has been *subsampled*
-using `MLUtils.getobs`, with the obvious interpretation applying to the outcomes of such
+using `MLCore.getobs`, with the obvious interpretation applying to the outcomes of such
 calls (e.g., if *all* observations are subsampled, then outcomes should be the same as if
 using the original data).
 

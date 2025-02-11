@@ -334,7 +334,7 @@ assumptions about data from those made above.
 
 - If the `data` object consumed by `fit`, `predict`, or `transform` is not not a suitable
   table¹, array³, tuple of tables and arrays, or some other object implementing the
-  [MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs`/`numobs` interface,
+  [MLCore.jl](https://juliaml.github.io/MLCore.jl/dev/) `getobs`/`numobs` interface,
   then an implementation must: (i) overload [`obs`](@ref) to articulate how provided data
   can be transformed into a form that does support this interface, as illustrated below
   under [Providing a separate data front end](@ref) below; or (ii) overload the trait
@@ -419,7 +419,7 @@ The [`obs`](@ref) methods exist to:
     how it works.
 
 In the typical case, where [`LearnAPI.data_interface`](@ref) is not overloaded, the
-alternative data representations must implement the MLUtils.jl `getobs/numobs` interface
+alternative data representations must implement the MLCore.jl `getobs/numobs` interface
 for observation subsampling, which is generally all a user or meta-algorithm will need,
 before passing the data on to `fit`/`predict`, as you would the original data.
 
@@ -436,14 +436,14 @@ one enables the following alternative:
 observations = obs(learner, data) # preprocessed training data
 
 # optional subsampling:
-observations = MLUtils.getobs(observations, train_indices)
+observations = MLCore.getobs(observations, train_indices)
 
 model = fit(learner, observations)
 
 newobservations = obs(model, newdata)
 
 # optional subsampling:
-newobservations = MLUtils.getobs(observations, test_indices)
+newobservations = MLCore.getobs(observations, test_indices)
 
 predict(model, newobservations)
 ```
@@ -568,7 +568,7 @@ LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, obs(learner, da
   are generally different.
 
 - We need the adjoint operator, `'`, because the last dimension in arrays is the
-  observation dimension, according to the MLUtils.jl convention. Remember, `Xnew` is a
+  observation dimension, according to the MLCore.jl convention. Remember, `Xnew` is a
   table here.
 
 Since LearnAPI.jl provides fallbacks for `obs` that simply return the unadulterated data
@@ -576,7 +576,7 @@ argument, overloading `obs` is optional. This is provided data in publicized
 `fit`/`predict` signatures already consists only of objects implement the
 [`LearnAPI.RandomAccess`](@ref) interface (most tables¹, arrays³, and tuples thereof).
 
-To opt out of supporting the MLUtils.jl interface altogether, an implementation must
+To opt out of supporting the MLCore.jl interface altogether, an implementation must
 overload the trait, [`LearnAPI.data_interface(learner)`](@ref). See [Data
 interfaces](@ref data_interfaces) for details.
 
@@ -593,15 +593,15 @@ LearnAPI.fit(learner::Ridge, X, y; kwargs...)  = fit(learner, (X, y); kwargs...)
 ## [Demonstration of an advanced `obs` workflow](@id advanced_demo)
 
 We now can train and predict using internal data representations, resampled using the
-generic MLUtils.jl interface:
+generic MLCore.jl interface:
 
 ```@example anatomy2
-import MLUtils
+import MLCore
 learner = Ridge()
 observations_for_fit = obs(learner, (X, y))
-model = fit(learner, MLUtils.getobs(observations_for_fit, train))
+model = fit(learner, MLCore.getobs(observations_for_fit, train))
 observations_for_predict = obs(model, X)
-ẑ = predict(model, MLUtils.getobs(observations_for_predict, test))
+ẑ = predict(model, MLCore.getobs(observations_for_predict, test))
 ```
 
 ```julia
@@ -616,7 +616,7 @@ obs_workflows).
 ¹ In LearnAPI.jl a *table* is any object `X` implementing the
 [Tables.jl](https://tables.juliadata.org/dev/) interface, additionally satisfying
 `Tables.istable(X) == true` and implementing `DataAPI.nrow` (and whence
-`MLUtils.numobs`). Tables that are also (unnamed) tuples are disallowed.
+`MLCore.numobs`). Tables that are also (unnamed) tuples are disallowed.
 
 ² An implementation can provide further accessor functions, if necessary, but
 like the native ones, they must be included in the [`LearnAPI.functions`](@ref)

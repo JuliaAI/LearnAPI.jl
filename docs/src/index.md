@@ -92,12 +92,13 @@ unless the algorithm explicitly opts out. Moreover, the `fit` and `predict` meth
 also be able to consume these alternative data representations, for performance benefits
 in some situations.
 
-The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
-`getobs/numobs` interface, here tagged as [`LearnAPI.RandomAccess()`](@ref), and if the
-input consumed by the algorithm already implements that interface (tables, arrays, etc.)
-then overloading `obs` is completely optional. Plain iteration interfaces, with or without
-knowledge of the number of observations, can also be specified, to support, e.g., data
-loaders reading images from disk.
+The fallback data interface is the [MLCore.jl](https://github.com/JuliaML/MLCore.jl)
+`getobs/numobs` interface (previously provided by MLUtils.jl) here tagged as
+[`LearnAPI.RandomAccess()`](@ref). However, if the input consumed by the algorithm already
+implements that interface (tables, arrays, etc.)  then overloading `obs` is completely
+optional. Plain iteration interfaces, with or without knowledge of the number of
+observations, can also be specified, to support, e.g., data loaders reading images from
+disk.
 
 Some canned data front ends (implementations of [`obs`](@ref)) are provided by the
 [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/) package.
