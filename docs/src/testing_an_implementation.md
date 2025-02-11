@@ -38,6 +38,7 @@ LearnTestAPI.Selector
 LearnTestAPI.FancySelector
 LearnTestAPI.NormalEstimator
 LearnTestAPI.Ensemble
+LearnTestAPI.StumpRegressor
 ```
 
 ## Private methods

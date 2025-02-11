@@ -4,10 +4,10 @@
 <div style="font-size:1.4em;font-weight:bold;">
   <a href="anatomy_of_an_implementation"
     style="color: #389826;">Tutorial</a>           &nbsp;|&nbsp;
-  <a href="reference"
-    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
   <a href="common_implementation_patterns"
     style="color: #9558B2;">Patterns</a>
+  <a href="reference"
+    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
 </div>
 
 <span style="color: #9558B2;font-size:4.5em;">
@@ -87,7 +87,7 @@ Algorithms are free to consume data in any format. However, a method called [`ob
 data_interface) (read as "observations") gives developers the option of providing a
 separate data front end for their algorithms. In this case `obs` gives users and
 meta-algorithms access to an algorithm-specific representation of input data, which is
-also guaranteed to implement a standard interface for accessing individual observations,
+additionally guaranteed to implement a standard interface for accessing individual observations,
 unless the algorithm explicitly opts out. Moreover, the `fit` and `predict` methods will
 also be able to consume these alternative data representations, for performance benefits
 in some situations.
@@ -99,8 +99,8 @@ then overloading `obs` is completely optional. Plain iteration interfaces, with 
 knowledge of the number of observations, can also be specified, to support, e.g., data
 loaders reading images from disk.
 
-Some canned data front ends are provided by the
-[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/stable/) package.
+Some canned data front ends (implementations of [`obs`](@ref)) are provided by the
+[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/) package.
 
 ## Learning more
 

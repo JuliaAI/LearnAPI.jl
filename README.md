@@ -11,40 +11,27 @@ Comprehensive documentation is [here](https://juliaai.github.io/LearnAPI.jl/dev/
 
 New contributions welcome. See the [road map](ROADMAP.md).
 
-## Code snippet
+## Synopsis
 
-Configure a machine learning algorithm:
-
-```julia
-julia> ridge = Ridge(lambda=0.1)
-```
-
-Inspect available functionality:
-
-```
-julia> @functions ridge
-(fit, LearnAPI.learner, LearnAPI.strip, obs, LearnAPI.features, LearnAPI.target, predict, LearnAPI.coefficients)
-```
-
-Train:
+Package provides for variations and elaborations on the following basic pattern in machine
+learning and statistics:
 
 ```julia
-julia> model = fit(ridge, data)
+model = fit(learner, data)
+predict(model, newdata)
 ```
 
-Predict:
+Here `learner` specifies the configuration the algorithm (the hyperparameters) while
+`model` stores learned parameters and any byproducts of algorithm execution.
 
-```julia
-julia> predict(model, newdata)[1]
-"virginica"
-```
+## Related packages
 
-Predict a probability distribution ([proxy](https://juliaai.github.io/LearnAPI.jl/dev/kinds_of_target_proxy/#proxy_types) for the target):
+- [MLCore.jl](https://github.com/JuliaML/MLCore.jl) ([docs](https://juliaml.github.io/MLUtils.jl/stable/api/#Core-API))
 
-```julia
-julia> predict(model, Distribution(), newdata)[1]
-UnivariateFinite{Multiclass{3}}(setosa=>0.0, versicolor=>0.25, virginica=>0.75)
-```
+- [LearnTestAPI.jl](https://github.com/JuliaAI/LearnTestAPI.jl): Package to test implementations of LearnAPI.jl (but documented here)
+
+- [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): for including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs]((https://juliaai.github.io/stable/))
+
 
 ## Credits
 
