@@ -33,6 +33,7 @@ useful for testing learner wrappers and meta-algorithms.
 ```@docs
 LearnTestAPI.Ridge
 LearnTestAPI.BabyRidge
+LearnTestAPI.ConstantClassifier
 LearnTestAPI.TruncatedSVD
 LearnTestAPI.Selector
 LearnTestAPI.FancySelector

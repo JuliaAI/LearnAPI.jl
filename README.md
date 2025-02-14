@@ -13,7 +13,7 @@ New contributions welcome. See the [road map](ROADMAP.md).
 
 ## Synopsis
 
-Package provides for variations and elaborations on the following basic pattern in machine
+LearnAPI.jl provides for variations and elaborations on the following basic pattern in machine
 learning and statistics:
 
 ```julia
@@ -30,7 +30,7 @@ Here `learner` specifies the configuration the algorithm (the hyperparameters) w
 
 - [LearnTestAPI.jl](https://github.com/JuliaAI/LearnTestAPI.jl): Package to test implementations of LearnAPI.jl (but documented here)
 
-- [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): for including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs]((https://juliaai.github.io/stable/))
+- [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): for including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs](https://juliaai.github.io/stable/))
 
 
 ## Credits
