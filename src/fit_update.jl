@@ -61,8 +61,8 @@ function fit end
     update(model, data, param_replacements...; verbosity=1)
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
-`update` call, but with the specified hyperparameter replacements, in the form `p1 =>
-value1, p2 => value2, ...`.
+`update` call, but with the specified hyperparameter replacements, in the form `:p1 =>
+value1, :p2 => value2, ...`.
 
 ```julia
 learner = MyForest(ntrees=100)
@@ -105,7 +105,7 @@ function update end
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new observations present in `new_data`. One may additionally
-specify hyperparameter replacements in the form `p1 => value1, p2 => value2, ...`.
+specify hyperparameter replacements in the form `:p1 => value1, :p2 => value2, ...`.
 
 ```julia-repl
 learner = MyNeuralNetwork(epochs=10, learning_rate => 0.01)
@@ -145,7 +145,7 @@ function update_observations end
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call given the new features encapsulated in `new_data`. One may additionally
-specify hyperparameter replacements in the form `p1 => value1, p2 => value2, ...`.
+specify hyperparameter replacements in the form `:p1 => value1, :p2 => value2, ...`.
 
 When following the call `fit(learner, data)`, the `update` call is semantically
 equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
