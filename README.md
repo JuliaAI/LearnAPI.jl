@@ -56,7 +56,7 @@ additional functionality. PR's to add missing items welcome.
 
 - [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) (an API in addition to being a wrapper for [scikit-learn](https://scikit-learn.org/stable/))
 
-- [StatsAPI.jl](https://github.com/JuliaStats/StatsAPI.jl/blob/main/src/regressionmodel.jl) (specialized to needs of traditional statistical models)
+- [StatsAPI.jl](https://github.com/JuliaStats/StatsAPI.jl/tree/main) (specialized to needs of traditional statistical models)
 
 
 ## Credits
