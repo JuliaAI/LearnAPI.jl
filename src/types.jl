@@ -244,14 +244,10 @@ struct RandomAccess <: Finite end
 """
     LearnAPI.FiniteIterable
 
-A data interface type.  We say that `data` implements the `FiniteIterable` interface if
-it implements Julia's `iterate` interface, including `Base.length`, and if
-`Base.IteratorSize(typeof(data)) == Base.HasLength()`. For example, this is true if:
-
-- `data` implements the [`LearnAPI.RandomAccess`](@ref) interface (arrays and most
-  tables); or
-
-- `data isa MLCore.DataLoader`, which includes output from `MLCore.eachobs`.
+A data interface type.  We say that `data` implements the `FiniteIterable` interface if it
+implements Julia's `iterate` interface, including `Base.length`, and if
+`Base.IteratorSize(typeof(data)) == Base.HasLength()`. For example, this is true if `data
+isa MLCore.DataLoader`, which includes the output of `MLUtils.eachobs`.
 
 If [`LearnAPI.data_interface(learner)`](@ref) takes the value `FiniteIterable()`, then
 [`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
