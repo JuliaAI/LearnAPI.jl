@@ -15,9 +15,9 @@ clustering algorithms); there is no training data and heavy lifting is carried o
 ### Updating
 
 ```
-update(model, data; verbosity=..., param1=new_value1, param2=new_value2, ...) -> updated_model
-update_observations(model, new_data; verbosity=..., param1=new_value1, ...) -> updated_model
-update_features(model, new_data; verbosity=..., param1=new_value1, ...) -> updated_model
+update(model, data; verbosity=..., :param1=new_value1, :param2=new_value2, ...) -> updated_model
+update_observations(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
+update_features(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
 ```
 
 ## Typical workflows

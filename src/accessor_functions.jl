@@ -319,7 +319,7 @@ Here's a sample workflow for some such `learner`, with training data, `(X, y)`, 
 is the training target, here assumed to be a vector.
 
 ```julia
-import MLUtils.getobs
+import MLCore.getobs
 model = fit(learner, (X, y))
 yhat = LearnAPI.predictions(model)
 test_indices = LearnAPI.out_of_sample_indices(model)

@@ -26,26 +26,26 @@ observations = obs(learner, data)
 
 then, assuming the typical case that `LearnAPI.data_interface(learner) ==
 LearnAPI.RandomAccess()`, `observations` implements the
-[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/dev/) `getobs`/`numobs` interface, for
+[MLCore.jl](https://juliaml.github.io/MLCore.jl/dev/) `getobs`/`numobs` interface, for
 grabbing and counting observations. Moreover, we can pass `observations` to `fit` in place
-of the original data, or first resample it using `MLUtils.getobs`:
+of the original data, or first resample it using `MLCore.getobs`:
 
 ```julia
 # equivalent to `model = fit(learner, data)`
 model = fit(learner, observations)
 
 # with resampling:
-resampled_observations = MLUtils.getobs(observations, 1:10)
+resampled_observations = MLCore.getobs(observations, 1:10)
 model = fit(learner, resampled_observations)
 ```
 
 In some implementations, the alternative pattern above can be used to avoid repeating
 unnecessary internal data preprocessing, or inefficient resampling.  For example, here's
-how a user might call `obs` and `MLUtils.getobs` to perform efficient cross-validation:
+how a user might call `obs` and `MLCore.getobs` to perform efficient cross-validation:
 
 ```julia
 using LearnAPI
-import MLUtils
+import MLCore
 
 learner = <some supervised learner>
 
@@ -61,7 +61,7 @@ never_trained = true
 scores = map(train_test_folds) do (train, test)
 
     # train using model-specific representation of data:
-    fitobs_subset = MLUtils.getobs(fitobs, train)
+    fitobs_subset = MLCore.getobs(fitobs, train)
     model = fit(learner, fitobs_subset)
 
     # predict on the fold complement:
@@ -70,7 +70,7 @@ scores = map(train_test_folds) do (train, test)
         global predictobs = obs(model, X)
         global never_trained = false
     end
-    predictobs_subset = MLUtils.getobs(predictobs, test)
+    predictobs_subset = MLCore.getobs(predictobs, test)
     ŷ = predict(model, Point(), predictobs_subset)
 
     y = LearnAPI.target(learner, data)

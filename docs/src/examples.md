@@ -4,7 +4,8 @@ Below is the complete source code for the ridge implementations described in the
 [Anatomy of an Implementation](@ref).
 
 - [Basic implementation](@ref)
-- [Implementation with data front end](@ref)
+- [Implementation with a data front end](@ref)
+- [Implementation with a canned data front end](@ref) 
 
 
 ## Basic implementation
@@ -85,7 +86,7 @@ LearnAPI.strip(model::RidgeFitted) =
 LearnAPI.fit(learner::Ridge, X, y; kwargs...) = fit(learner, (X, y); kwargs...)
 ```
 
-# Implementation with data front end
+# Implementation with a data front end
 
 ```julia
 using LearnAPI
@@ -189,4 +190,92 @@ LearnAPI.strip(model::RidgeFitted) =
    )
 )
 
+```
+
+# Implementation with a canned data front end
+
+The following implements the `Saffron` data front end from
+[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/), which
+allows for a greater variety of forms of input to `fit` and `predict`.  Refer to that
+package's [documentation](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/) for details.
+    
+```julia
+using LearnAPI
+import LearnDataFrontEnds as FrontEnds
+using LinearAlgebra, Tables
+
+struct Ridge{T<:Real}
+   lambda::T
+end
+
+Ridge(; lambda=0.1) = Ridge(lambda)
+
+# struct for output of `fit`:
+struct RidgeFitted{T,F}
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
+end
+
+frontend = FrontEnds.Saffron()
+
+# these will return objects of type `FrontEnds.Obs`:
+LearnAPI.obs(learner::Ridge, data) = FrontEnds.fitobs(learner, data, frontend)
+LearnAPI.obs(model::RidgeFitted, data) = obs(model, data, frontend)
+
+function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=1)
+
+    lambda = learner.lambda
+
+    A = observations.features
+    names = observations.names
+    y = observations.target
+
+    # apply core learner:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
+
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
+
+    return RidgeFitted(learner, coefficients, named_coefficients)
+
+end
+LearnAPI.fit(learner::Ridge, data; kwargs...) =
+    fit(learner, obs(learner, data); kwargs...)
+
+LearnAPI.predict(model::RidgeFitted, ::Point, observations::FrontEnds.Obs) =
+    (observations.features)'*model.coefficients
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+    predict(model, Point(), obs(model, Xnew))
+
+# training data deconstructors:
+LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, data, frontend)
+LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, data, frontend)
+
+# accessor functions:
+LearnAPI.learner(model::RidgeFitted) = model.learner
+LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
+LearnAPI.strip(model::RidgeFitted) =
+    RidgeFitted(model.learner, model.coefficients, nothing)
+
+@trait(
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = ("regression",),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
+   )
+)
 ```
