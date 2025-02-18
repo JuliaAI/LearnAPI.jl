@@ -105,7 +105,7 @@ nothing # hide
 ```
 
 Note that we also include `learner` in the struct, for it must be possible to recover
-`learner` from the output of `fit`; see [Accessor functions](@ref) below.
+`learner` from the output of `fit`; see [Accessor functions](@ref af) below.
 
 The implementation of `fit` looks like this:
 
@@ -159,7 +159,7 @@ first element of the tuple returned by [`LearnAPI.kinds_of_proxy(learner)`](@ref
 we overload appropriately below.
 
 
-### Accessor functions
+### [Accessor functions](@id af)
 
 An [accessor function](@ref accessor_functions) has the output of [`fit`](@ref) as it's
 sole argument.  Every new implementation must implement the accessor function
