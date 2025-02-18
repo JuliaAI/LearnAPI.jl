@@ -52,11 +52,11 @@ additional functionality. PR's to add missing items very welcome.
 
 - [MLJModelInterface.jl](https://github.com/JuliaAI/MLJModelInterface.jl)
 
+- [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) (more than a base API, focused on deep learning)
+
 - [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) (an API in addition to being a wrapper for [scikit-learn](https://scikit-learn.org/stable/))
 
 - [StatsAPI.jl](https://github.com/JuliaStats/StatsAPI.jl/blob/main/src/regressionmodel.jl) (specialized to needs of traditional statistical models)
-
-- [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) (more than a base API, focused on deep learning)
 
 
 ## Credits
