@@ -5,9 +5,9 @@
   <a href="anatomy_of_an_implementation"
     style="color: #389826;">Tutorial</a>           &nbsp;|&nbsp;
   <a href="common_implementation_patterns"
-    style="color: #9558B2;">Patterns</a>
+    style="color: #9558B2;">Patterns</a>           &nbsp;|&nbsp;
   <a href="reference"
-    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
+    style="color: #9558B2;">Reference</a>
 </div>
 
 <span style="color: #9558B2;font-size:4.5em;">
