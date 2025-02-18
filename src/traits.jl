@@ -65,7 +65,7 @@ Return a tuple of expressions representing functions that can be meaningfully ap
 argument. Learner traits (methods for which `learner` is the *only* argument) are
 excluded.
 
-To return actual functions, instead of symbols, use [`@functions`](@ref)` learner`
+To return actual functions, instead of symbols, use [`@functions`](@ref)  `learner`
 instead.
 
 The returned tuple may include expressions like `:(DecisionTree.print_tree)`, which

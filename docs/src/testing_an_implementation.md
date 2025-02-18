@@ -1,6 +1,6 @@
 # Testing an Implementation
 
-Testing is provided by the LearnTestAPI.jl package documented below. 
+Testing is provided by the LearnTestAPI.jl package documented below.
 
 ## Quick start
 
@@ -8,15 +8,13 @@ Testing is provided by the LearnTestAPI.jl package documented below.
 LearnTestAPI
 ```
 
-LearnAPI.jl and LearnTestAPI.jl have synchronized releases. For example, LearnTestAPI.jl
-version 0.2.3 will generally support all LearnAPI.jl versions 0.2.*.
-
 !!! warning
 
-    New releases of LearnTestAPI.jl may add tests to `@testapi`, and this may result in
-    new failures in client package test suites. Nevertheless, adding a test to `@testapi`
-    is not considered a breaking change to LearnTestAPI, unless the addition supports a
-    breaking release of LearnAPI.jl.
+	New releases of LearnTestAPI.jl may add tests to `@testapi`, and
+	this may result in new failures in client package test suites, because
+	of previously undetected broken contracts. Adding a test to `@testapi`
+	is not considered a breaking change
+	to LearnTestAPI, unless it supports a breaking change to LearnAPI.jl.
 
 
 ## The @testapi macro
@@ -28,7 +26,7 @@ LearnTestAPI.@testapi
 ## Learners for testing
 
 LearnTestAPI.jl provides some simple, tested, LearnAPI.jl implementations, which may be
-useful for testing learner wrappers and meta-algorithms. 
+useful for testing learner wrappers and meta-algorithms.
 
 ```@docs
 LearnTestAPI.Ridge
@@ -44,7 +42,7 @@ LearnTestAPI.StumpRegressor
 
 ## Private methods
 
-For LearnTestAPI.jl developers only, and subject to breaking changes:
+For LearnTestAPI.jl developers only, and subject to breaking changes at any time:
 
 ```@docs
 LearnTestAPI.@logged_testset

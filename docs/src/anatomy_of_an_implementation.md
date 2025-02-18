@@ -555,8 +555,8 @@ above. Here we must explicitly overload them, so that they also handle the outpu
 
 ```@example anatomy2
 LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
-LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, obs(learner, data))
+LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, obs(learner, data))
 ```
 
