@@ -1,8 +1,10 @@
 # [Reference](@id reference)
 
 Here we give the definitive specification of the LearnAPI.jl interface. For informal
-guides see [Anatomy of an Implementation](@ref) and [Common Implementation
-Patterns](@ref patterns).
+guides see [Anatomy of an Implementation](@ref) and [Common Implementation Patterns](@ref
+patterns).
+
+ - [List of Public Names](@ref)
 
 
 ## [Important terms and concepts](@id scope)
@@ -21,13 +23,13 @@ individual observations.
 A `DataFrame` instance, from [DataFrames.jl](https://dataframes.juliadata.org/stable/), is
 an example of data, the observations being the rows. Typically, data provided to
 LearnAPI.jl algorithms, will implement the
-[MLUtils.jl](https://juliaml.github.io/MLUtils.jl/stable) `getobs/numobs` interface for
+[MLCore.jl](https://juliaml.github.io/MLCore.jl/stable) `getobs/numobs` interface for
 accessing individual observations, but implementations can opt out of this requirement;
 see [`obs`](@ref) and [`LearnAPI.data_interface`](@ref) for details.
 
 !!! note
 
-	In the MLUtils.jl
+	In the MLCore.jl
 	convention, observations in tables are the rows but observations in a matrix are the
 	columns.
 
@@ -190,7 +192,7 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
 
 - [`LearnAPI.features`](@ref input), [`LearnAPI.target`](@ref input),
   [`LearnAPI.weights`](@ref input): for extracting relevant parts of training data, where
-  defined.
+  defined. Also called *training data deconstructors*. 
 
 - [Accessor functions](@ref accessor_functions): these include functions like
   `LearnAPI.feature_importances` and `LearnAPI.training_losses`, for extracting, from

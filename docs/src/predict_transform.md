@@ -52,8 +52,8 @@ transform(learner, data) # `fit` implied
 
 ```julia
 fitobs = obs(learner, (X, y)) # learner-specific repr. of data
-model = fit(learner, MLUtils.getobs(fitobs, 1:100))
-predictobs = obs(model, MLUtils.getobs(X, 101:150))
+model = fit(learner, MLCore.getobs(fitobs, 1:100))
+predictobs = obs(model, MLCore.getobs(X, 101:150))
 ŷ = predict(model, Point(), predictobs)
 ```
 

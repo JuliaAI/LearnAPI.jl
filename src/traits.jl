@@ -12,7 +12,7 @@ const DOC_ON_TYPE = "The value of the trait must depend only on the type of `lea
 #     Here, "for each `o` in `observations`" is understood in the sense of the data
 #     interface specified for the learner, [`LearnAPI.data_interface(learner)`](@ref). For
 #     example, if this is `LearnAPI.RandomAccess()`, then this means "for `o` in
-#     `MLUtils.eachobs(observations)`".
+#     `MLCore.eachobs(observations)`".
 
 #     """
 
@@ -65,7 +65,7 @@ Return a tuple of expressions representing functions that can be meaningfully ap
 argument. Learner traits (methods for which `learner` is the *only* argument) are
 excluded.
 
-To return actual functions, instead of symbols, use [`@functions`](@ref)` learner`
+To return actual functions, instead of symbols, use [`@functions`](@ref)  `learner`
 instead.
 
 The returned tuple may include expressions like `:(DecisionTree.print_tree)`, which
@@ -470,7 +470,7 @@ Specifically, both of the following are always true:
   `target_observations`" is understood in the sense of the data interface specified for
   the learner, [`LearnAPI.data_interface(learner)`](@ref). For example, if this is
   `LearnAPI.RandomAccess()`, then this means "for each `o in
-  MLUtils.eachobs(target_observations)`".
+  MLCore.eachobs(target_observations)`".
 
 - `S` is an upper bound on the `scitype` of (point) observations that might normally be
   extracted from the output of [`predict`](@ref).

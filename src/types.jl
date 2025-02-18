@@ -212,9 +212,9 @@ abstract type Finite <: DataInterface end
     LearnAPI.RandomAccess
 
 A data interface type. We say that `data` implements the `RandomAccess` interface if
-`data` implements the methods `getobs` and `numobs` from MLUtils.jl. The first method
+`data` implements the methods `getobs` and `numobs` from MLCore.jl. The first method
 allows one to grab observations specified by an arbitrary index set, as in
-`MLUtils.getobs(data, [2, 3, 5])`, while the second method returns the total number of
+`MLCore.getobs(data, [2, 3, 5])`, while the second method returns the total number of
 available observations, which is assumed to be known and finite.
 
 All arrays implement `RandomAccess`, with the last index being the observation index
@@ -234,8 +234,8 @@ If [`LearnAPI.data_interface(learner)`](@ref) takes the value `RandomAccess()`, 
 # Implementing `RandomAccess` for new data types
 
 Typically, to implement `RandomAccess` for a new data type requires only implementing
-`Base.getindex` and `Base.length`, which are the fallbacks for `MLUtils.getobs` and
-`MLUtils.numobs`, and this avoids making MLUtils.jl a package dependency.
+`Base.getindex` and `Base.length`, which are the fallbacks for `MLCore.getobs` and
+`MLCore.numobs`, and this avoids making MLCore.jl a package dependency.
 
 See also [`LearnAPI.FiniteIterable`](@ref), [`LearnAPI.Iterable`](@ref).
 """
@@ -251,7 +251,7 @@ it implements Julia's `iterate` interface, including `Base.length`, and if
 - `data` implements the [`LearnAPI.RandomAccess`](@ref) interface (arrays and most
   tables); or
 
-- `data isa MLUtils.DataLoader`, which includes output from `MLUtils.eachobs`.
+- `data isa MLCore.DataLoader`, which includes output from `MLCore.eachobs`.
 
 If [`LearnAPI.data_interface(learner)`](@ref) takes the value `FiniteIterable()`, then
 [`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing the
@@ -267,7 +267,7 @@ struct FiniteIterable <: Finite end
 
 A data interface type. We say that `data` implements the `Iterable` interface if it
 implements Julia's basic `iterate` interface. (Such objects may not implement
-`MLUtils.numobs` or `Base.length`.)
+`MLCore.numobs` or `Base.length`.)
 
 If [`LearnAPI.data_interface(learner)`](@ref) takes the value `Iterable()`, then
 [`obs`](@ref)`(learner, ...)` is guaranteed to return objects implementing `Iterable`,

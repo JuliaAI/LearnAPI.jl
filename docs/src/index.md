@@ -4,10 +4,10 @@
 <div style="font-size:1.4em;font-weight:bold;">
   <a href="anatomy_of_an_implementation"
     style="color: #389826;">Tutorial</a>           &nbsp;|&nbsp;
-  <a href="reference"
-    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
   <a href="common_implementation_patterns"
     style="color: #9558B2;">Patterns</a>
+  <a href="reference"
+    style="color: #9558B2;">Reference</a>      &nbsp;|&nbsp;
 </div>
 
 <span style="color: #9558B2;font-size:4.5em;">
@@ -29,17 +29,6 @@ includes a number of Julia [traits](@ref traits) for promising specific behavior
 
 LearnAPI.jl's has no package dependencies.
 
-```@raw html
-&#128679;
-```
-
-!!! warning
-
-	The API described here is under active development and not ready for adoption.
-	Join an ongoing design discussion at
-	[this](https://discourse.julialang.org/t/ann-learnapi-jl-proposal-for-a-basement-level-machine-learning-api/93048)
-	Julia Discourse thread.
-
 
 ## Sample workflow
 
@@ -47,7 +36,7 @@ Suppose `forest` is some object encapsulating the hyperparameters of the [random
 algorithm](https://en.wikipedia.org/wiki/Random_forest) (the number of trees, etc.). Then,
 a LearnAPI.jl interface can be implemented, for objects with the type of `forest`, to
 enable the basic workflow below. In this case data is presented following the
-"scikit-learn" `X, y` pattern, although LearnAPI.jl supports other data pattern.
+"scikit-learn" `X, y` pattern, although LearnAPI.jl supports other data patterns.
 
 ```julia
 # `X` is some training features
@@ -58,7 +47,7 @@ enable the basic workflow below. In this case data is presented following the
 @functions forest
 
 # Train:
-model = fit(forest, X, y)
+model = fit(forest, (X, y))
 
 # Generate point predictions:
 ŷ = predict(model, Xnew) # or `predict(model, Point(), Xnew)`
@@ -81,21 +70,27 @@ on the usual supervised/unsupervised learning dichotomy. From this point of view
 supervised learner is simply one in which a target variable exists, and happens to
 appear as an input to training but not to prediction.
 
-## Data interfaces
+## Data interfaces and front ends
 
 Algorithms are free to consume data in any format. However, a method called [`obs`](@ref
-data_interface) (read as "observations") gives users and meta-algorithms access to an
-algorithm-specific representation of input data, which is also guaranteed to implement a
-standard interface for accessing individual observations, unless the algorithm explicitly
-opts out. Moreover, the `fit` and `predict` methods will also be able to consume these
-alternative data representations, for performance benefits in some situations.
+data_interface) (read as "observations") gives developers the option of providing a
+separate data front end for their algorithms. In this case `obs` gives users and
+meta-algorithms access to an algorithm-specific representation of input data, which is
+additionally guaranteed to implement a standard interface for accessing individual
+observations, unless the algorithm explicitly opts out. Moreover, the `fit` and `predict`
+methods can directly consume these alternative data representations, for performance
+benefits in some situations, such as cross-validation.
 
-The fallback data interface is the [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl)
-`getobs/numobs` interface, here tagged as [`LearnAPI.RandomAccess()`](@ref), and if the
-input consumed by the algorithm already implements that interface (tables, arrays, etc.)
-then overloading `obs` is completely optional. Plain iteration interfaces, with or without
-knowledge of the number of observations, can also be specified, to support, e.g., data
-loaders reading images from disk.
+The fallback data interface is the [MLCore.jl](https://github.com/JuliaML/MLCore.jl)
+`getobs/numobs` interface (previously provided by MLUtils.jl) here tagged as
+[`LearnAPI.RandomAccess()`](@ref). However, if the input consumed by the algorithm already
+implements that interface (tables, arrays, etc.)  then overloading `obs` is completely
+optional. Plain iteration interfaces, with or without knowledge of the number of
+observations, can also be specified, to support, e.g., data loaders reading images from
+disk.
+
+Some canned data front ends (implementations of [`obs`](@ref)) are provided by the
+[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/) package.
 
 ## Learning more
 

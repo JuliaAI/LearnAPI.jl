@@ -1,7 +1,7 @@
 name = "LearnAPI"
 uuid = "92ad9a40-7767-427a-9ee6-6e577f1266cb"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.2.0"
+version = "1.0.0"
 
 [compat]
 julia = "1.10"
