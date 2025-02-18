@@ -33,7 +33,7 @@ support such algorithms.
 
 - [LearnTestAPI.jl](https://github.com/JuliaAI/LearnTestAPI.jl): Package to test implementations of LearnAPI.jl (but documented here)
 
-- [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): For including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs](https://juliaai.github.io/stable/))
+- [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): For including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/))
 
 - [StatisticalMeasures.jl](https://github.com/JuliaAI/StatisticalMeasures.jl): Package providing metrics, compatible with LearnAPI.jl
 
