@@ -37,6 +37,8 @@ support such algorithms.
 
 - [StatisticalMeasures.jl](https://github.com/JuliaAI/StatisticalMeasures.jl): Package providing metrics, compatible with LearnAPI.jl
 
+- [StatsModels.jl](https://github.com/JuliaStats/StatsModels.jl): Provides the R-style formula implementation of data preprocessing handled by [LearnDataFrontEnds.jl]((https://github.com/JuliaAI/LearnDataFrontEnds.jl)
+
 ### Selected packages providing alternative API's
 
 The following alphabetical list of packages provide public base API's.  Some provide
