@@ -14,7 +14,7 @@
   "Common Implementation Patterns". As real-world implementations roll out, we could
   increasingly point to those instead, to conserve effort
   - [x] regression
-  - [ ] classification
+  - [x] classification
   - [ ] clustering
   - [x] gradient descent
   - [x] iterative algorithms
