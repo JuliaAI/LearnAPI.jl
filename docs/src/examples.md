@@ -24,7 +24,6 @@ end
 Instantiate a ridge regression learner, with regularization of `lambda`.
 """
 Ridge(; lambda=0.1) = Ridge(lambda)
-LearnAPI.constructor(::Ridge) = Ridge
 
 # struct for output of `fit`
 struct RidgeFitted{T,F}
