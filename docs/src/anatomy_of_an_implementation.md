@@ -414,7 +414,7 @@ The [`obs`](@ref) methods exist to:
 
 !!! important
 
-    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/dev/), we
+    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/dev/), we
     focus here on a self-contained implementation of `obs` for the ridge example above, to show
     how it works.
 
