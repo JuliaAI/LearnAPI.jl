@@ -573,7 +573,7 @@ LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, obs(learner, da
 
 Since LearnAPI.jl provides fallbacks for `obs` that simply return the unadulterated data
 argument, overloading `obs` is optional. This is provided data in publicized
-`fit`/`predict` signatures already consists only of objects implement the
+`fit`/`predict` signatures already consists only of objects implementing the
 [`LearnAPI.RandomAccess`](@ref) interface (most tables¹, arrays³, and tuples thereof).
 
 To opt out of supporting the MLCore.jl interface altogether, an implementation must
