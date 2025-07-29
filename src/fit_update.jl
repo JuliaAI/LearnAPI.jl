@@ -39,15 +39,20 @@ overloaded to return `true`.
 
 The signature must include `verbosity` with `1` as default.
 
-If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
-[`LearnAPI.target`](@ref) must be implemented. If [`predict`](@ref) or [`transform`](@ref)
-are implemented and consume data, then you made need to overload
-[`LearnAPI.features`](@ref).
-
 The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
 two arguments. For convenience, for example, an implementation is free to implement a
 slurping signature, such as `fit(learner, X, y, extras...) = fit(learner, (X, y,
 extras...))` but LearnAPI.jl does not guarantee such signatures are actually implemented.
+
+## The `target`, `features` and `sees_features` methods
+
+If `data` encapsulates a *target* variable, as defined in LearnAPI.jl documentation, then
+[`LearnAPI.target`](@ref) must be implemented. If [`predict`](@ref) or [`transform`](@ref)
+are implemented and consume data, then you may need to overload
+[`LearnAPI.features`](@ref). If [`predict`](@ref) or [`transform`](@ref) are implemented
+and consume no data, then you must instead overload
+[`LearnAPI.sees_features(learner)`](@ref) to return `false`, and overload
+[`LearnAPI.features(learner, data)`](@ref) to return `nothing`.
 
 $(DOC_DATA_INTERFACE(:fit))
 

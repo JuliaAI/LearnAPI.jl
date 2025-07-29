@@ -129,4 +129,4 @@ data).
 features(learner, data) = _first(data)
 _first(data) = data
 _first(data::Tuple) = first(data)
-# note the factoring above guards against method ambiguities
+# the factoring above guards against method ambiguities

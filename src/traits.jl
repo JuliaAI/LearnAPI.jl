@@ -153,6 +153,46 @@ macro functions(learner)
 end
 
 """
+    LearnAPI.sees_features(learner)
+
+Returns `false` for those learners trained only on target data, such as density
+estimators; in these cases `predict(model, ...)` and `transform(model, ...)` consume no
+data at all.
+
+More precisely, supposing `model = fit(learner, data)`, then
+
+- If `false` is returned, then:
+
+  - The only possible continuations of [`predict`](@ref)`(model, ...)` are `predict(model,
+    ::KindOfProxy)` and `predict(model)`.
+
+  - The only possible continuation of [`transform`](@ref)`(model, ...)` are
+    `transform(model)`.
+
+  - [`LearnAPI.features(learner, data)`](@ref) returns `nothing`.
+
+-  If `true` is returned, then:
+
+  - The only possible continuations of [`predict`](@ref)`(model, ...)` are `predict(model,
+    ::KindOfProxy, data)` and `predict(model, data)`.
+
+  - The only possible continuation of [`transform`](@ref)`(model, ...)` is
+    `transform(model, data)`.
+
+  - `LearnAPI.features(learner, data)` never returns `nothing` (meaning its output is
+    valid data input for `predict` or `transform`, where implemented).
+
+See also [`LearnAPI.features`](@ref), [`fit`](@ref).
+
+# New implementations
+
+The fallback return value is `true`. Typically overloaded because `learner` is a density
+estimator.
+
+"""
+sees_features(::Any) = true
+
+"""
     LearnAPI.kinds_of_proxy(learner)
 
 Returns a tuple of all instances, `kind`, for which for which `predict(learner, kind,
