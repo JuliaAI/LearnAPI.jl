@@ -1,5 +1,6 @@
 # [`fit`, `update`, `update_observations`, and `update_features`](@id fit_docs)
 
+
 ### Training
 
 ```julia
@@ -7,9 +8,13 @@ fit(learner, data; verbosity=1) -> model
 fit(learner; verbosity=1) -> static_model 
 ```
 
-A "static" algorithm is one that does not generalize to new observations (e.g., some
-clustering algorithms); there is no training data and heavy lifting is carried out by
-`predict` or `transform` which receive the data. See example below.
+The first signature applies in the case `LearnAPI.kind_of(learner)` is
+[`LearnAPI.Standard()`](@ref) or [`LearnAPI.Generative()`](@ref).
+
+The second signature applies in the case `LearnAPI.kind_of(learner) ==
+`[`LearnAPI.Static()`](@ref). 
+
+Examples appear below.
 
 
 ### Updating
@@ -19,6 +24,9 @@ update(model, data; verbosity=..., :param1=new_value1, :param2=new_value2, ...) 
 update_observations(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
 update_features(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
 ```
+
+[`LearnAPI.Static()`](@ref) learners cannot be updated. 
+
 
 ## Typical workflows
 
@@ -41,6 +49,8 @@ model = update(model; n=150)
 predict(model, Distribution(), X)
 ```
 
+In this case, `LearnAPI.kind_of(learner) == `[`LearnAPI.Standard()`](@ref).
+
 See also [Classification](@ref) and [Regression](@ref).
 
 ### Transformers
@@ -58,6 +68,9 @@ or, if implemented, using a single call:
 transform(learner, X) # `fit` implied
 ```
 
+In this case also, `LearnAPI.kind_of(learner) == `[`LearnAPI.Standard()`](@ref).
+
+
 ### [Static algorithms (no "learning")](@id static_algorithms)
 
 Suppose `learner` is some clustering algorithm that cannot be generalized to new data
@@ -73,6 +86,8 @@ labels = predict(learner, X)
 # But two-line version exposes byproducts of the clustering algorithm (e.g., outliers):
 LearnAPI.extras(model)
 ```
+
+In this case `LearnAPI.kind_of(learner) == `[`LearnAPI.Static()`](@ref).
 
 See also [Static Algorithms](@ref)
 
@@ -91,6 +106,8 @@ A one-liner will typically be implemented as well:
 ```julia
 predict(learner, y)
 ```
+
+In this case `LearnAPI.kind_of(learner) == `[`LearnAPI.Generative()`](@ref).
 
 See also [Density Estimation](@ref).
 

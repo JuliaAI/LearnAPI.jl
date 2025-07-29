@@ -1,6 +1,137 @@
+# # KIND OF LEARNER
+
+# see later for doc-string:
+abstract type KindOfLearner end
+
+"""
+    LearnAPI.Standard
+
+Type with a single instance, `LearnAPI.Standard()`.
+
+If [`LearnAPI.kind_of(learner)`](@ref)` == LearnAPI.Standard()`, then the only possible
+signatures of [`fit`](@ref), [`predict`](@ref) and [`transform`](@ref) are those appearing
+below, or variations on these in which keyword arguments are also supplied:
+
+```
+model = fit(learner, data)
+predict(model, new_data)
+predict(model, kop::KindOfProxy, new_data)
+transform(model, new_data)
+```
+
+and the one-line convenience forms
+
+```
+predict(learner, data)
+predict(learner, kop::KindOfProxy, new_data)
+transform(learner, data)
+```
+
+See also [`LearnAPI.Static`](@ref), [`LearnAPI.Generative`](@ref).
+
+"""
+struct Standard <: KindOfLearner end
+
+"""
+    LearnAPI.Static
+
+Type with a single instance, `LearnAPI.Static()`.
+
+If [`LearnAPI.kind_of(learner)`](@ref)` == LearnAPI.Static()`, then the only possible
+signatures of [`fit`](@ref), [`predict`](@ref) and [`transform`](@ref) are those appearing
+below, or variations on these in which keyword arguments are also supplied:
+
+```
+model = fit(learner)   # (no `data` argument)
+predict(model, data)
+predict(model, kop::KindOfProxy, data)
+transform(model, data)
+```
+
+and the one-line convenience forms
+
+```
+predict(learner, data)
+predict(learner, kop::KindOfProxy)
+transform(learner, data)
+```
+
+See also [`LearnAPI.Standard](@ref), [`LearnAPI.Generative`](@ref).
+
+"""
+struct Static <: KindOfLearner end
+
+"""
+    LearnAPI.Generative
+
+Type with a single instance, `LearnAPI.Generative()`.
+
+If [`LearnAPI.kind_of(learner)`](@ref)` == LearnAPI.Generative()`, then the only possible
+signatures of [`fit`](@ref), [`predict`](@ref) and [`transform`](@ref) are those appearing
+below, or variations on these in which keyword arguments are also supplied:
+
+```
+model = fit(learner, data)
+predict(model)
+predict(model, kop::KindOfProxy)
+transform(model)
+```
+
+and the one-liner convenience forms
+
+```
+predict(learner, data)
+predict(learner, kop::KindOfProxy, data)
+transform(learner, data)
+```
+
+"""
+struct Generative <: KindOfLearner end
+
+
+"""
+    LearnAPI.KindOfLearner
+
+Abstract type whose instances are the possible values of
+[`LearnAPI.kind_of(learner)`](@ref). All instances of this type, and brief indications of
+their interpretation, appear below.
+
+[`LearnAPI.Standard()`](@ref): A typical workflow looks like:
+
+```
+model = fit(learner, data)
+predict(learner, new_data)
+# or
+transform(learner, new_data)
+```
+
+[`LearnAPI.Static()`](@ref): A typical workflow looks like:
+
+```
+model = fit(learner)
+predict(learner, data)
+# or
+transform(learner, data)
+```
+
+[`LearnAPI.Generative()`](@ref): A typical workflow looks like:
+
+```
+model = fit(learner, data)
+predict(learner)
+# or
+transform(learner)
+```
+
+For precise details, refer to the document strings for [`LearnAPI.Standard`](@ref),
+[`LearnAPI.Static`](@ref), and [`LearnAPI.Generative`](@ref).
+"""
+KindOfLearner
+
+
 # # TARGET PROXIES
 
-# see later for doc string:
+# see later for doc-string:
 abstract type KindOfProxy end
 
 """
@@ -15,6 +146,13 @@ following must hold:
 
 - The ``j``th observation of `ŷ`, for any ``j``, depends only on the ``j``th
   observation of the provided `data` (no correlation between observations).
+
+Alternatively, in the case `LearnAPI.sees_features(learner) == false` (so that
+`predict(model, ...)` consumes no data, and `fit` sees only target data), one requires
+only that:
+
+- `LearnAPI.predict(model, kind_of_proxy)` consists of a single observation (such as a
+  single probability distribution).
 
 See also [`LearnAPI.KindOfProxy`](@ref).
 
@@ -113,40 +251,8 @@ for S in JOINT_SYMBOLS
     end |> eval
 end
 
-"""
-    Single <: KindOfProxy
-
-Abstract subtype of [`LearnAPI.KindOfProxy`](@ref). It applies only to learners for
-which `predict` has no data argument, i.e., is of the form `predict(model,
-kind_of_proxy)`. An example is an algorithm learning a probability distribution from
-samples, and we regard the samples as drawn from the "target" variable. If in this case,
-`kind_of_proxy` is an instance of `LearnAPI.Single` then, `predict(learner)` returns a
-single object representing a probability distribution.
-
-| type `T`                         | form of output of `predict(model, ::T)`                                |
-|:--------------------------------:|:-----------------------------------------------------------------------|
-| `SingleSampleable`      | object that can be sampled to obtain a single target observation       |
-| `SingleDistribution`    | explicit probability density/mass function for sampling the target     |
-| `SingleLogDistribution` | explicit log-probability density/mass function for sampling the target |
-
-"""
-abstract type Single <: KindOfProxy end
-
-const SINGLE_SYMBOLS = [
-    :SingleSampeable,
-    :SingleDistribution,
-    :SingleLogDistribution,
-]
-
-for S in SINGLE_SYMBOLS
-    quote
-        struct $S <: Single end
-    end |> eval
-end
-
 const CONCRETE_TARGET_PROXY_SYMBOLS = [
     IID_SYMBOLS...,
-    SINGLE_SYMBOLS...,
     JOINT_SYMBOLS...,
 ]
 
@@ -166,17 +272,16 @@ are probability density/mass functions, assuming `learner = LearnAPI.learner(mod
 supports predictions of that form, which is true if `Distribution() in`
 [`LearnAPI.kinds_of_proxy(learner)`](@ref).
 
-Proxy types are grouped under three abstract subtypes:
+Proxy types are grouped under two abstract subtypes:
 
 - [`LearnAPI.IID`](@ref): The main type, for proxies consisting of uncorrelated individual
-  components, one for each input observation
+  components, one for each input observation. The type also applies to learners, such as
+  density estimators, that are trained on a target variable only (no features), and where
+  `predict` consumes no data and the returned target proxy is a single observation (e.g.,
+  a single probability mass function)
 
 - [`LearnAPI.Joint`](@ref): For learners that predict a single probabilistic structure
-  encapsulating correlations between target predictions for different input observations
-
-- [`LearnAPI.Single`](@ref): For learners, such as density estimators, that are trained on
-  a target variable only (no features); `predict` consumes no data and the returned target
-  proxy is a single probabilistic structure.
+  encapsulating correlations between target predictions for different input observations.
 
 For lists of all concrete instances, refer to documentation for the relevant subtype.
 

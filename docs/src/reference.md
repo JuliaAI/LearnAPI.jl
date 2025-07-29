@@ -40,11 +40,11 @@ number of user-specified *hyperparameters*, such as the number of trees in a ran
 forest. Hyperparameters are understood in a rather broad sense. For example, one is
 allowed to have hyperparameters that are not data-generic.  For example, a class weight
 dictionary, which will only make sense for a target taking values in the set of specified
-dictionary keys, should be given as a hyperparameter. For simplicity and composability,
-LearnAPI.jl discourages "run time" parameters (extra arguments to `fit`) such as
-acceleration options (cpu/gpu/multithreading/multiprocessing). These should be included as
-hyperparameters as far as possible. An exception is the compulsory `verbosity` keyword
-argument of `fit`.
+dictionary keys, should be given as a hyperparameter. For simplicity and easier
+composability, LearnAPI.jl discourages "run time" parameters (extra arguments to `fit`)
+such as acceleration options (cpu/gpu/multithreading/multiprocessing). These should be
+included as hyperparameters as far as possible. An exception is the compulsory `verbosity`
+keyword argument of `fit`.
 
 
 ### [Targets and target proxies](@id proxy)
@@ -106,6 +106,18 @@ generally requires overloading `Base.==` for the struct.
 	No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
 	deep copies of RNG hyperparameters before using them in an implementation of
 	[`fit`](@ref).
+
+
+#### Kinds of learners
+
+Variations in the signature patterns for `fit`/`predict`/`transform` lead to a
+division of learners into three distinct kinds, articlated by the return value of the
+[`LearnAPI.kind_of(learner)`](@ref) trait. For traditional supervised learners and many
+transformers, this value is [`LearnAPI.Standard()`](@ref). For "one-shot" clustering
+algorithms and transformers, it is [`LearnAPI.Static()`](@ref). For density estimation,
+it will be [`LearnAPI.Generative()`](@ref). The precise pattern differences are detailed
+[here](@ref kinds_of_learner).
+
 
 #### Composite learners (wrappers)
 
