@@ -8,6 +8,8 @@
 
 - [`update_observations`](@ref)
 
+- [`update_features`](@ref)
+
 - [`predict`](@ref)
 
 - [`transform`](@ref)
@@ -34,6 +36,13 @@ See [here](@ref accessor_functions).
 
 See [here](@ref traits).
 
+## Kinds of learner
+
+- [`LearnAPI.Descriminative`](@ref)
+
+- [`LearnAPI.Static`](@ref)
+
+- [`LearnAPI.Generative`](@ref)
 
 ## Kinds of target proxy
 

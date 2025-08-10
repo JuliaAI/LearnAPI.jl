@@ -153,6 +153,19 @@ macro functions(learner)
 end
 
 """
+    LearnAPI.kind_of(learner)
+
+Return the `fit`/`predict`/`transform` signature pattern used by `learner`. See
+[`KindOfLearner`](@ref) for details.
+
+# New implementations
+
+The fallback value is [`LearnAPI.Descriminative()`].
+
+"""
+kind_of(learner) = Descriminative()
+
+"""
     LearnAPI.kinds_of_proxy(learner)
 
 Returns a tuple of all instances, `kind`, for which for which `predict(learner, kind,

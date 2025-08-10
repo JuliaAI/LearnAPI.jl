@@ -17,7 +17,7 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 |:---------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------|:---------------------------------------------------------------|
 | [`LearnAPI.constructor`](@ref)`(learner)`                | constructor for generating new or modified versions of `learner`                                                       | (no fallback)                                        | `RidgeRegressor`                                               |
 | [`LearnAPI.functions`](@ref)`(learner)`                  | functions you can apply to `learner` or associated model (traits excluded)                                             | `()`                                                 | `(:fit, :predict, :LearnAPI.strip, :(LearnAPI.learner), :obs)` |
-| [`LearnAPI.sees_features`](@ref)`(learner)`              | `true` unless `fit` only sees target data and `predict`/`transform` consume no data.                                   | `true`                                               | `false`                                                        |
+| [`LearnAPI.kind_of`](@ref)`(learner)`                    | the `fit`/`predict`/`transform` pattern used by `learner`                                                              | `LearnAPI.Static()`                                  | `LearnAPI.Descriminative()`                                    |
 | [`LearnAPI.kinds_of_proxy`](@ref)`(learner)`             | instances `kind` of `KindOfProxy` for which an implementation of `LearnAPI.predict(learner, kind, ...)` is guaranteed. | `()`                                                 | `(Distribution(), Interval())`                                 |
 | [`LearnAPI.tags`](@ref)`(learner)`                       | lists one or more suggestive learner tags from `LearnAPI.tags()`                                                       | `()`                                                 | (:regression, :probabilistic)                                  |
 | [`LearnAPI.is_pure_julia`](@ref)`(learner)`              | `true` if implementation is 100% Julia code                                                                            | `false`                                              | `true`                                                         |
@@ -95,7 +95,7 @@ informative (as in `LearnAPI.target_observation_scitype(learner) = Any`).
 ```@docs
 LearnAPI.constructor
 LearnAPI.functions
-LearnAPI.sees_features
+LearnAPI.kind_of
 LearnAPI.kinds_of_proxy
 LearnAPI.tags
 LearnAPI.is_pure_julia

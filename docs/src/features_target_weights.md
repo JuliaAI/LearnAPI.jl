@@ -4,7 +4,7 @@ Methods for extracting certain parts of `data` for all supported calls of the fo
 [`fit(learner, data)`](@ref).
 
 ```julia
-LearnAPI.features(learner, data) -> <training "features", suitable input for `predict` or `transform`>
+LearnAPI.features(learner, data) -> <training "features"; suitable input for `predict` or `transform`>
 LearnAPI.target(learner, data) -> <target variable>
 LearnAPI.weights(learner, data) -> <per-observation weights>
 ```
@@ -29,11 +29,11 @@ training_loss = sum(ŷ .!= y)
 
 # Implementation guide
 
-| method                                     | fallback return value                         | compulsory?              |
-|:-------------------------------------------|:---------------------------------------------:|--------------------------|
-| [`LearnAPI.features(learner, data)`](@ref) | `first(data)` if `data` is tuple, else `data` | if fallback insufficient |
-| [`LearnAPI.target(learner, data)`](@ref)   | `last(data)`                                  | if fallback insufficient |
-| [`LearnAPI.weights(learner, data)`](@ref)  | `nothing`                                     | no                       |
+| method                                     | fallback return value | compulsory? |
+|:-------------------------------------------|:---------------------:|-------------|
+| [`LearnAPI.features(learner, data)`](@ref) | no fallback           | no          |
+| [`LearnAPI.target(learner, data)`](@ref)   | no fallback           | no          |
+| [`LearnAPI.weights(learner, data)`](@ref)  | `nothing`             | no          |
  
 
 # Reference

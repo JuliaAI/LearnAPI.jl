@@ -5,14 +5,19 @@
 
 ```julia
 fit(learner, data; verbosity=1) -> model
+```
+
+This is the typical `fit` pattern, applying in the case that [`LearnAPI.kind_of(learner)`](@ref)
+returns one of:
+
+- [`LearnAPI.Descriminative()`](@ref)
+- [`LearnAPI.Generative()`](@ref)
+
+```
 fit(learner; verbosity=1) -> static_model 
 ```
 
-The first signature applies in the case `LearnAPI.kind_of(learner)` is
-[`LearnAPI.Standard()`](@ref) or [`LearnAPI.Generative()`](@ref).
-
-The second signature applies in the case `LearnAPI.kind_of(learner) ==
-`[`LearnAPI.Static()`](@ref). 
+This pattern applies in the case [`LearnAPI.kind_of(learner)`](@ref) returns [`LearnAPI.Static()`](@ref). 
 
 Examples appear below.
 
@@ -28,7 +33,7 @@ update_features(model, new_data; verbosity=..., :param1=new_value1, ...) -> upda
 [`LearnAPI.Static()`](@ref) learners cannot be updated. 
 
 
-## Typical workflows
+## [Typical workflows](@id fit_workflows)
 
 ### Supervised models
 
@@ -49,7 +54,7 @@ model = update(model; n=150)
 predict(model, Distribution(), X)
 ```
 
-In this case, `LearnAPI.kind_of(learner) == `[`LearnAPI.Standard()`](@ref).
+In this case, `LearnAPI.kind_of(learner) == `[`LearnAPI.Descriminative()`](@ref).
 
 See also [Classification](@ref) and [Regression](@ref).
 
@@ -68,7 +73,7 @@ or, if implemented, using a single call:
 transform(learner, X) # `fit` implied
 ```
 
-In this case also, `LearnAPI.kind_of(learner) == `[`LearnAPI.Standard()`](@ref).
+In this case also, `LearnAPI.kind_of(learner) == `[`LearnAPI.Descriminative()`](@ref).
 
 
 ### [Static algorithms (no "learning")](@id static_algorithms)
@@ -98,7 +103,7 @@ which consumes no data, returns the learned density:
 
 ```julia
 model = fit(learner, y) # no features
-predict(model)  # shortcut for  `predict(model, SingleDistribution())`, or similar
+predict(model)  # shortcut for  `predict(model, Distribution())`, or similar
 ```
 
 A one-liner will typically be implemented as well:

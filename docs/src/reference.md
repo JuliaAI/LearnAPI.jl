@@ -108,15 +108,13 @@ generally requires overloading `Base.==` for the struct.
 	[`fit`](@ref).
 
 
-#### Kinds of learners
+#### Kinds of learner
 
-Variations in the signature patterns for `fit`/`predict`/`transform` lead to a
-division of learners into three distinct kinds, articlated by the return value of the
-[`LearnAPI.kind_of(learner)`](@ref) trait. For traditional supervised learners and many
-transformers, this value is [`LearnAPI.Standard()`](@ref). For "one-shot" clustering
-algorithms and transformers, it is [`LearnAPI.Static()`](@ref). For density estimation,
-it will be [`LearnAPI.Generative()`](@ref). The precise pattern differences are detailed
-[here](@ref kinds_of_learner).
+As previewed in [Anatomy of an Implementation](@ref), different
+`fit`/`predict`/`transform` patterns lead to a division of learners into three distinct
+kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative`](@ref), and
+[`LearnAPI.Static`](@ref), which is detailed [here](@ref kinds_of_learner). See also
+[these workflows](@ref fit_workflows) for concrete examples.
 
 
 #### Composite learners (wrappers)
@@ -134,19 +132,19 @@ Below is an example of a learner type with a valid constructor:
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}
-	learning_rate::T
-	epochs::Int
-	l2_regularization::T
+    learning_rate::T
+    epochs::Int
+    l2_regularization::T
 end
 
 """
-	GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
+    GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
 
 Instantiate a gradient ridge regressor with the specified hyperparameters.
 
 """
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
-	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+    GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 

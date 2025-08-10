@@ -2,7 +2,7 @@
 
 ```@docs
 LearnAPI.KindOfLearner
-LearnAPI.Standard
+LearnAPI.Descriminative
 LearnAPI.Static
 LearnAPI.Generative
 ```

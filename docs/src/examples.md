@@ -57,6 +57,10 @@ end
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
 
+# data deconstructors:
+LearnAPI.target(learner::Ridge, (X, y)) = y
+LearnAPI.features(learner::Ridge, (X, y)) = X
+
 # accessor functions:
 LearnAPI.learner(model::RidgeFitted) = model.learner
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
@@ -159,7 +163,7 @@ LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     predict(model, Point(), obs(model, Xnew))
 
-# methods to deconstruct training data:
+# training data deconstructors:
 LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, obs(learner, data))

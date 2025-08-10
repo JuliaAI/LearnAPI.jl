@@ -4,11 +4,11 @@
 abstract type KindOfLearner end
 
 """
-    LearnAPI.Standard
+    LearnAPI.Descriminative
 
-Type with a single instance, `LearnAPI.Standard()`.
+Type with a single instance, `LearnAPI.Descriminative()`.
 
-If [`LearnAPI.kind_of(learner)`](@ref)` == LearnAPI.Standard()`, then the only possible
+If [`LearnAPI.kind_of(learner)`](@ref)` == LearnAPI.Descriminative()`, then the only possible
 signatures of [`fit`](@ref), [`predict`](@ref) and [`transform`](@ref) are those appearing
 below, or variations on these in which keyword arguments are also supplied:
 
@@ -30,7 +30,7 @@ transform(learner, data)
 See also [`LearnAPI.Static`](@ref), [`LearnAPI.Generative`](@ref).
 
 """
-struct Standard <: KindOfLearner end
+struct Descriminative <: KindOfLearner end
 
 """
     LearnAPI.Static
@@ -42,10 +42,10 @@ signatures of [`fit`](@ref), [`predict`](@ref) and [`transform`](@ref) are those
 below, or variations on these in which keyword arguments are also supplied:
 
 ```
-model = fit(learner)   # (no `data` argument)
-predict(model, data)
-predict(model, kop::KindOfProxy, data)
-transform(model, data)
+model = fit(learner)   # no `data` argument
+predict(model, data)                   # may mutate `model`
+predict(model, kop::KindOfProxy, data) # may mutate `model`
+transform(model, data)                 # may mutate `model`
 ```
 
 and the one-line convenience forms
@@ -56,7 +56,7 @@ predict(learner, kop::KindOfProxy)
 transform(learner, data)
 ```
 
-See also [`LearnAPI.Standard](@ref), [`LearnAPI.Generative`](@ref).
+See also [`LearnAPI.Descriminative`](@ref), [`LearnAPI.Generative`](@ref).
 
 """
 struct Static <: KindOfLearner end
@@ -72,12 +72,12 @@ below, or variations on these in which keyword arguments are also supplied:
 
 ```
 model = fit(learner, data)
-predict(model)
-predict(model, kop::KindOfProxy)
-transform(model)
+predict(model)                    # no `newdata` argument
+predict(model, kop::KindOfProxy)  # no `newdata` argument
+transform(model)                  # no `newdata` argument
 ```
 
-and the one-liner convenience forms
+and the one-line convenience forms
 
 ```
 predict(learner, data)
@@ -85,6 +85,7 @@ predict(learner, kop::KindOfProxy, data)
 transform(learner, data)
 ```
 
+See also [`LearnAPI.Descriminative`](@ref), [`LearnAPI.Static`](@ref).
 """
 struct Generative <: KindOfLearner end
 
@@ -96,7 +97,7 @@ Abstract type whose instances are the possible values of
 [`LearnAPI.kind_of(learner)`](@ref). All instances of this type, and brief indications of
 their interpretation, appear below.
 
-[`LearnAPI.Standard()`](@ref): A typical workflow looks like:
+[`LearnAPI.Descriminative()`](@ref): A typical workflow looks like:
 
 ```
 model = fit(learner, data)
@@ -109,21 +110,19 @@ transform(learner, new_data)
 
 ```
 model = fit(learner)
-predict(learner, data)
+predict(model, data) # may mutate `model` to record byproducts of computation
 # or
-transform(learner, data)
+transform(model, data)
 ```
 
 [`LearnAPI.Generative()`](@ref): A typical workflow looks like:
 
 ```
 model = fit(learner, data)
-predict(learner)
-# or
-transform(learner)
+predict(learner) # e.g., returns a single probability distribution
 ```
 
-For precise details, refer to the document strings for [`LearnAPI.Standard`](@ref),
+For precise details, refer to the document strings for [`LearnAPI.Descriminative`](@ref),
 [`LearnAPI.Static`](@ref), and [`LearnAPI.Generative`](@ref).
 """
 KindOfLearner
@@ -147,9 +146,8 @@ following must hold:
 - The ``j``th observation of `ŷ`, for any ``j``, depends only on the ``j``th
   observation of the provided `data` (no correlation between observations).
 
-Alternatively, in the case `LearnAPI.sees_features(learner) == false` (so that
-`predict(model, ...)` consumes no data, and `fit` sees only target data), one requires
-only that:
+An exception holds in the case that [`LearnAPI.kind_of(learner)`](@ref)` ==
+[`LearnAPI.Generative()`](@ref):
 
 - `LearnAPI.predict(model, kind_of_proxy)` consists of a single observation (such as a
   single probability distribution).
