@@ -73,7 +73,7 @@ Here's a new type whose instances specify the single ridge regression hyperparam
 
 ```@example anatomy
 struct Ridge{T<:Real}
-	lambda::T
+    lambda::T
 end
 nothing # hide
 ```
@@ -87,7 +87,7 @@ fields) that are not other learners, and we must implement
 
 ```@example anatomy
 """
-	Ridge(; lambda=0.1)
+    Ridge(; lambda=0.1)
 
 Instantiate a ridge regression learner, with regularization of `lambda`.
 """
@@ -111,9 +111,9 @@ coefficients labelled by feature name for inspection after training:
 
 ```@example anatomy
 struct RidgeFitted{T,F}
-	learner::Ridge
-	coefficients::Vector{T}
-	named_coefficients::F
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 nothing # hide
 ```
@@ -125,25 +125,25 @@ The implementation of `fit` looks like this:
 
 ```@example anatomy
 function LearnAPI.fit(learner::Ridge, data; verbosity=1)
-	X, y = data
+    X, y = data
 
-	# data preprocessing:
-	table = Tables.columntable(X)
-	names = Tables.columnnames(table) |> collect
-	A = Tables.matrix(table, transpose=true)
+    # data preprocessing:
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    A = Tables.matrix(table, transpose=true)
 
-	lambda = learner.lambda
+    lambda = learner.lambda
 
-	# apply core algorithm:
-	coefficients = (A*A' + learner.lambda*I)\(A*y) # vector
+    # apply core algorithm:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # vector
 
-	# determine named coefficients:
-	named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-	# make some noise, if allowed:
-	verbosity > 0 && @info "Coefficients: $named_coefficients"
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-	return RidgeFitted(learner, coefficients, named_coefficients)
+    return RidgeFitted(learner, coefficients, named_coefficients)
 end
 ```
 
@@ -165,7 +165,7 @@ We provide this implementation for our ridge regressor:
 
 ```@example anatomy
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
-	Tables.matrix(Xnew)*model.coefficients
+    Tables.matrix(Xnew)*model.coefficients
 ```
 
 If the kind of proxy is omitted, as in `predict(model, Xnew)`, then a fallback grabs the
@@ -215,7 +215,7 @@ dump the named version of the coefficients:
 
 ```@example anatomy
 LearnAPI.strip(model::RidgeFitted) =
-	RidgeFitted(model.learner, model.coefficients, nothing)
+    RidgeFitted(model.learner, model.coefficients, nothing)
 ```
 
 Crucially, we can still use `LearnAPI.strip(model)` in place of `model` to make new
@@ -240,20 +240,20 @@ A macro provides a shortcut, convenient when multiple traits are to be defined:
 
 ```@example anatomy
 @trait(
-	Ridge,
-	constructor = Ridge,
-	kinds_of_proxy=(Point(),),
-	tags = ("regression",),
-	functions = (
-		:(LearnAPI.fit),
-		:(LearnAPI.learner),
-		:(LearnAPI.clone),
-		:(LearnAPI.strip),
-		:(LearnAPI.obs),
-		:(LearnAPI.features),
-		:(LearnAPI.target),
-		:(LearnAPI.predict),
-		:(LearnAPI.coefficients),
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = ("regression",),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
    )
 )
 nothing # hide
@@ -382,31 +382,31 @@ end
 Ridge(; lambda=0.1) = Ridge(lambda)
 
 struct RidgeFitted{T,F}
-	learner::Ridge
-	coefficients::Vector{T}
-	named_coefficients::F
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
 end
 
 LearnAPI.learner(model::RidgeFitted) = model.learner
 LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
 LearnAPI.strip(model::RidgeFitted) =
-	RidgeFitted(model.learner, model.coefficients, nothing)
+    RidgeFitted(model.learner, model.coefficients, nothing)
 
 @trait(
-	Ridge,
-	constructor = Ridge,
-	kinds_of_proxy=(Point(),),
-	tags = ("regression",),
-	functions = (
-		:(LearnAPI.fit),
-		:(LearnAPI.learner),
-		:(LearnAPI.clone),
-		:(LearnAPI.strip),
-		:(LearnAPI.obs),
-		:(LearnAPI.features),
-		:(LearnAPI.target),
-		:(LearnAPI.predict),
-		:(LearnAPI.coefficients),
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = ("regression",),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
    )
 )
 
@@ -435,9 +435,9 @@ The [`obs`](@ref) methods exist to:
 
 !!! important
 
-	While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/dev/), we
-	focus here on a self-contained implementation of `obs` for the ridge example above, to show
-	how it works.
+    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/dev/), we
+    focus here on a self-contained implementation of `obs` for the ridge example above, to show
+    how it works.
 
 In the typical case, where [`LearnAPI.data_interface`](@ref) is not overloaded, the
 alternative data representations must implement the MLCore.jl `getobs/numobs` interface
@@ -480,9 +480,9 @@ introduce a new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
-	A::M                  # `p` x `n` matrix
-	names::Vector{Symbol} # features
-	y::Vector{T}          # target
+    A::M                  # `p` x `n` matrix
+    names::Vector{Symbol} # features
+    y::Vector{T}          # target
 end
 ```
 
@@ -490,10 +490,10 @@ Now we overload `obs` to carry out the data preprocessing previously in `fit`, l
 
 ```@example anatomy2
 function LearnAPI.obs(::Ridge, data)
-	X, y = data
-	table = Tables.columntable(X)
-	names = Tables.columnnames(table) |> collect
-	return RidgeFitObs(Tables.matrix(table)', names, y)
+    X, y = data
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |> collect
+    return RidgeFitObs(Tables.matrix(table)', names, y)
 end
 ```
 
@@ -505,27 +505,27 @@ methods - one to handle "regular" input, and one to handle the pre-processed dat
 ```@example anatomy2
 function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
 
-	lambda = learner.lambda
+    lambda = learner.lambda
 
-	A = observations.A
-	names = observations.names
-	y = observations.y
+    A = observations.A
+    names = observations.names
+    y = observations.y
 
-	# apply core learner:
-	coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
+    # apply core learner:
+    coefficients = (A*A' + learner.lambda*I)\(A*y) # 1 x p matrix
 
-	# determine named coefficients:
-	named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
+    # determine named coefficients:
+    named_coefficients = [names[j] => coefficients[j] for j in eachindex(names)]
 
-	# make some noise, if allowed:
-	verbosity > 0 && @info "Coefficients: $named_coefficients"
+    # make some noise, if allowed:
+    verbosity > 0 && @info "Coefficients: $named_coefficients"
 
-	return RidgeFitted(learner, coefficients, named_coefficients)
+    return RidgeFitted(learner, coefficients, named_coefficients)
 
 end
 
 LearnAPI.fit(learner::Ridge, data; kwargs...) =
-	fit(learner, obs(learner, data); kwargs...)
+    fit(learner, obs(learner, data); kwargs...)
 ```
 
 ### The `obs` contract
@@ -549,7 +549,7 @@ this is [`LearnAPI.RandomAccess()`](@ref) (the default) it usually suffices to o
 
 ```@example anatomy2
 Base.getindex(data::RidgeFitObs, I) =
-	RidgeFitObs(data.A[:,I], data.names, y[I])
+    RidgeFitObs(data.A[:,I], data.names, y[I])
 Base.length(data::RidgeFitObs) = length(data.y)
 ```
 
@@ -560,10 +560,10 @@ LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)'
 LearnAPI.obs(::RidgeFitted, observations::AbstractArray) = observations # involutivity
 
 LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
-	observations'*model.coefficients
+    observations'*model.coefficients
 
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
-	predict(model, Point(), obs(model, Xnew))
+    predict(model, Point(), obs(model, Xnew))
 ```
 
 ### Data deconstructors: `features` and `target
