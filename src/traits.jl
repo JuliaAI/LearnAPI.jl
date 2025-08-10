@@ -84,23 +84,23 @@ functions owned by LearnAPI.jl.
 All new implementations must implement this trait. Here's a checklist for elements in the
 return value:
 
-| expression                        | implementation compulsory? | include in returned tuple?       |
-|:----------------------------------|:---------------------------|:---------------------------------|
-| `:(LearnAPI.fit)`                 | yes                        | yes                              |
-| `:(LearnAPI.learner)`             | yes                        | yes                              |
-| `:(LearnAPI.clone)`               | never overloaded           | yes                              |
-| `:(LearnAPI.strip)`               | no                         | yes                              |
-| `:(LearnAPI.obs)`                 | no                         | yes                              |
-| `:(LearnAPI.features)`            | no                         | yes, unless `learner` is static  |
-| `:(LearnAPI.target)`              | no                         | only if implemented              |
-| `:(LearnAPI.weights)`             | no                         | only if implemented              |
-| `:(LearnAPI.update)`              | no                         | only if implemented              |
-| `:(LearnAPI.update_observations)` | no                         | only if implemented              |
-| `:(LearnAPI.update_features)`     | no                         | only if implemented              |
-| `:(LearnAPI.predict)`             | no                         | only if implemented              |
-| `:(LearnAPI.transform)`           | no                         | only if implemented              |
-| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented              |
-| < accessor functions>             | no                         | only if implemented              |
+| expression                        | implementation compulsory? | include in returned tuple? |
+|:----------------------------------|:---------------------------|:---------------------------|
+| `:(LearnAPI.fit)`                 | yes                        | yes                        |
+| `:(LearnAPI.learner)`             | yes                        | yes                        |
+| `:(LearnAPI.clone)`               | never overloaded           | yes                        |
+| `:(LearnAPI.strip)`               | no                         | yes                        |
+| `:(LearnAPI.obs)`                 | no                         | yes                        |
+| `:(LearnAPI.features)`            | no                         | only if implemented        |
+| `:(LearnAPI.target)`              | no                         | only if implemented        |
+| `:(LearnAPI.weights)`             | no                         | only if implemented        |
+| `:(LearnAPI.update)`              | no                         | only if implemented        |
+| `:(LearnAPI.update_observations)` | no                         | only if implemented        |
+| `:(LearnAPI.update_features)`     | no                         | only if implemented        |
+| `:(LearnAPI.predict)`             | no                         | only if implemented        |
+| `:(LearnAPI.transform)`           | no                         | only if implemented        |
+| `:(LearnAPI.inverse_transform)`   | no                         | only if implemented        |
+| < accessor functions>             | no                         | only if implemented        |
 
 Also include any implemented accessor functions, both those owned by LearnaAPI.jl, and any
 learner-specific ones. The LearnAPI.jl accessor functions are: $ACCESSOR_FUNCTIONS_LIST
@@ -151,46 +151,6 @@ macro functions(learner)
         eval.(exs)
     end |> esc
 end
-
-"""
-    LearnAPI.sees_features(learner)
-
-Returns `false` for those learners trained only on target data, such as density
-estimators; in these cases `predict(model, ...)` and `transform(model, ...)` consume no
-data at all.
-
-More precisely, supposing `model = fit(learner, data)`, then
-
-- If `false` is returned, then:
-
-  - The only possible continuations of [`predict`](@ref)`(model, ...)` are `predict(model,
-    ::KindOfProxy)` and `predict(model)`.
-
-  - The only possible continuation of [`transform`](@ref)`(model, ...)` are
-    `transform(model)`.
-
-  - [`LearnAPI.features(learner, data)`](@ref) returns `nothing`.
-
--  If `true` is returned, then:
-
-  - The only possible continuations of [`predict`](@ref)`(model, ...)` are `predict(model,
-    ::KindOfProxy, data)` and `predict(model, data)`.
-
-  - The only possible continuation of [`transform`](@ref)`(model, ...)` is
-    `transform(model, data)`.
-
-  - `LearnAPI.features(learner, data)` never returns `nothing` (meaning its output is
-    valid data input for `predict` or `transform`, where implemented).
-
-See also [`LearnAPI.features`](@ref), [`fit`](@ref).
-
-# New implementations
-
-The fallback return value is `true`. Typically overloaded because `learner` is a density
-estimator.
-
-"""
-sees_features(::Any) = true
 
 """
     LearnAPI.kinds_of_proxy(learner)
