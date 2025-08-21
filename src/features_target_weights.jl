@@ -63,7 +63,7 @@ Where `nothing` is returned, weighting is understood to be uniform.
 
 Implementing is optional.
 
-If `obs` is being overloaded, then typically it suffices to overload
+If `obs` is being implemented, then typically it suffices to overload
 `LearnAPI.weights(learner, observations)` where `observations = obs(learner, data)` and
 `data` is any documented supported `data` in calls of the form [`fit(learner,
 data)`](@ref), and to add a declaration of the form
@@ -79,7 +79,7 @@ Ensure the returned object, unless `nothing`, implements the data interface spec
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=false))
 
 """
-weights(::Any, data) = nothing
+function weights end
 
 """
     LearnAPI.features(learner, data)

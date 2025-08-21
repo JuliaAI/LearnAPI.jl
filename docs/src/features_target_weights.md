@@ -33,7 +33,7 @@ training_loss = sum(ŷ .!= y)
 |:-------------------------------------------|:---------------------:|-------------|
 | [`LearnAPI.features(learner, data)`](@ref) | no fallback           | no          |
 | [`LearnAPI.target(learner, data)`](@ref)   | no fallback           | no          |
-| [`LearnAPI.weights(learner, data)`](@ref)  | `nothing`             | no          |
+| [`LearnAPI.weights(learner, data)`](@ref)  | no fallback           | no          |
  
 
 # Reference
