@@ -29,9 +29,9 @@ model = fit(learner) # no `data` argument
 predict(model, data) # may mutate `model` to record byproducts of computation
 ```
 
-Do not read too much into the names for these patterns, which are formalized [here](@ref kinds_of_learner). They may not correspond in every case to prior conceptions.
+Do not read too much into the names for these patterns, which are formalized [here](@ref kinds_of_learner). Use may not always correspond to prior associations.
 
-Elaborating on the very common `Descriminative` pattern above, this tutorial details an
+Elaborating on the common `Descriminative` pattern above, this tutorial details an
 implementation of the LearnAPI.jl for naive [ridge
 regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. The kind of
 workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
@@ -177,7 +177,7 @@ we overload appropriately below.
 LearnAPI.jl is flexible about the form of training `data`. However, to buy into
 meta-functionality, such as cross-validation, we'll need to say something about the
 structure of this data. We implement [`LearnAPI.target`](@ref) to say what
-part of the data consistutes a [target variable](@ref proxy), and
+part of the data constitutes a [target variable](@ref proxy), and
 [`LearnAPI.features`](@ref) to say what are the features (valid `newdata` in a
 `predict(model, newdata)` call):
 
@@ -271,11 +271,11 @@ the *type* of the argument.
 ### The `functions` trait
 
 The last trait, `functions`, above returns a list of all LearnAPI.jl methods that can be
-meaningfully applied to the learner or associated model, with the exception of traits. You
-always include the first five you see here: `fit`, `learner`, `clone` ,`strip`,
-`obs`. Here [`clone`](@ref) is a utility function provided by LearnAPI that you never
-overload, while [`obs`](@ref) is discussed under [Providing a separate data front
-end](@ref) below and is always included because it has a meaningful fallback.
+meaningfully applied to the learner or the output of `fit` (denoted `model` above), with
+the exception of traits. You always include the first five you see here: `fit`, `learner`,
+`clone` ,`strip`, `obs`. Here [`clone`](@ref) is a utility function provided by LearnAPI
+that you never overload, while [`obs`](@ref) is discussed under [Providing a separate data
+front end](@ref) below and is always included because it has a meaningful fallback.
 
 See [`LearnAPI.functions`](@ref) for a checklist of what the `functions` trait needs to
 return.
@@ -469,14 +469,14 @@ newobservations = MLCore.getobs(observations, test_indices)
 predict(model, newobservations)
 ```
 
-which works for any non-static learner implementing `predict`, no matter how one is
-supposed to accesses the individual observations of `data` or `newdata`. See also the
-demonstration [below](@ref advanced_demo). Furthermore, fallbacks ensure the above pattern
-still works if we choose not to implement a front end at all, which is allowed, if
-supported `data` and `newdata` already implement `getobs`/`numobs`.
+which works for any [`LearnAPI.Descriminative`](@ref) learner implementing `predict`, no
+matter how one is supposed to accesses the individual observations of `data` or
+`newdata`. See also the demonstration [below](@ref advanced_demo). Furthermore, fallbacks
+ensure the above pattern still works if we choose not to implement a front end at all,
+which is allowed, if supported `data` and `newdata` already implement `getobs`/`numobs`.
 
-Here we specifically wrap all the preprocessed data into single object, for which we
-introduce a new type:
+In the ridge regression example we specifically wrap all the preprocessed data into single
+object, for which we introduce a new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
@@ -497,8 +497,8 @@ function LearnAPI.obs(::Ridge, data)
 end
 ```
 
-We informally refer to the output of `obs` as "observations" (see [The `obs`
-contract](@ref) below). The previous core `fit` signature is now replaced with two
+We informally refer to the output of `obs` as "observations" (see "[The `obs`
+contract](@ref)" below). The previous core `fit` signature is now replaced with two
 methods - one to handle "regular" input, and one to handle the pre-processed data
 (observations) which appears first below:
 
@@ -566,7 +566,7 @@ LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     predict(model, Point(), obs(model, Xnew))
 ```
 
-### Data deconstructors: `features` and `target
+### Data deconstructors: `features` and `target`
 
 These methods must be able to handle any `data` supported by `fit`, which includes the
 output of `obs(learner, data)`:
