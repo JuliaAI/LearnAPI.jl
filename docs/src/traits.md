@@ -1,4 +1,4 @@
-# [Learner Traits](@id traits)
+2# [Learner Traits](@id traits)
 
 Learner traits are simply functions whose sole argument is a learner.
 
@@ -17,7 +17,7 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 |:---------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------|:---------------------------------------------------------------|
 | [`LearnAPI.constructor`](@ref)`(learner)`                | constructor for generating new or modified versions of `learner`                                                       | (no fallback)                                        | `RidgeRegressor`                                               |
 | [`LearnAPI.functions`](@ref)`(learner)`                  | functions you can apply to `learner` or associated model (traits excluded)                                             | `()`                                                 | `(:fit, :predict, :LearnAPI.strip, :(LearnAPI.learner), :obs)` |
-| [`LearnAPI.kind_of`](@ref)`(learner)`                    | the `fit`/`predict`/`transform` pattern used by `learner`                                                              | `LearnAPI.Static()`                                  | `LearnAPI.Descriminative()`                                    |
+| [`LearnAPI.kind_of`](@ref)`(learner)`                    | the `fit`/`predict`/`transform` pattern used by `learner`                                                              | `LearnAPI.Descriminative()`                                  | `LearnAPI.Static()`                                    |
 | [`LearnAPI.kinds_of_proxy`](@ref)`(learner)`             | instances `kind` of `KindOfProxy` for which an implementation of `LearnAPI.predict(learner, kind, ...)` is guaranteed. | `()`                                                 | `(Distribution(), Interval())`                                 |
 | [`LearnAPI.tags`](@ref)`(learner)`                       | lists one or more suggestive learner tags from `LearnAPI.tags()`                                                       | `()`                                                 | (:regression, :probabilistic)                                  |
 | [`LearnAPI.is_pure_julia`](@ref)`(learner)`              | `true` if implementation is 100% Julia code                                                                            | `false`                                              | `true`                                                         |
