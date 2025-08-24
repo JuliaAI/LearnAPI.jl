@@ -40,7 +40,7 @@ refer to the [demonstration](@ref workflow) of the implementation given later.
 !!! tip "Quick Start for new implementations"
 
 	1. From this tutorial, read at least "[A basic implementation](@ref)" below.
-	1. Looking over the examples in "[Common Implementation Patterns](@ref patterns)", identify the apppropriate core learner pattern above for your algorithm.
+	1. Looking over the examples in "[Common Implementation Patterns](@ref patterns)", identify the appropriate core learner pattern above for your algorithm.
 	1. Implement `fit` (probably following an existing example). Read the [`fit`](@ref) document string to see what else may need to be implemented, paying particular attention to the "New implementations" section.
 	3. Rinse and repeat with each new method implemented.
 	4. Identify any additional [learner traits](@ref traits) that have appropriate overloadings; use the [`@trait`](@ref) macro to define these in one block.
