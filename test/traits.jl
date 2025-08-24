@@ -32,7 +32,7 @@ LearnAPI.learner(model::SmallLearner) = model
 small = SmallLearner()
 @test LearnAPI.constructor(small) == SmallLearner
 @test :(LearnAPI.learner) in LearnAPI.functions(small)
-@test LearnAPI.kind_of(learner) == LearnAPI.Descriminative()
+@test LearnAPI.kind_of(small) == LearnAPI.Descriminative()
 @test isempty(LearnAPI.kinds_of_proxy(small))
 @test isempty(LearnAPI.tags(small))
 @test !LearnAPI.is_pure_julia(small)
