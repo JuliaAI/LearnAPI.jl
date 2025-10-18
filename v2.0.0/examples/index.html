@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Code for ridge example · LearnAPI.jl</title><meta name="title" content="Code for ridge example · LearnAPI.jl"/><meta property="og:title" content="Code for ridge example · LearnAPI.jl"/><meta property="twitter:title" content="Code for ridge example · LearnAPI.jl"/><meta name="description" content="Documentation for LearnAPI.jl."/><meta property="og:description" content="Documentation for LearnAPI.jl."/><meta property="twitter:description" content="Documentation for LearnAPI.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">LearnAPI.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../anatomy_of_an_implementation/">Anatomy of an Implementation</a></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Reference</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../reference/">Overview</a></li><li><a class="tocitem" href="../list_of_public_names/">Public Names</a></li><li><a class="tocitem" href="../kinds_of_learner/">Kinds of learner</a></li><li><a class="tocitem" href="../fit_update/">fit/update</a></li><li><a class="tocitem" href="../predict_transform/">predict/transform</a></li><li><a class="tocitem" href="../kinds_of_target_proxy/">Kinds of Target Proxy</a></li><li><a class="tocitem" href="../obs/">obs and Data Interfaces</a></li><li><a class="tocitem" href="../features_target_weights/">features/target/weights</a></li><li><a class="tocitem" href="../accessor_functions/">Accessor Functions</a></li><li><a class="tocitem" href="../traits/">Learner Traits</a></li></ul></li><li><a class="tocitem" href="../common_implementation_patterns/">Common Implementation Patterns</a></li><li><a class="tocitem" href="../testing_an_implementation/">Testing an Implementation</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Code for ridge example</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Code for ridge example</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaAI/LearnAPI.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaAI/LearnAPI.jl/blob/dev/docs/src/examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="code"><a class="docs-heading-anchor" href="#code">Code for ridge example</a><a id="code-1"></a><a class="docs-heading-anchor-permalink" href="#code" title="Permalink"></a></h1><p>Below is the complete source code for the ridge implementations described in the tutorial, <a href="../anatomy_of_an_implementation/#Anatomy-of-an-Implementation">Anatomy of an Implementation</a>.</p><ul><li><a href="#Basic-implementation">Basic implementation</a></li><li><a href="#Implementation-with-a-data-front-end">Implementation with a data front end</a></li><li><a href="#Implementation-with-a-canned-data-front-end">Implementation with a canned data front end</a> </li></ul><h2 id="Basic-implementation"><a class="docs-heading-anchor" href="#Basic-implementation">Basic implementation</a><a id="Basic-implementation-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-implementation" title="Permalink"></a></h2><pre><code class="language-julia hljs">using LearnAPI
+using LinearAlgebra, Tables
+
+struct Ridge{T&lt;:Real}
+    lambda::T
+end
+
+&quot;&quot;&quot;
+    Ridge(; lambda=0.1)
+
+Instantiate a ridge regression learner, with regularization of `lambda`.
+&quot;&quot;&quot;
+Ridge(; lambda=0.1) = Ridge(lambda)
+
+# struct for output of `fit`
+struct RidgeFitted{T,F}
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
+end
+
+function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
+    X, y = data
+
+    # data preprocessing:
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |&gt; collect
+    A = Tables.matrix(table, transpose=true)
+
+    lambda = learner.lambda
+
+    # apply core algorithm:
+    coefficients = (A*A&#39; + learner.lambda*I)\(A*y) # vector
+
+    # determine named coefficients:
+    named_coefficients = [names[j] =&gt; coefficients[j] for j in eachindex(names)]
+
+    # make some noise, if allowed:
+    verbosity &gt; 0 &amp;&amp; @info &quot;Coefficients: $named_coefficients&quot;
+
+    return RidgeFitted(learner, coefficients, named_coefficients)
+end
+
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+    Tables.matrix(Xnew)*model.coefficients
+
+# data deconstructors:
+LearnAPI.target(learner::Ridge, (X, y)) = y
+LearnAPI.features(learner::Ridge, (X, y)) = X
+
+# accessor functions:
+LearnAPI.learner(model::RidgeFitted) = model.learner
+LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
+LearnAPI.strip(model::RidgeFitted) =
+    RidgeFitted(model.learner, model.coefficients, nothing)
+
+@trait(
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = (&quot;regression&quot;,),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
+   )
+)
+
+# convenience method:
+LearnAPI.fit(learner::Ridge, X, y; kwargs...) = fit(learner, (X, y); kwargs...)</code></pre><h1 id="Implementation-with-a-data-front-end"><a class="docs-heading-anchor" href="#Implementation-with-a-data-front-end">Implementation with a data front end</a><a id="Implementation-with-a-data-front-end-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation-with-a-data-front-end" title="Permalink"></a></h1><pre><code class="language-julia hljs">using LearnAPI
+using LinearAlgebra, Tables
+
+struct Ridge{T&lt;:Real}
+   lambda::T
+end
+
+Ridge(; lambda=0.1) = Ridge(lambda)
+
+# struct for output of `fit`:
+struct RidgeFitted{T,F}
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
+end
+
+# struct for internal representation of training data:
+struct RidgeFitObs{T,M&lt;:AbstractMatrix{T}}
+    A::M                  # `p` x `n` matrix
+    names::Vector{Symbol} # features
+    y::Vector{T}          # target
+end
+
+# implementation of `RandomAccess()` data interface for such representation:
+Base.getindex(data::RidgeFitObs, I) =
+    RidgeFitObs(data.A[:,I], data.names, y[I])
+Base.length(data::RidgeFitObs) = length(data.y)
+
+# data front end for `fit`:
+function LearnAPI.obs(::Ridge, data)
+    X, y = data
+    table = Tables.columntable(X)
+    names = Tables.columnnames(table) |&gt; collect
+    return RidgeFitObs(Tables.matrix(table)&#39;, names, y)
+end
+LearnAPI.obs(::Ridge, observations::RidgeFitObs) = observations
+
+function LearnAPI.fit(
+    learner::Ridge,
+    observations::RidgeFitObs;
+    verbosity=LearnAPI.default_verbosity(),
+    )
+
+    lambda = learner.lambda
+
+    A = observations.A
+    names = observations.names
+    y = observations.y
+
+    # apply core learner:
+    coefficients = (A*A&#39; + learner.lambda*I)\(A*y) # 1 x p matrix
+
+    # determine named coefficients:
+    named_coefficients = [names[j] =&gt; coefficients[j] for j in eachindex(names)]
+
+    # make some noise, if allowed:
+    verbosity &gt; 0 &amp;&amp; @info &quot;Coefficients: $named_coefficients&quot;
+
+    return RidgeFitted(learner, coefficients, named_coefficients)
+
+end
+
+LearnAPI.fit(learner::Ridge, data; kwargs...) =
+    fit(learner, obs(learner, data); kwargs...)
+
+# data front end for `predict`:
+LearnAPI.obs(::RidgeFitted, Xnew) = Tables.matrix(Xnew)&#39;
+LearnAPI.obs(::RidgeFitted, observations::AbstractArray) = observations # involutivity
+
+LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
+    observations&#39;*model.coefficients
+
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+    predict(model, Point(), obs(model, Xnew))
+
+# training data deconstructors:
+LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
+LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
+LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, obs(learner, data))
+LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, obs(learner, data))
+
+# accessor functions:
+LearnAPI.learner(model::RidgeFitted) = model.learner
+LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
+LearnAPI.strip(model::RidgeFitted) =
+    RidgeFitted(model.learner, model.coefficients, nothing)
+
+@trait(
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = (&quot;regression&quot;,),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
+   )
+)
+</code></pre><h1 id="Implementation-with-a-canned-data-front-end"><a class="docs-heading-anchor" href="#Implementation-with-a-canned-data-front-end">Implementation with a canned data front end</a><a id="Implementation-with-a-canned-data-front-end-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation-with-a-canned-data-front-end" title="Permalink"></a></h1><p>The following implements the <code>Saffron</code> data front end from <a href="https://juliaai.github.io/LearnDataFrontEnds.jl/stable/">LearnDataFrontEnds.jl</a>, which allows for a greater variety of forms of input to <code>fit</code> and <code>predict</code>.  Refer to that package&#39;s <a href="https://juliaai.github.io/LearnDataFrontEnds.jl/stable/">documentation</a> for details.</p><pre><code class="language-julia hljs">using LearnAPI
+import LearnDataFrontEnds as FrontEnds
+using LinearAlgebra, Tables
+
+struct Ridge{T&lt;:Real}
+   lambda::T
+end
+
+Ridge(; lambda=0.1) = Ridge(lambda)
+
+# struct for output of `fit`:
+struct RidgeFitted{T,F}
+    learner::Ridge
+    coefficients::Vector{T}
+    named_coefficients::F
+end
+
+frontend = FrontEnds.Saffron()
+
+# these will return objects of type `FrontEnds.Obs`:
+LearnAPI.obs(learner::Ridge, data) = FrontEnds.fitobs(learner, data, frontend)
+LearnAPI.obs(model::RidgeFitted, data) = obs(model, data, frontend)
+
+function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=LearnAPI.default_verbosity())
+
+    lambda = learner.lambda
+
+    A = observations.features
+    names = observations.names
+    y = observations.target
+
+    # apply core learner:
+    coefficients = (A*A&#39; + learner.lambda*I)\(A*y) # 1 x p matrix
+
+    # determine named coefficients:
+    named_coefficients = [names[j] =&gt; coefficients[j] for j in eachindex(names)]
+
+    # make some noise, if allowed:
+    verbosity &gt; 0 &amp;&amp; @info &quot;Coefficients: $named_coefficients&quot;
+
+    return RidgeFitted(learner, coefficients, named_coefficients)
+
+end
+LearnAPI.fit(learner::Ridge, data; kwargs...) =
+    fit(learner, obs(learner, data); kwargs...)
+
+LearnAPI.predict(model::RidgeFitted, ::Point, observations::FrontEnds.Obs) =
+    (observations.features)&#39;*model.coefficients
+LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
+    predict(model, Point(), obs(model, Xnew))
+
+# training data deconstructors:
+LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, data, frontend)
+LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, data, frontend)
+
+# accessor functions:
+LearnAPI.learner(model::RidgeFitted) = model.learner
+LearnAPI.coefficients(model::RidgeFitted) = model.named_coefficients
+LearnAPI.strip(model::RidgeFitted) =
+    RidgeFitted(model.learner, model.coefficients, nothing)
+
+@trait(
+    Ridge,
+    constructor = Ridge,
+    kinds_of_proxy=(Point(),),
+    tags = (&quot;regression&quot;,),
+    functions = (
+        :(LearnAPI.fit),
+        :(LearnAPI.learner),
+        :(LearnAPI.clone),
+        :(LearnAPI.strip),
+        :(LearnAPI.obs),
+        :(LearnAPI.features),
+        :(LearnAPI.target),
+        :(LearnAPI.predict),
+        :(LearnAPI.coefficients),
+   )
+)</code></pre></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 18 October 2025 22:25">Saturday 18 October 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
