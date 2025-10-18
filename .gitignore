@@ -8,3 +8,4 @@ sandbox/
 /docs/site/
 /docs/Manifest.toml
 .vscode
+LocalPreferences.toml

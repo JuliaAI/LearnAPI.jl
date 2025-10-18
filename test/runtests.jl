@@ -1,6 +1,7 @@
 using Test
 
 test_files = [
+    "preferences.jl",
     "tools.jl",
     "traits.jl",
     "clone.jl",

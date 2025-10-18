@@ -1,5 +1,8 @@
 module LearnAPI
 
+using Preferences
+
+include("preferences.jl")
 include("types.jl")
 include("tools.jl")
 include("predict_transform.jl")
