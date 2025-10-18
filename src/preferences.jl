@@ -8,10 +8,12 @@ INFO_VERBOSITY_WILL_BE(verbosity) =
 """
     LearnAPI.default_verbosity()
 
-Return the default verbosity for training LearnAPI learners.
+Return the default LearnAPI verbosity level.
 
 The value is determined at compile time by a Preferences.jl-style preference, with key
 "verbosity".
+
+If `verbosity=0`, only warnings are displayed; `verbosity=-1` suppresses warnings.
 
 """
 default_verbosity() = VERBOSITY

@@ -4,7 +4,7 @@
 ### Training
 
 ```julia
-fit(learner, data; verbosity=1) -> model
+fit(learner, data; verbosity=...) -> model
 ```
 
 This is the typical `fit` pattern, applying in the case that [`LearnAPI.kind_of(learner)`](@ref)
@@ -25,9 +25,9 @@ Examples appear below.
 ### Updating
 
 ```
-update(model, data; verbosity=..., :param1=new_value1, :param2=new_value2, ...) -> updated_model
-update_observations(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
-update_features(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
+update(model, data, :param1=>new_value1, :param2=>new_value2, ...; verbosity=...) -> updated_model
+update_observations(model, new_data, :param1=>new_value1, ...; verbosity=...) -> updated_model
+update_features(model, new_data, :param1=>new_value1, ...; verbosity=...) -> updated_model
 ```
 
 [`LearnAPI.Static()`](@ref) learners cannot be updated. 
@@ -50,7 +50,7 @@ ŷ = predict(model, Distribution(), Xnew)
 LearnAPI.feature_importances(model)
 
 # Add 50 iterations and predict again:
-model = update(model; n=150)
+model = update(model, n => 150)
 predict(model, Distribution(), X)
 ```
 
@@ -123,21 +123,21 @@ See also [Density Estimation](@ref).
 
 Exactly one of the following must be implemented:
 
-| method                                      | fallback |
-|:--------------------------------------------|:---------|
-| [`fit`](@ref)`(learner, data; verbosity=1)` | none     |
-| [`fit`](@ref)`(learner; verbosity=1)`       | none     |
+| method                                                                 | fallback |
+|:-----------------------------------------------------------------------|:---------|
+| [`fit`](@ref)`(learner, data; verbosity=LearnAPI.default_verbosity())` | none     |
+| [`fit`](@ref)`(learner; verbosity=LearnAPI.default_verbosity())`       | none     |
 
 ### Updating
 
-| method                                                                               | fallback | compulsory? |
-|:-------------------------------------------------------------------------------------|:---------|-------------|
-| [`update`](@ref)`(model, data; verbosity=1, hyperparameter_updates...)`              | none     | no          |
-| [`update_observations`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)` | none     | no          |
-| [`update_features`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)`     | none     | no          |
+| method                                                                                     | fallback | compulsory? |
+|:-------------------------------------------------------------------------------------------|:---------|-------------|
+| [`update`](@ref)`(model, data, hyperparameter_updates...; verbosity=...)`                  | none     | no          |
+| [`update_observations`](@ref)`(model, new_data, hyperparameter_updates...; verbosity=...)` | none     | no          |
+| [`update_features`](@ref)`(model, new_data, hyperparameter_updates...; verbosity=...)`     | none     | no          |
 
-There are some contracts governing the behaviour of the update methods, as they relate to
-a previous `fit` call. Consult the document strings for details.
+There are contracts governing the behaviour of the update methods, as they relate to a
+previous `fit` call. Consult the document strings for details.
 
 ## Reference
 

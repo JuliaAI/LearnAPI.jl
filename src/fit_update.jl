@@ -1,8 +1,8 @@
 # # FIT
 
 """
-    fit(learner, data; verbosity=1)
-    fit(learner; verbosity=1)
+    fit(learner, data; verbosity=LearnAPI.default_verbosity())
+    fit(learner; verbosity=LearnAPI.default_verbosity()))
 
 In the case of the first signature, execute the machine learning or statistical algorithm
 with configuration `learner` using the provided training `data`, returning an object,
@@ -51,7 +51,8 @@ Implementation of exactly one of the signatures is compulsory. Unless implementi
 [`LearnAPI.Descriminative()`](@ref) `fit`/`predict`/`transform` pattern,
 [`LearnAPI.kind_of(learner)`](@ref) will need to be suitably overloaded.
 
-The `fit` signature must include `verbosity` with `1` as default.
+The `fit` signature must include the keyword argument `verbosity` with
+`LearnAPI.default_verbosity()` as default.
 
 The LearnAPI.jl specification has nothing to say regarding `fit` signatures with more than
 two arguments. For convenience, for example, an implementation is free to implement a
@@ -74,7 +75,7 @@ function fit end
 # # UPDATE AND COUSINS
 
 """
-    update(model, data, param_replacements...; verbosity=1)
+    update(model, data, param_replacements...; verbosity=LearnAPI.default_verbosity())
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
 `update` call, but with the specified hyperparameter replacements, in the form `:p1 =>
@@ -104,9 +105,10 @@ See also [`fit`](@ref), [`update_observations`](@ref), [`update_features`](@ref)
 
 # New implementations
 
-Implementation is optional. The signature must include `verbosity`. It should be true that
-`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
-`newlearner = LearnAPI.clone(learner, replacements...)`.
+Implementation is optional. The signature must include the `verbosity` keyword
+argument. It should be true that `LearnAPI.learner(newmodel) == newlearner`, where
+`newmodel` is the return value and `newlearner = LearnAPI.clone(learner,
+replacements...)`.
 
 Cannot be implemented if [`LearnAPI.kind_of(learner)`](@ref)` == `LearnAPI.Static()`.
 
@@ -118,10 +120,15 @@ See also [`LearnAPI.clone`](@ref)
 function update end
 
 """
-    update_observations(model, new_data, param_replacements...; verbosity=1)
+    update_observations(
+       model,
+       new_data,
+       param_replacements...;
+       verbosity=LearnAPI.default_verbosity(),
+    )
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
-`update` call given the new observations present in `new_data`. One may additionally
+`update` call, given the new observations present in `new_data`. One may additionally
 specify hyperparameter replacements in the form `:p1 => value1, :p2 => value2, ...`.
 
 ```julia-repl
@@ -145,9 +152,10 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
 # New implementations
 
-Implementation is optional. The signature must include `verbosity`. It should be true that
-`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
-`newlearner = LearnAPI.clone(learner, replacements...)`.
+Implementation is optional. The signature must include the `verbosity` keyword
+argument. It should be true that `LearnAPI.learner(newmodel) == newlearner`, where
+`newmodel` is the return value and `newlearner = LearnAPI.clone(learner,
+replacements...)`.
 
 Cannot be implemented if [`LearnAPI.kind_of(learner)`](@ref)` == `LearnAPI.Static()`.
 
@@ -159,7 +167,11 @@ See also [`LearnAPI.clone`](@ref).
 function update_observations end
 
 """
-    update_features(model, new_data, param_replacements...; verbosity=1)
+    update_features(
+        model,
+        new_data,
+        param_replacements,...;
+        verbosity=LearnAPI.default_verbosity(),
     )
 
 Return an updated version of the `model` object returned by a previous [`fit`](@ref) or
@@ -177,9 +189,10 @@ See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).
 
 # New implementations
 
-Implementation is optional. The signature must include `verbosity`. It should be true that
-`LearnAPI.learner(newmodel) == newlearner`, where `newmodel` is the return value and
-`newlearner = LearnAPI.clone(learner, replacements...)`.
+Implementation is optional. The signature must include the `verbosity` keyword
+argument. It should be true that `LearnAPI.learner(newmodel) == newlearner`, where
+`newmodel` is the return value and `newlearner = LearnAPI.clone(learner,
+replacements...)`.
 
 Cannot be implemented if [`LearnAPI.kind_of(learner)`](@ref)` == `LearnAPI.Static()`.
 
