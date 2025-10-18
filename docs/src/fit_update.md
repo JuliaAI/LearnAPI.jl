@@ -14,10 +14,12 @@ returns one of:
 - [`LearnAPI.Generative()`](@ref)
 
 ```
-fit(learner; verbosity=1) -> static_model 
+fit(learner; verbosity=...) -> static_model
 ```
 
-This pattern applies in the case [`LearnAPI.kind_of(learner)`](@ref) returns [`LearnAPI.Static()`](@ref). 
+This pattern applies in the case [`LearnAPI.kind_of(learner)`](@ref) returns:
+
+- [`LearnAPI.Static()`](@ref)
 
 Examples appear below.
 

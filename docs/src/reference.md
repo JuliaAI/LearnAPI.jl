@@ -217,17 +217,18 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
 
 ## Utilities
 
-
 - [`LearnAPI.is_learner`](@ref)
 - [`clone`](@ref): for cloning a learner with specified hyperparameter replacements.
 - [`@trait`](@ref): for simultaneously declaring multiple traits
 - [`@functions`](@ref): for listing functions available for use with a learner 
+- [`LearnAPI.default_verbosity`](@ref): get/reset the default verbosity
 
 ```@docs
 LearnAPI.is_learner
 clone
 @trait
 @functions
+LearnAPI.default_verbosity
 ```
 
 ---

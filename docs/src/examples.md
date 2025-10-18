@@ -32,7 +32,7 @@ struct RidgeFitted{T,F}
     named_coefficients::F
 end
 
-function LearnAPI.fit(learner::Ridge, data; verbosity=1)
+function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
     X, y = data
 
     # data preprocessing:
@@ -129,7 +129,11 @@ function LearnAPI.obs(::Ridge, data)
 end
 LearnAPI.obs(::Ridge, observations::RidgeFitObs) = observations
 
-function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
+function LearnAPI.fit(
+    learner::Ridge,
+    observations::RidgeFitObs;
+    verbosity=LearnAPI.default_verbosity(),
+    )
 
     lambda = learner.lambda
 
@@ -226,7 +230,7 @@ frontend = FrontEnds.Saffron()
 LearnAPI.obs(learner::Ridge, data) = FrontEnds.fitobs(learner, data, frontend)
 LearnAPI.obs(model::RidgeFitted, data) = obs(model, data, frontend)
 
-function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=1)
+function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=LearnAPI.default_verbosity())
 
     lambda = learner.lambda
 

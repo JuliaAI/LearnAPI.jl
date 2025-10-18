@@ -1,4 +1,4 @@
-2# [Learner Traits](@id traits)
+# [Learner Traits](@id traits)
 
 Learner traits are simply functions whose sole argument is a learner.
 
