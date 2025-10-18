@@ -14,12 +14,6 @@ LearnAPI.KindOfProxy
 LearnAPI.IID
 ```
 
-## Proxies for density estimation algorithms
-
-```@docs
-LearnAPI.Single
-```
-
 ## Joint probability distributions
 
 ```@docs

@@ -24,7 +24,7 @@ Here `learner` specifies the configuration the algorithm (the hyperparameters) w
 `model` stores learned parameters and any byproducts of algorithm execution.
 
 LearnAPI.jl is mostly method stubs and lots of documentation. It does not provide
-meta-algorithms, such as cross-validation or hyperparameter optimization, but does aim to
+meta-algorithms, such as cross-validation, hyperparameter optimization, or model composition, but does aim to
 support such algorithms.
 
 ## Related packages
@@ -36,6 +36,8 @@ support such algorithms.
 - [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl): For including flexible, user-friendly, data front ends for LearnAPI.jl implementations ([docs](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/))
 
 - [StatisticalMeasures.jl](https://github.com/JuliaAI/StatisticalMeasures.jl): Package providing metrics, compatible with LearnAPI.jl
+
+- [StatsModels.jl](https://github.com/JuliaStats/StatsModels.jl): Provides the R-style formula implementation of data preprocessing handled by [LearnDataFrontEnds.jl](https://github.com/JuliaAI/LearnDataFrontEnds.jl)
 
 ### Selected packages providing alternative API's
 

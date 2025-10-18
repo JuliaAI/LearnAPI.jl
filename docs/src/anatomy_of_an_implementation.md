@@ -1,6 +1,7 @@
 # Anatomy of an Implementation
 
-The core LearnAPI.jl pattern looks like this:
+LearnAPI.jl supports three core patterns. The default pattern, known as the
+[`LearnAPI.Descriminative`](@ref) pattern, looks like this:
 
 ```julia
 model = fit(learner, data)
@@ -10,38 +11,51 @@ predict(model, newdata)
 Here `learner` specifies [hyperparameters](@ref hyperparameters), while `model` stores
 learned parameters and any byproducts of algorithm execution.
 
-Variations on this pattern:
+[Transformers](@ref) ordinarily implement `transform` instead of `predict`. For more on
+`predict` versus `transform`, see [Predict or transform?](@ref)
 
-- [Transformers](@ref) ordinarily implement `transform` instead of `predict`. For more on
-  `predict` versus `transform`, see [Predict or transform?](@ref)
+Two other `fit`/`predict`/`transform` patterns supported by LearnAPI.jl are:
+[`LearnAPI.Generative`](@ref) which has the form:
 
-- ["Static" (non-generalizing) algorithms](@ref static_algorithms), which includes some
-  simple transformers and some clustering algorithms, have a `fit` that consumes no
-  `data`. Instead `predict` or `transform` does the heavy lifting.
+```julia
+model = fit(learner, data)
+predict(model) # a single distribution, for example
+```
 
-- In [density estimation](@ref density_estimation), the `newdata` argument in `predict` is
-  missing.
+and [`LearnAPI.Static`](@ref), which looks like this:
 
-These are the basic possibilities.
+```julia
+model = fit(learner) # no `data` argument
+predict(model, data) # may mutate `model` to record byproducts of computation
+```
 
-Elaborating on the core pattern above, this tutorial details an implementation of the
-LearnAPI.jl for naive [ridge regression](https://en.wikipedia.org/wiki/Ridge_regression)
-with no intercept. The kind of workflow we want to enable has been previewed in [Sample
-workflow](@ref). Readers can also refer to the [demonstration](@ref workflow) of the
-implementation given later.
+Do not read too much into the names for these patterns, which are formalized [here](@ref kinds_of_learner). Use may not always correspond to prior associations.
+
+Elaborating on the common `Descriminative` pattern above, this tutorial details an
+implementation of the LearnAPI.jl for naive [ridge
+regression](https://en.wikipedia.org/wiki/Ridge_regression) with no intercept. The kind of
+workflow we want to enable has been previewed in [Sample workflow](@ref). Readers can also
+refer to the [demonstration](@ref workflow) of the implementation given later.
+
+!!! tip "Quick Start for new implementations"
+
+	1. From this tutorial, read at least "[A basic implementation](@ref)" below.
+	1. Looking over the examples in "[Common Implementation Patterns](@ref patterns)", identify the appropriate core learner pattern above for your algorithm.
+	1. Implement `fit` (probably following an existing example). Read the [`fit`](@ref) document string to see what else may need to be implemented, paying particular attention to the "New implementations" section.
+	3. Rinse and repeat with each new method implemented.
+	4. Identify any additional [learner traits](@ref traits) that have appropriate overloadings; use the [`@trait`](@ref) macro to define these in one block.
+	5. Ensure your implementation includes the compulsory method [`LearnAPI.learner`](@ref) and compulsory traits [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref). Read and apply "[Testing your implementation](@ref)".
+
+	If you get stuck, refer back to this tutorial and the [Reference](@ref reference) sections.
+
 
 ## A basic implementation
 
 See [here](@ref code) for code without explanations.
 
-We suppose our algorithm's `fit` method consumes data in the form `(X, y)`, where
-`X` is a suitable table¹ (the features) and `y` a vector (the target).
-
-!!! important
-
-    Implementations wishing to support other data
-    patterns may need to take additional steps explained under
-    [Other data patterns](@ref di) below.
+Let us suppose our algorithm's `fit` method is to consume data in the form `(X, y)`, where
+`X` is a suitable table¹ (the features, a.k.a., covariates or predictors) and `y` a vector
+(the target, a.k.a., labels or response).
 
 The first line below imports the lightweight package LearnAPI.jl whose methods we will be
 extending. The second imports libraries needed for the core algorithm.
@@ -110,7 +124,7 @@ Note that we also include `learner` in the struct, for it must be possible to re
 The implementation of `fit` looks like this:
 
 ```@example anatomy
-function LearnAPI.fit(learner::Ridge, data; verbosity=1)
+function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
     X, y = data
 
     # data preprocessing:
@@ -158,6 +172,22 @@ If the kind of proxy is omitted, as in `predict(model, Xnew)`, then a fallback g
 first element of the tuple returned by [`LearnAPI.kinds_of_proxy(learner)`](@ref), which
 we overload appropriately below.
 
+### Data deconstructors: `target` and `features`
+
+LearnAPI.jl is flexible about the form of training `data`. However, to buy into
+meta-functionality, such as cross-validation, we'll need to say something about the
+structure of this data. We implement [`LearnAPI.target`](@ref) to say what
+part of the data constitutes a [target variable](@ref proxy), and
+[`LearnAPI.features`](@ref) to say what are the features (valid `newdata` in a
+`predict(model, newdata)` call):
+
+```@example anatomy
+LearnAPI.target(learner::Ridge, (X, y)) = y
+LearnAPI.features(learner::Ridge, (X, y)) = X
+```
+
+Another data deconstructor, for learners that support per-observation weights in training,
+is [`LearnAPI.weights`](@ref).
 
 ### [Accessor functions](@id af)
 
@@ -241,15 +271,11 @@ the *type* of the argument.
 ### The `functions` trait
 
 The last trait, `functions`, above returns a list of all LearnAPI.jl methods that can be
-meaningfully applied to the learner or associated model, with the exception of traits. You
-always include the first five you see here: `fit`, `learner`, `clone` ,`strip`,
-`obs`. Here [`clone`](@ref) is a utility function provided by LearnAPI that you never
-overload, while [`obs`](@ref) is discussed under [Providing a separate data front
-end](@ref) below and is always included because it has a meaningful fallback. The
-`features` method, here provided by a fallback, articulates how the features `X` can be
-extracted from the training data `(X, y)`. We must also include `target` here to flag our
-model as supervised; again the method itself is provided by a fallback valid in the
-present case.
+meaningfully applied to the learner or the output of `fit` (denoted `model` above), with
+the exception of traits. You always include the first five you see here: `fit`, `learner`,
+`clone` ,`strip`, `obs`. Here [`clone`](@ref) is a utility function provided by LearnAPI
+that you never overload, while [`obs`](@ref) is discussed under [Providing a separate data
+front end](@ref) below and is always included because it has a meaningful fallback.
 
 See [`LearnAPI.functions`](@ref) for a checklist of what the `functions` trait needs to
 return.
@@ -340,11 +366,6 @@ assumptions about data from those made above.
   under [Providing a separate data front end](@ref) below; or (ii) overload the trait
   [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API.
 
-- Where the form of data consumed by `fit` is different from that consumed by
-  `predict/transform` (as in classical supervised learning) it may be necessary to
-  explicitly overload the functions [`LearnAPI.features`](@ref) and (if supervised)
-  [`LearnAPI.target`](@ref). The same holds if overloading [`obs`](@ref); see below.
-
 
 ## Providing a separate data front end
 
@@ -414,7 +435,7 @@ The [`obs`](@ref) methods exist to:
 
 !!! important
 
-    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnAPI.jl/dev/), we
+    While many new learner implementations will want to adopt a canned data front end, such as those provided by [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/dev/), we
     focus here on a self-contained implementation of `obs` for the ridge example above, to show
     how it works.
 
@@ -448,14 +469,14 @@ newobservations = MLCore.getobs(observations, test_indices)
 predict(model, newobservations)
 ```
 
-which works for any non-static learner implementing `predict`, no matter how one is
-supposed to accesses the individual observations of `data` or `newdata`. See also the
-demonstration [below](@ref advanced_demo). Furthermore, fallbacks ensure the above pattern
-still works if we choose not to implement a front end at all, which is allowed, if
-supported `data` and `newdata` already implement `getobs`/`numobs`.
+which works for any [`LearnAPI.Descriminative`](@ref) learner implementing `predict`, no
+matter how one is supposed to accesses the individual observations of `data` or
+`newdata`. See also the demonstration [below](@ref advanced_demo). Furthermore, fallbacks
+ensure the above pattern still works if we choose not to implement a front end at all,
+which is allowed, if supported `data` and `newdata` already implement `getobs`/`numobs`.
 
-Here we specifically wrap all the preprocessed data into single object, for which we
-introduce a new type:
+In the ridge regression example we specifically wrap all the preprocessed data into single
+object, for which we introduce a new type:
 
 ```@example anatomy2
 struct RidgeFitObs{T,M<:AbstractMatrix{T}}
@@ -476,13 +497,13 @@ function LearnAPI.obs(::Ridge, data)
 end
 ```
 
-We informally refer to the output of `obs` as "observations" (see [The `obs`
-contract](@ref) below). The previous core `fit` signature is now replaced with two
+We informally refer to the output of `obs` as "observations" (see "[The `obs`
+contract](@ref)" below). The previous core `fit` signature is now replaced with two
 methods - one to handle "regular" input, and one to handle the pre-processed data
 (observations) which appears first below:
 
 ```@example anatomy2
-function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
+function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=LearnAPI.default_verbosity())
 
     lambda = learner.lambda
 
@@ -545,13 +566,10 @@ LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     predict(model, Point(), obs(model, Xnew))
 ```
 
-### `features` and `target` methods
+### Data deconstructors: `features` and `target`
 
-Two methods [`LearnAPI.features`](@ref) and [`LearnAPI.target`](@ref) articulate how
-features and target can be extracted from `data` consumed by LearnAPI.jl
-methods. Fallbacks provided by LearnAPI.jl sufficed in our basic implementation
-above. Here we must explicitly overload them, so that they also handle the output of
-`obs(learner, data)`:
+These methods must be able to handle any `data` supported by `fit`, which includes the
+output of `obs(learner, data)`:
 
 ```@example anatomy2
 LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
@@ -573,7 +591,7 @@ LearnAPI.target(learner::Ridge, data) = LearnAPI.target(learner, obs(learner, da
 
 Since LearnAPI.jl provides fallbacks for `obs` that simply return the unadulterated data
 argument, overloading `obs` is optional. This is provided data in publicized
-`fit`/`predict` signatures already consists only of objects implement the
+`fit`/`predict` signatures already consists only of objects implementing the
 [`LearnAPI.RandomAccess`](@ref) interface (most tables¹, arrays³, and tuples thereof).
 
 To opt out of supporting the MLCore.jl interface altogether, an implementation must

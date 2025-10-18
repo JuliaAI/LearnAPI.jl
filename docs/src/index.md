@@ -94,8 +94,8 @@ Some canned data front ends (implementations of [`obs`](@ref)) are provided by t
 
 ## Learning more
 
-- [Anatomy of an Implementation](@ref): informal introduction to the main actors in a new
-  LearnAPI.jl implementation
+- [Anatomy of an Implementation](@ref): informal tutorial introducing the main actors in a
+  new LearnAPI.jl implementation, including a **Quick Start** for new implementations.
 
 - [Reference](@ref reference): official specification
 

@@ -1,26 +1,41 @@
 # [`fit`, `update`, `update_observations`, and `update_features`](@id fit_docs)
 
+
 ### Training
 
 ```julia
-fit(learner, data; verbosity=1) -> model
-fit(learner; verbosity=1) -> static_model 
+fit(learner, data; verbosity=...) -> model
 ```
 
-A "static" algorithm is one that does not generalize to new observations (e.g., some
-clustering algorithms); there is no training data and heavy lifting is carried out by
-`predict` or `transform` which receive the data. See example below.
+This is the typical `fit` pattern, applying in the case that [`LearnAPI.kind_of(learner)`](@ref)
+returns one of:
+
+- [`LearnAPI.Descriminative()`](@ref)
+- [`LearnAPI.Generative()`](@ref)
+
+```
+fit(learner; verbosity=...) -> static_model
+```
+
+This pattern applies in the case [`LearnAPI.kind_of(learner)`](@ref) returns:
+
+- [`LearnAPI.Static()`](@ref)
+
+Examples appear below.
 
 
 ### Updating
 
 ```
-update(model, data; verbosity=..., :param1=new_value1, :param2=new_value2, ...) -> updated_model
-update_observations(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
-update_features(model, new_data; verbosity=..., :param1=new_value1, ...) -> updated_model
+update(model, data, :param1=>new_value1, :param2=>new_value2, ...; verbosity=...) -> updated_model
+update_observations(model, new_data, :param1=>new_value1, ...; verbosity=...) -> updated_model
+update_features(model, new_data, :param1=>new_value1, ...; verbosity=...) -> updated_model
 ```
 
-## Typical workflows
+[`LearnAPI.Static()`](@ref) learners cannot be updated. 
+
+
+## [Typical workflows](@id fit_workflows)
 
 ### Supervised models
 
@@ -37,9 +52,11 @@ ŷ = predict(model, Distribution(), Xnew)
 LearnAPI.feature_importances(model)
 
 # Add 50 iterations and predict again:
-model = update(model; n=150)
+model = update(model, n => 150)
 predict(model, Distribution(), X)
 ```
+
+In this case, `LearnAPI.kind_of(learner) == `[`LearnAPI.Descriminative()`](@ref).
 
 See also [Classification](@ref) and [Regression](@ref).
 
@@ -58,6 +75,9 @@ or, if implemented, using a single call:
 transform(learner, X) # `fit` implied
 ```
 
+In this case also, `LearnAPI.kind_of(learner) == `[`LearnAPI.Descriminative()`](@ref).
+
+
 ### [Static algorithms (no "learning")](@id static_algorithms)
 
 Suppose `learner` is some clustering algorithm that cannot be generalized to new data
@@ -74,6 +94,8 @@ labels = predict(learner, X)
 LearnAPI.extras(model)
 ```
 
+In this case `LearnAPI.kind_of(learner) == `[`LearnAPI.Static()`](@ref).
+
 See also [Static Algorithms](@ref)
 
 ### [Density estimation](@id density_estimation)
@@ -83,7 +105,7 @@ which consumes no data, returns the learned density:
 
 ```julia
 model = fit(learner, y) # no features
-predict(model)  # shortcut for  `predict(model, SingleDistribution())`, or similar
+predict(model)  # shortcut for  `predict(model, Distribution())`, or similar
 ```
 
 A one-liner will typically be implemented as well:
@@ -91,6 +113,8 @@ A one-liner will typically be implemented as well:
 ```julia
 predict(learner, y)
 ```
+
+In this case `LearnAPI.kind_of(learner) == `[`LearnAPI.Generative()`](@ref).
 
 See also [Density Estimation](@ref).
 
@@ -101,21 +125,21 @@ See also [Density Estimation](@ref).
 
 Exactly one of the following must be implemented:
 
-| method                                      | fallback |
-|:--------------------------------------------|:---------|
-| [`fit`](@ref)`(learner, data; verbosity=1)` | none     |
-| [`fit`](@ref)`(learner; verbosity=1)`       | none     |
+| method                                                                 | fallback |
+|:-----------------------------------------------------------------------|:---------|
+| [`fit`](@ref)`(learner, data; verbosity=LearnAPI.default_verbosity())` | none     |
+| [`fit`](@ref)`(learner; verbosity=LearnAPI.default_verbosity())`       | none     |
 
 ### Updating
 
-| method                                                                               | fallback | compulsory? |
-|:-------------------------------------------------------------------------------------|:---------|-------------|
-| [`update`](@ref)`(model, data; verbosity=1, hyperparameter_updates...)`              | none     | no          |
-| [`update_observations`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)` | none     | no          |
-| [`update_features`](@ref)`(model, new_data; verbosity=1, hyperparameter_updates...)`     | none     | no          |
+| method                                                                                     | fallback | compulsory? |
+|:-------------------------------------------------------------------------------------------|:---------|-------------|
+| [`update`](@ref)`(model, data, hyperparameter_updates...; verbosity=...)`                  | none     | no          |
+| [`update_observations`](@ref)`(model, new_data, hyperparameter_updates...; verbosity=...)` | none     | no          |
+| [`update_features`](@ref)`(model, new_data, hyperparameter_updates...; verbosity=...)`     | none     | no          |
 
-There are some contracts governing the behaviour of the update methods, as they relate to
-a previous `fit` call. Consult the document strings for details.
+There are contracts governing the behaviour of the update methods, as they relate to a
+previous `fit` call. Consult the document strings for details.
 
 ## Reference
 

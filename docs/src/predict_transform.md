@@ -1,12 +1,26 @@
 # [`predict`, `transform` and `inverse_transform`](@id operations)
 
 ```julia
-predict(model, kind_of_proxy, data)
+predict(model, [kind_of_proxy,] data)
 transform(model, data)
 inverse_transform(model, data)
 ```
 
-Versions without the `data` argument may apply, for example in [density
+The above signatures apply in the case that [`LearnAPI.kind_of(learner)`](@ref)
+returns one of:
+
+- [`LearnAPI.Descriminative()`](@ref)
+- [`LearnAPI.Static()`](@ref)
+
+
+```julia
+predict(model[, kind_of_proxy])
+transform(model)
+inverse_transform(model)
+```
+
+The above signatures apply in the case that [`LearnAPI.kind_of(learner)`](@ref)
+returns  [`LearnAPI.Generative()`](@ref), as in [density
 estimation](@ref density_estimation).
 
 ## [Typical worklows](@id predict_workflow)

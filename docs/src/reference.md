@@ -40,11 +40,11 @@ number of user-specified *hyperparameters*, such as the number of trees in a ran
 forest. Hyperparameters are understood in a rather broad sense. For example, one is
 allowed to have hyperparameters that are not data-generic.  For example, a class weight
 dictionary, which will only make sense for a target taking values in the set of specified
-dictionary keys, should be given as a hyperparameter. For simplicity and composability,
-LearnAPI.jl discourages "run time" parameters (extra arguments to `fit`) such as
-acceleration options (cpu/gpu/multithreading/multiprocessing). These should be included as
-hyperparameters as far as possible. An exception is the compulsory `verbosity` keyword
-argument of `fit`.
+dictionary keys, should be given as a hyperparameter. For simplicity and easier
+composability, LearnAPI.jl discourages "run time" parameters (extra arguments to `fit`)
+such as acceleration options (cpu/gpu/multithreading/multiprocessing). These should be
+included as hyperparameters as far as possible. An exception is the compulsory `verbosity`
+keyword argument of `fit`.
 
 
 ### [Targets and target proxies](@id proxy)
@@ -107,6 +107,16 @@ generally requires overloading `Base.==` for the struct.
 	deep copies of RNG hyperparameters before using them in an implementation of
 	[`fit`](@ref).
 
+
+#### Kinds of learner
+
+As previewed in [Anatomy of an Implementation](@ref), different
+`fit`/`predict`/`transform` patterns lead to a division of learners into three distinct
+kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative`](@ref), and
+[`LearnAPI.Static`](@ref), which is detailed [here](@ref kinds_of_learner). See also
+[these workflows](@ref fit_workflows) for concrete examples.
+
+
 #### Composite learners (wrappers)
 
 A *composite learner* is one with at least one property that can take other learners as
@@ -122,19 +132,19 @@ Below is an example of a learner type with a valid constructor:
 
 ```julia
 struct GradientRidgeRegressor{T<:Real}
-	learning_rate::T
-	epochs::Int
-	l2_regularization::T
+    learning_rate::T
+    epochs::Int
+    l2_regularization::T
 end
 
 """
-	GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
+    GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01)
 
 Instantiate a gradient ridge regressor with the specified hyperparameters.
 
 """
 GradientRidgeRegressor(; learning_rate=0.01, epochs=10, l2_regularization=0.01) =
-	GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
+    GradientRidgeRegressor(learning_rate, epochs, l2_regularization)
 LearnAPI.constructor(::GradientRidgeRegressor) = GradientRidgeRegressor
 ```
 
@@ -207,17 +217,18 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
 
 ## Utilities
 
-
 - [`LearnAPI.is_learner`](@ref)
 - [`clone`](@ref): for cloning a learner with specified hyperparameter replacements.
 - [`@trait`](@ref): for simultaneously declaring multiple traits
 - [`@functions`](@ref): for listing functions available for use with a learner 
+- [`LearnAPI.default_verbosity`](@ref): get/reset the default verbosity
 
 ```@docs
 LearnAPI.is_learner
 clone
 @trait
 @functions
+LearnAPI.default_verbosity
 ```
 
 ---
