@@ -32,7 +32,7 @@ struct RidgeFitted{T,F}
     named_coefficients::F
 end
 
-function LearnAPI.fit(learner::Ridge, data; verbosity=1)
+function LearnAPI.fit(learner::Ridge, data; verbosity=LearnAPI.default_verbosity())
     X, y = data
 
     # data preprocessing:
@@ -56,6 +56,10 @@ end
 
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     Tables.matrix(Xnew)*model.coefficients
+
+# data deconstructors:
+LearnAPI.target(learner::Ridge, (X, y)) = y
+LearnAPI.features(learner::Ridge, (X, y)) = X
 
 # accessor functions:
 LearnAPI.learner(model::RidgeFitted) = model.learner
@@ -125,7 +129,11 @@ function LearnAPI.obs(::Ridge, data)
 end
 LearnAPI.obs(::Ridge, observations::RidgeFitObs) = observations
 
-function LearnAPI.fit(learner::Ridge, observations::RidgeFitObs; verbosity=1)
+function LearnAPI.fit(
+    learner::Ridge,
+    observations::RidgeFitObs;
+    verbosity=LearnAPI.default_verbosity(),
+    )
 
     lambda = learner.lambda
 
@@ -159,7 +167,7 @@ LearnAPI.predict(model::RidgeFitted, ::Point, observations::AbstractMatrix) =
 LearnAPI.predict(model::RidgeFitted, ::Point, Xnew) =
     predict(model, Point(), obs(model, Xnew))
 
-# methods to deconstruct training data:
+# training data deconstructors:
 LearnAPI.features(::Ridge, observations::RidgeFitObs) = observations.A
 LearnAPI.target(::Ridge, observations::RidgeFitObs) = observations.y
 LearnAPI.features(learner::Ridge, data) = LearnAPI.features(learner, obs(learner, data))
@@ -222,7 +230,7 @@ frontend = FrontEnds.Saffron()
 LearnAPI.obs(learner::Ridge, data) = FrontEnds.fitobs(learner, data, frontend)
 LearnAPI.obs(model::RidgeFitted, data) = obs(model, data, frontend)
 
-function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=1)
+function LearnAPI.fit(learner::Ridge, observations::FrontEnds.Obs; verbosity=LearnAPI.default_verbosity())
 
     lambda = learner.lambda
 

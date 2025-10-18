@@ -46,7 +46,7 @@ DOC_DATA_INTERFACE(method) =
     case then an implementation must either: (i) overload [`obs`](@ref) to articulate how
     provided data can be transformed into a form that does support
     [`LearnAPI.RandomAccess`](@ref); or (ii) overload the trait
-    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API. Refer tbo
+    [`LearnAPI.data_interface`](@ref) to specify a more relaxed data API. Refer to the
     document strings for details.
 
     """

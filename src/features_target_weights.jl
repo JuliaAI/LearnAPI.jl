@@ -22,14 +22,16 @@ the LearnAPI.jl documentation.
 
 ## New implementations
 
-A fallback returns `last(data)`.  The method must be overloaded if [`fit`](@ref) consumes
-data that includes a target variable and this fallback fails to fulfill the contract stated
-above.
+The method should be overloaded if [`fit`](@ref) consumes data that includes a target
+variable (in the sense above). This will include both [`LearnAPI.Descriminative`](@ref)
+and [`LearnAPI.Generative`](@ref) learners, but never [`LearnAPI.Static`](@ref) learners.
+Implementation allows for certain meta-functionality, such as cross-validation in
+supervised learning, supervised anomaly detection, and density estimation.
 
 If `obs` is being overloaded, then typically it suffices to overload
 `LearnAPI.target(learner, observations)` where `observations = obs(learner, data)` and
 `data` is any documented supported `data` in calls of the form [`fit(learner,
-data)`](@ref), and to add a declaration of the form
+data)`](@ref), and to then add a declaration of the form
 
 ```julia
 LearnAPI.target(learner, data) = LearnAPI.target(learner, obs(learner, data))
@@ -39,10 +41,10 @@ to catch all other forms of supported input `data`.
 Remember to ensure the return value of `LearnAPI.target` implements the data
 interface specified by [`LearnAPI.data_interface(learner)`](@ref).
 
-$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.target)"; overloaded=true))
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.target)"; overloaded=false))
 
 """
-target(::Any, data) = last(data)
+function target end
 
 """
     LearnAPI.weights(learner, data) -> weights
@@ -50,9 +52,8 @@ target(::Any, data) = last(data)
 Return, for each form of `data` supported by the call [`fit(learner, data)`](@ref), the
 per-observation weights part of `data`.
 
-The returned object has the same number of observations
-as `data` has and is guaranteed to implement the data interface specified by
-[`LearnAPI.data_interface(learner)`](@ref).
+The returned object has the same number of observations as `data` has and is guaranteed to
+implement the data interface specified by [`LearnAPI.data_interface(learner)`](@ref).
 
 Where `nothing` is returned, weighting is understood to be uniform.
 
@@ -60,9 +61,9 @@ Where `nothing` is returned, weighting is understood to be uniform.
 
 # New implementations
 
-Overloading is optional. A fallback returns `nothing`.
+Implementing is optional.
 
-If `obs` is being overloaded, then typically it suffices to overload
+If `obs` is being implemented, then typically it suffices to overload
 `LearnAPI.weights(learner, observations)` where `observations = obs(learner, data)` and
 `data` is any documented supported `data` in calls of the form [`fit(learner,
 data)`](@ref), and to add a declaration of the form
@@ -75,10 +76,10 @@ to catch all other forms of supported input `data`.
 Ensure the returned object, unless `nothing`, implements the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
 
-$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=true))
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.weights)"; overloaded=false))
 
 """
-weights(::Any, data) = nothing
+function weights end
 
 """
     LearnAPI.features(learner, data)
@@ -86,8 +87,8 @@ weights(::Any, data) = nothing
 Return, for each form of `data` supported by the call [`fit(learner, data)`](@ref), the
 features part `X` of `data`.
 
-While "features" will typically have the commonly understood meaning, the only
-learner-generic guaranteed properties of `X` are:
+While "features" will typically have the commonly understood meaning ("covariates" or
+"prediuctors"), the only learner-generic guaranteed properties of `X` are:
 
 - `X` can be passed to [`predict`](@ref) or [`transform`](@ref) when these are supported
   by `learner`, as in the call `predict(model, X)`, where `model = fit(learner, data)`.
@@ -95,18 +96,13 @@ learner-generic guaranteed properties of `X` are:
 - `X` has the same number of observations as `data` has and is guaranteed to implement
   the data interface specified by [`LearnAPI.data_interface(learner)`](@ref).
 
-Where `nothing` is returned, `predict` and `transform` consume no data.
-
 # Extended help
 
 # New implementations
 
-A fallback returns `first(data)` if `data` is a tuple, and otherwise returns `data`. The
-method has no meaning for static learners (where `data` is not an argument of `fit`) and
-otherwise an implementation needs to overload this method if the fallback is inadequate.
-
-For density estimators, whose `fit` typically consumes *only* a target variable, you
-should overload this method to always return `nothing`.
+Implementation of this method allows for certain meta-functionality, such as
+cross-validation. It can only be implemented for [`LearnAPI.Descriminative`](@ref)
+learners.
 
 If `obs` is being overloaded, then typically it suffices to overload
 `LearnAPI.features(learner, observations)` where `observations = obs(learner, data)` and
@@ -118,15 +114,14 @@ LearnAPI.features(learner, data) = LearnAPI.features(learner, obs(learner, data)
 ```
 to catch all other forms of supported input `data`.
 
-Ensure the returned object, unless `nothing`, implements the data interface specified by
+Ensure the returned object, implements the data interface specified by
 [`LearnAPI.data_interface(learner)`](@ref).
 
 `:(LearnAPI.features)` must be included in the return value of
 [`LearnAPI.functions(learner)`](@ref), unless the learner is static (`fit` consumes no
 data).
 
+$(DOC_IMPLEMENTED_METHODS(":(LearnAPI.target)"; overloaded=false))
+
 """
-features(learner, data) = _first(data)
-_first(data) = data
-_first(data::Tuple) = first(data)
-# note the factoring above guards against method ambiguities
+function features end

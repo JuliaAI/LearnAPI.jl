@@ -9,8 +9,10 @@ This guide is intended to be consulted after reading [Anatomy of an Implementati
 which introduces the main interface objects and terminology.
 
 Although an implementation is defined purely by the methods and traits it implements, many
-implementations fall into one (or more) of the following informally understood patterns or
-tasks:
+implementations fall into one (or more) of the informally understood patterns or tasks
+below. While some generally fall into one of the core `Descriminative`, `Generative` or
+`Static` patterns detailed [here](@id kinds_of_learner), there are exceptions (such as
+clustering, which has both `Descriminative` and `Static` variations).
 
 - [Regression](@ref): Supervised learners for continuous targets
 

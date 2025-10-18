@@ -2,12 +2,12 @@ using Documenter
 using LearnAPI
 using ScientificTypesBase
 using DocumenterInterLinks
-using LearnTestAPI
+# using LearnTestAPI
 
 const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
 makedocs(
-    modules=[LearnAPI, LearnTestAPI],
+    modules=[LearnAPI, ], #LearnTestAPI],
     format=Documenter.HTML(
         prettyurls = true,#get(ENV, "CI", nothing) == "true",
         collapselevel = 1,
@@ -18,6 +18,7 @@ makedocs(
         "Reference" => [
             "Overview" => "reference.md",
             "Public Names" => "list_of_public_names.md",
+            "Kinds of learner" => "kinds_of_learner.md",
             "fit/update" => "fit_update.md",
             "predict/transform" => "predict_transform.md",
             "Kinds of Target Proxy" => "kinds_of_target_proxy.md",
