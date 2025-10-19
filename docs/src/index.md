@@ -27,8 +27,6 @@ functionality, such as external performance estimates, hyperparameter optimizati
 model composition, provided by ML/statistics toolboxes and other packages. LearnAPI.jl
 includes a number of Julia [traits](@ref traits) for promising specific behavior.
 
-LearnAPI.jl's has no package dependencies.
-
 
 ## Sample workflow
 
