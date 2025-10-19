@@ -390,32 +390,6 @@ tables, and tuples of these. See the doc-string for details.
 data_interface(::Any) = LearnAPI.RandomAccess()
 
 """
-    LearnAPI.is_static(learner)
-
-Returns `true` if [`fit`](@ref) is called with no data arguments, as in
-`fit(learner)`. That is, `learner` does not generalize to new data, and data is only
-provided at the `predict` or `transform` step.
-
-For example, some clustering algorithms are applied with this workflow, to assign labels
-to the observations in `X`:
-
-```julia
-model = fit(learner) # no training data
-labels = predict(model, X) # may mutate `model`!
-
-# extract some byproducts of the clustering algorithm (e.g., outliers):
-LearnAPI.extras(model)
-```
-
-# New implementations
-
-This trait, falling back to `false`, may only be overloaded when `fit` has no data
-arguments. See more at [`fit`](@ref).
-
-"""
-is_static(::Any) = false
-
-"""
     LearnAPI.iteration_parameter(learner)
 
 The name of the iteration parameter of `learner`, or `nothing` if the algorithm is not
