@@ -30,6 +30,17 @@ LearnTestAPI.@testapi
 LearnTestAPI.jl provides some simple, tested, LearnAPI.jl implementations, which may be
 useful for testing learner wrappers and meta-algorithms.
 
+- [`LearnTestAPI.Ridge`](@ref)
+- [`LearnTestAPI.BabyRidge`](@ref)
+- [`LearnTestAPI.ConstantClassifier`](@ref)
+- [`LearnTestAPI.TruncatedSVD`](@ref)
+- [`LearnTestAPI.Selector`](@ref)
+- [`LearnTestAPI.FancySelector`](@ref)
+- [`LearnTestAPI.NormalEstimator`](@ref)
+- [`LearnTestAPI.Ensemble`](@ref)
+- [`LearnTestAPI.StumpRegressor`](@ref)
+
+
 ```@docs
 LearnTestAPI.Ridge
 LearnTestAPI.BabyRidge

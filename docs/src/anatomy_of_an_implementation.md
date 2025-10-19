@@ -44,7 +44,7 @@ refer to the [demonstration](@ref workflow) of the implementation given later.
 	1. Implement `fit` (probably following an existing example). Read the [`fit`](@ref) document string to see what else may need to be implemented, paying particular attention to the "New implementations" section.
 	3. Rinse and repeat with each new method implemented.
 	4. Identify any additional [learner traits](@ref traits) that have appropriate overloadings; use the [`@trait`](@ref) macro to define these in one block.
-	5. Ensure your implementation includes the compulsory method [`LearnAPI.learner`](@ref) and compulsory traits [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref). Read and apply "[Testing your implementation](@ref)".
+	5. Ensure your implementation includes the compulsory method [`LearnAPI.learner`](@ref) and compulsory traits [`LearnAPI.constructor`](@ref) and [`LearnAPI.functions`](@ref). Read and apply "[Testing an Implementation](@ref)".
 
 	If you get stuck, refer back to this tutorial and the [Reference](@ref reference) sections.
 
