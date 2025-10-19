@@ -1,7 +1,5 @@
 # Testing an Implementation
 
-Testing is provided by the LearnTestAPI.jl package.
-
 Testing is provided by the LearnTestAPI.jl package documented below.
 
 ## Quick start

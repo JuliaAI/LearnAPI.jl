@@ -1,7 +1,7 @@
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
 name = "LearnAPI"
 uuid = "92ad9a40-7767-427a-9ee6-6e577f1266cb"
-version = "2.0.0"
+version = "2.0.1"
 
 [compat]
 Preferences = "1.5.0"

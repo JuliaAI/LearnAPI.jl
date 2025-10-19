@@ -31,7 +31,6 @@ In the examples column of the table below, `Continuous` is a name owned the pack
 | [`LearnAPI.data_interface`](@ref)`(learner)`             | Interface implemented by objects returned by [`obs`](@ref)                                                             | `Base.HasLength()` (supports `MLCore.getobs/numobs`) | `Base.SizeUnknown()` (supports `iterate`)                      |
 | [`LearnAPI.fit_scitype`](@ref)`(learner)`                | upper bound on `scitype(data)` ensuring `fit(learner, data)` works                                                     | `Union{}`                                            | `Tuple{AbstractVector{Continuous}, Continuous}`                |
 | [`LearnAPI.target_observation_scitype`](@ref)`(learner)` | upper bound on the scitype of each observation of the targget                                                          | `Any`                                                | `Continuous`                                                   |
-| [`LearnAPI.is_static`](@ref)`(learner)`                  | `true` if `fit` consumes no data                                                                                       | `false`                                              | `true`                                                         |
 
 ### Derived Traits
 
@@ -109,7 +108,6 @@ LearnAPI.data_interface
 LearnAPI.iteration_parameter
 LearnAPI.fit_scitype
 LearnAPI.target_observation_scitype
-LearnAPI.is_static
 ```
 
 ```@docs
