@@ -1,5 +1,6 @@
 using Documenter
 using LearnAPI
+using LearnTestAPI
 using ScientificTypesBase
 using DocumenterInterLinks
 # using LearnTestAPI
@@ -7,7 +8,7 @@ using DocumenterInterLinks
 const  REPO = Remotes.GitHub("JuliaAI", "LearnAPI.jl")
 
 makedocs(
-    modules=[LearnAPI, ], #LearnTestAPI],
+    modules=[LearnAPI, LearnTestAPI],
     format=Documenter.HTML(
         prettyurls = true,#get(ENV, "CI", nothing) == "true",
         collapselevel = 1,

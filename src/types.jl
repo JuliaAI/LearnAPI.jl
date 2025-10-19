@@ -146,7 +146,7 @@ following must hold:
 - The ``j``th observation of `ŷ`, for any ``j``, depends only on the ``j``th
   observation of the provided `data` (no correlation between observations).
 
-An exception holds in the case that [`LearnAPI.kind_of(learner)`](@ref)` ==
+An exception holds in the case that [`LearnAPI.kind_of(learner)`](@ref)` == `
 [`LearnAPI.Generative()`](@ref):
 
 - `LearnAPI.predict(model, kind_of_proxy)` consists of a single observation (such as a
