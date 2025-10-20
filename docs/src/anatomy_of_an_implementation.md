@@ -1,7 +1,7 @@
 # Anatomy of an Implementation
 
-This section is a tutorial for developers wanting to write implementations of the
-LearnAPI.jl interface for their machine learning / statistical algorithms.
+This section is a tutorial for developers wanting to implement the LearnAPI.jl interface
+for their machine learning / statistical algorithms.
 
 LearnAPI.jl supports three core patterns. The default pattern, known as the
 [`LearnAPI.Descriminative`](@ref) pattern, looks like this:
