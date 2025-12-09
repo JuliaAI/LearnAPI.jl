@@ -112,8 +112,8 @@ generally requires overloading `Base.==` for the struct.
 
 As previewed in [Anatomy of an Implementation](@ref), different
 `fit`/`predict`/`transform` patterns lead to a division of learners into three distinct
-kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative`](@ref), and
-[`LearnAPI.Static`](@ref), which is detailed [here](@ref kinds_of_learner). See also
+kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative()`](@ref), and
+[`LearnAPI.Static()`](@ref), which is detailed [here](@ref kinds_of_learner). See also
 [these workflows](@ref fit_workflows) for concrete examples.
 
 
