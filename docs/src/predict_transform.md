@@ -23,7 +23,7 @@ The above signatures apply in the case that [`LearnAPI.kind_of(learner)`](@ref)
 returns  [`LearnAPI.Generative()`](@ref), as in [density
 estimation](@ref density_estimation).
 
-## [Typical worklows](@id predict_workflow)
+## [Typical workflows](@id predict_workflow)
 
 Train some supervised `learner`:
 
