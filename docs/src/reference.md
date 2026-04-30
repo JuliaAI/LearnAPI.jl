@@ -192,7 +192,7 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
   proxies](@ref proxy) (such as probability density functions)
 
 - [`transform`](@ref operations): similar to `predict`, but for arbitrary kinds of output,
-  and which can be paired with an `inverse_transform` method
+  and which can be optionally paired with an `inverse_transform` method
 
 - [`inverse_transform`](@ref operations): for inverting the output of
   `transform` ("inverting" broadly understood)
