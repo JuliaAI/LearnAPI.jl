@@ -104,8 +104,10 @@ generally requires overloading `Base.==` for the struct.
 !!! important
 
 	No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
-	deep copies of RNG hyperparameters before using them in an implementation of
-	[`fit`](@ref).
+	copies of RNG hyperparameters before using them in an implementation of
+	[`fit`](@ref). (Do not make *deep* copies as this leads to wrong behavior in the case
+	of `Random.default_rng()`, which not an actual RNG but only a pointer to the task-local
+	default RNG.)
 
 
 #### Kinds of learner
