@@ -160,7 +160,7 @@ Return the `fit`/`predict`/`transform` signature pattern used by `learner`. See
 
 # New implementations
 
-The fallback value is [`LearnAPI.Descriminative()`].
+The fallback value is [`LearnAPI.Descriminative()`](@ref).
 
 """
 kind_of(learner) = Descriminative()

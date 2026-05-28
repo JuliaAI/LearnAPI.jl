@@ -55,4 +55,6 @@ See [here](@ref proxy_types).
 
 - [`@trait`](@ref): for simultaneously declaring multiple traits
 
-- [`@functions`](@ref): for listing functions available for use with a learner 
+- [`@functions`](@ref): for listing functions available for use with a learner
+
+- [`LearnAPI.default_verbosity`](@ref): setter/getter for the default verbosity level 

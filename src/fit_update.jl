@@ -141,8 +141,8 @@ model = fit(learner, data)
 model = update_observations(model, new_data, epochs => 12, learning_rate => 0.1)
 ```
 
-When following the call `fit(learner, data)`, the `update` call is semantically
-equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
+When following the call `fit(learner, data)`, the `update` call is semantically equivalent
+to retraining ab initio using an observation-wise concatenation of `data` and `new_data`,
 *provided there are no hyperparameter replacements* (which rules out the example
 above). Behaviour is otherwise learner-specific.
 
@@ -178,9 +178,9 @@ Return an updated version of the `model` object returned by a previous [`fit`](@
 `update` call given the new features encapsulated in `new_data`. One may additionally
 specify hyperparameter replacements in the form `:p1 => value1, :p2 => value2, ...`.
 
-When following the call `fit(learner, data)`, the `update` call is semantically
-equivalent to retraining ab initio using a concatenation of `data` and `new_data`,
-*provided there are no hyperparameter replacements.* Behaviour is otherwise
+When following the call `fit(learner, data)`, the `update_features` call is semantically
+equivalent to retraining ab initio using a feature-wise concatenation of `data` and
+`new_data`, *provided there are no hyperparameter replacements.* Behaviour is otherwise
 learner-specific.
 
 See also [`fit`](@ref), [`update`](@ref), [`update_features`](@ref).

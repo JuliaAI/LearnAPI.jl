@@ -104,16 +104,18 @@ generally requires overloading `Base.==` for the struct.
 !!! important
 
 	No LearnAPI.jl method is permitted to mutate a learner. In particular, one should make
-	deep copies of RNG hyperparameters before using them in an implementation of
-	[`fit`](@ref).
+	copies of RNG hyperparameters before using them in an implementation of
+	[`fit`](@ref). (Do not make *deep* copies as this leads to wrong behavior in the case
+	of `Random.default_rng()`, which not an actual RNG but only a pointer to the task-local
+	default RNG.)
 
 
 #### Kinds of learner
 
 As previewed in [Anatomy of an Implementation](@ref), different
 `fit`/`predict`/`transform` patterns lead to a division of learners into three distinct
-kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative`](@ref), and
-[`LearnAPI.Static`](@ref), which is detailed [here](@ref kinds_of_learner). See also
+kinds, [`LearnAPI.Descriminative()`](@ref), [`LearnAPI.Generative()`](@ref), and
+[`LearnAPI.Static()`](@ref), which is detailed [here](@ref kinds_of_learner). See also
 [these workflows](@ref fit_workflows) for concrete examples.
 
 
@@ -190,7 +192,7 @@ Most learners will also implement [`predict`](@ref) and/or [`transform`](@ref).
   proxies](@ref proxy) (such as probability density functions)
 
 - [`transform`](@ref operations): similar to `predict`, but for arbitrary kinds of output,
-  and which can be paired with an `inverse_transform` method
+  and which can be optionally paired with an `inverse_transform` method
 
 - [`inverse_transform`](@ref operations): for inverting the output of
   `transform` ("inverting" broadly understood)
