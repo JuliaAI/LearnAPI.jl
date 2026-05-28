@@ -7,10 +7,10 @@ end
 DOC_MUTATION(op) =
     """
 
-    If [`LearnAPI.is_static(learner)`](@ref) is `true`, then `$op` may mutate it's first
-    argument (to record byproducts of the computation not naturally part of the return
-    value) but not in a way that alters the result of a subsequent call to `predict`,
-    `transform` or `inverse_transform`. See more at [`fit`](@ref).
+    If [`LearnAPI.kind_of(learner)`](@ref) is `LearnAPI.Static()`(@ref), then `$op` may
+    mutate it's first argument (to record byproducts of the computation not naturally part
+    of the return value) but not in a way that alters the result of a subsequent call to
+    `predict`, `transform` or `inverse_transform`. See more at [`fit`](@ref).
 
     """
 
@@ -83,9 +83,9 @@ See also [`fit`](@ref), [`transform`](@ref), [`inverse_transform`](@ref).
 
 # Extended help
 
-In the special case `LearnAPI.is_static(learner) == true`, it is possible that
-`predict(model, ...)` will mutate `model`, but not in a way that affects subsequent
-`predict` calls.
+In the special case If [`LearnAPI.kind_of(learner)`](@ref) is `LearnAPI.Static()`(@ref),
+it is possible that `predict(model, ...)` will mutate `model`, but not in a way that
+affects subsequent `predict` calls.
 
 # New implementations
 
@@ -151,9 +151,9 @@ or, in one step (where supported):
 W = transform(learner, X) # `fit` implied
 ```
 
-In the special case `LearnAPI.is_static(learner) == true`, it is possible that
-`transform(model, ...)` will mutate `model`, but not in a way that affects subsequent
-`transform` calls.
+In the special case If [`LearnAPI.kind_of(learner)`](@ref) is `LearnAPI.Static()`(@ref),
+it is possible that `transform(model, ...)` will mutate `model`, but not in a way that
+affects subsequent `transform` calls.
 
 See also [`fit`](@ref), [`predict`](@ref),
 [`inverse_transform`](@ref).
