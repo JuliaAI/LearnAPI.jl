@@ -1,8 +1,9 @@
 # [Accessor Functions](@id accessor_functions)
 
-The sole argument of an accessor function is the output, `model`, of
-[`fit`](@ref). Learners are free to implement any number of these, or none of them. Only
-`LearnAPI.strip` has a fallback, namely the identity.
+The sole argument of an accessor function is the output, `model`, of [`fit`](@ref). The
+only accessor function that must be implemented for each new learner is
+[`LearnAPI.learner(model)`](@ref); [`LearnAPI.strip`](@ref) has a fallback, namely the
+identity.
 
 - [`LearnAPI.learner(model)`](@ref)
 - [`LearnAPI.extras(model)`](@ref)
