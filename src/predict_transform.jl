@@ -99,9 +99,7 @@ implementation must be added to the list returned by
 `LearnAPI.kinds_of_proxy()`.
 
 When `predict` is implemented, it may be necessary to overload
-[`LearnAPI.features`](@ref). If `data` is not present in the implemented signature (eg.,
-for density estimators) then [`LearnAPI.features(learner, data)`](@ref) must always return
-`nothing`.
+[`LearnAPI.features`](@ref).
 
 $(DOC_IMPLEMENTED_METHODS(":(LearnAPI.predict)"))
 
