@@ -1,3 +1,4 @@
+[files]
 extend-exclude = ["*.svg"]
 
 [default.extend-words]
