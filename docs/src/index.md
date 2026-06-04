@@ -70,25 +70,41 @@ appear as an input to training but not to prediction.
 
 ## Data interfaces and front ends
 
-Algorithms are free to consume data in any format. However, a method called [`obs`](@ref
-data_interface) (read as "observations") gives developers the option of providing a
-separate data front end for their algorithms. In this case `obs` gives users and
-meta-algorithms access to an algorithm-specific representation of input data, which is
-additionally guaranteed to implement a standard interface for accessing individual
-observations, unless the algorithm explicitly opts out. Moreover, the `fit` and `predict`
-methods can directly consume these alternative data representations, for performance
-benefits in some situations, such as cross-validation.
+Algorithms are free to consume data in any format. However, this means LearnAPI.jl should
+provide meta-algorithms, such as cross-validation, some means of subsampling observations,
+without repeating unnecessarily internal conversions of input data into the form needed by
+core algorithms. LearnAPI.jl's solution to this problem is to provide a method called
+[`obs(learner, data)`](@ref data_interface) (read as "observations") which exposes to the
+user, and whence third party meta-algorithms, a learner-specific, "internal"
+representation of the "external" `data` ordinarily supplied to `fit` (or `predict`) by the
+user. For example, `data` might be a table with mixed column types, but `obs(learner,
+data)` consists only of numerical arrays. Unless the implementation opts out, such a
+representation is additionally guaranteed to implement a standard interface for accessing
+individual observations, the [MLCore.jl](https://github.com/JuliaML/MLCore.jl)
+`getobs/numobs` API (previously provided by MLUtils.jl) which is here tagged as
+[`LearnAPI.RandomAccess()`](@ref). These can then be subsampled, without caring about the
+details of the representation, as in cross-validation. Moreover, such "observations"
+(sampled or not) can be passed on to `fit` and `predict`, instead of the original external
+form of `data`. In other words, `obs` factors out of `fit` the internal preprocessing of
+user-supplied data, but in a way that ensures the intercepted, internal form of data
+implements a standard subsampling API.
 
-The fallback data interface is the [MLCore.jl](https://github.com/JuliaML/MLCore.jl)
-`getobs/numobs` interface (previously provided by MLUtils.jl) here tagged as
-[`LearnAPI.RandomAccess()`](@ref). However, if the input consumed by the algorithm already
-implements that interface (tables, arrays, etc.)  then overloading `obs` is completely
-optional. Plain iteration interfaces, with or without knowledge of the number of
-observations, can also be specified, to support, e.g., data loaders reading images from
-disk.
+![](img/obs.svg)
 
-Some canned data front ends (implementations of [`obs`](@ref)) are provided by the
-[LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/) package.
+> Two pathways to generating a model, with and without subsampling. Here `obs` is provided
+> by an LearnAPI.jl learner implementation, while `getobs` is a MLCore.jl method for
+> subsampling.
+
+If the input consumed by the algorithm already implements the
+[`LearnAPI.RandomAccess()`](@ref) interface (tables, arrays, etc.)  then overloading `obs`
+is completely optional, as LearnAPI.jl provides a no-operation fallback. Plain iteration
+interfaces, with or without knowledge of the number of observations, can also be
+specified, to support, e.g., data loaders reading images from disk.
+
+In the typical case, a new implementation can avoid actually coding data preprocessing by
+using a canned data front end (implementations of [`obs`](@ref)). These are provided by
+the [LearnDataFrontEnds.jl](https://juliaai.github.io/LearnDataFrontEnds.jl/stable/)
+package.
 
 ## Learning more
 
